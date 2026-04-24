@@ -47,25 +47,25 @@ const Landing = () => {
                     {t('heroDesc')}
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 sm:gap-6 px-4 sm:px-0 w-full max-w-sm sm:max-w-none mx-auto">
                     {userRole !== 'owner' ? (
                         <>
-                            <Link to="/discovery" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-dark text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-gray-800 transition-all shadow-2xl shadow-dark/20 active:scale-95 group">
+                            <Link to="/discovery" className="flex items-center justify-center gap-3 bg-gradient-to-r from-dark to-gray-800 text-white px-8 py-4 sm:px-10 sm:py-5 rounded-[1.5rem] font-black text-lg sm:text-xl hover:from-primary hover:to-emerald-600 transition-all duration-300 shadow-xl shadow-dark/20 active:scale-95 group border border-gray-700 hover:border-emerald-500/50">
                                 {t('getStarted')}
-                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight size={22} className="group-hover:translate-x-2 transition-transform" />
                             </Link>
-                            <Link to="/my-bookings" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-dark border-2 border-gray-100 px-10 py-5 rounded-2xl font-black text-lg hover:border-dark transition-all active:scale-95 group">
+                            <Link to="/my-bookings" className="flex items-center justify-center gap-3 bg-white/80 backdrop-blur-md text-dark border border-gray-200/80 px-8 py-4 sm:px-10 sm:py-5 rounded-[1.5rem] font-black text-lg sm:text-xl hover:bg-white hover:border-gray-300 hover:shadow-xl hover:shadow-black/5 transition-all duration-300 active:scale-95 group">
                                 {t('myBookings')}
-                                <CalendarCheck size={20} className="group-hover:scale-110 transition-transform text-primary" />
+                                <CalendarCheck size={22} className="group-hover:scale-110 group-hover:-rotate-6 transition-transform text-primary" />
                             </Link>
                         </>
                     ) : (
                         <button
                             onClick={handleOwnerStart}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-dark text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-gray-800 transition-all shadow-2xl shadow-dark/10 active:scale-95"
+                            className="flex items-center justify-center gap-3 bg-gradient-to-r from-dark to-gray-800 text-white px-8 py-4 sm:px-10 sm:py-5 rounded-[1.5rem] font-black text-lg sm:text-xl hover:from-secondary hover:to-sky-500 transition-all duration-300 shadow-xl shadow-dark/20 active:scale-95 group border border-gray-700 hover:border-sky-400/50 w-full sm:w-auto"
                         >
                             {t('ownerPanel')}
-                            <ArrowRight size={20} />
+                            <ArrowRight size={22} className="group-hover:translate-x-2 transition-transform" />
                         </button>
                     )}
                 </div>
@@ -105,18 +105,21 @@ const Landing = () => {
 
 const StepCard = ({ icon, title, desc, delay }) => (
     <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay }}
-        whileHover={{ y: -10 }}
-        className="bg-white/80 backdrop-blur-sm p-10 rounded-[2.5rem] border border-white/60 flex flex-col items-center text-center shadow-[0_8px_32px_rgba(34,211,238,0.05)] hover:shadow-[0_20px_60px_rgba(34,211,238,0.12)] transition-all group"
+        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5, delay, type: "spring", bounce: 0.4 }}
+        whileHover={{ y: -5, scale: 1.02 }}
+        className="bg-white/70 backdrop-blur-xl p-8 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-white flex flex-col items-center sm:items-start text-center sm:text-left shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(16,185,129,0.15)] transition-all duration-300 group overflow-hidden relative"
     >
-        <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+        {/* Glow effect */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-[40px] -mr-10 -mt-10 pointer-events-none transition-all duration-500 group-hover:bg-primary/20 group-hover:scale-150" />
+
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-gray-50 to-white group-hover:from-white group-hover:to-primary/5 rounded-[1.5rem] flex items-center justify-center mb-6 sm:mb-8 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-sm border border-gray-100 group-hover:border-primary/20 relative z-10">
             {icon}
         </div>
-        <h3 className="text-2xl font-black mb-4 text-dark">{title}</h3>
-        <p className="text-gray-500 font-medium leading-relaxed">{desc}</p>
+        <h3 className="text-xl sm:text-2xl font-black mb-3 text-dark tracking-tight relative z-10">{title}</h3>
+        <p className="text-gray-500 font-medium leading-relaxed text-sm sm:text-base relative z-10">{desc}</p>
     </motion.div>
 );
 
