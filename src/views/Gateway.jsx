@@ -37,31 +37,10 @@ const Gateway = () => {
     );
 
     return (
-        <div className="-mt-8 min-h-screen w-full flex flex-col items-center py-20 relative overflow-hidden bg-gradient-to-br from-[#E0F7FA]/50 to-white rounded-3xl" style={{ margin: '-2rem -1rem 0 -1rem' }}>
-            {/* Background elements */}
-            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                {[...Array(15)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute bg-cyan-400/10 rounded-full blur-3xl"
-                        style={{
-                            width: Math.random() * 300 + 100,
-                            height: Math.random() * 300 + 100,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
-                        animate={{
-                            x: [0, 50, 0],
-                            y: [0, 30, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{
-                            duration: Math.random() * 10 + 10,
-                            repeat: Infinity,
-                        }}
-                    />
-                ))}
-            </div>
+        <div className="-mt-8 min-h-screen w-full flex flex-col items-center py-20 relative overflow-hidden antigravity-bg" style={{ margin: '-2rem -1rem 0 -1rem' }}>
+            {/* Deep Ambient effects */}
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] bg-primary/10 rounded-full blur-[100px] sm:blur-[150px] pointer-events-none mix-blend-multiply"></div>
+            <div className="absolute top-1/4 left-0 w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] bg-secondary/10 rounded-full blur-[100px] sm:blur-[150px] pointer-events-none mix-blend-multiply"></div>
 
             <div className="z-10 w-full max-w-6xl px-6 flex flex-col items-center">
                 <motion.div
@@ -69,22 +48,30 @@ const Gateway = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-16"
                 >
-                    <h1 className="text-5xl sm:text-6xl font-black text-dark mb-6 tracking-tight">
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="inline-block bg-white/60 text-primary px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-white shadow-lg backdrop-blur-md"
+                    >
+                        Explore Salons
+                    </motion.div>
+
+                    <h1 className="text-5xl sm:text-7xl font-black text-dark mb-6 tracking-tight leading-tight">
                         {t('discoverServices').split(t('discoverHighlight'))[0]}
-                        <span className="text-primary">{t('discoverHighlight')}</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-emerald-400 to-secondary">{t('discoverHighlight')}</span>
                         {t('discoverServices').split(t('discoverHighlight'))[1]}
                     </h1>
-                    <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto">
+                    <p className="text-xl text-gray-400 font-bold max-w-2xl mx-auto">
                         {t('discoverDesc')}
                     </p>
                 </motion.div>
 
-                {/* Search Bar */}
+                {/* Modern Search Bar */}
                 <div className="w-full max-w-2xl mb-16 relative group">
-                    <div className="absolute inset-0 bg-primary/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative glass rounded-[2.5rem] p-2 flex items-center bg-white shadow-2xl shadow-primary/5">
-                        <div className="p-4 text-primary">
-                            <Search size={28} />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[2.5rem] blur opacity-25 group-focus-within:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="relative glass rounded-[2.5rem] p-2 flex items-center bg-white/60 border border-white shadow-2xl backdrop-blur-xl transition-all duration-300 group-focus-within:shadow-primary/10">
+                        <div className="p-4 text-primary bg-primary/5 rounded-full mr-2">
+                            <Search size={24} />
                         </div>
                         <input
                             type="text"
@@ -103,21 +90,20 @@ const Gateway = () => {
                             <motion.div
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"
+                                className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full mx-auto mb-6"
                             />
-                            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">{t('loading')}</p>
+                            <p className="text-gray-400 font-black uppercase tracking-[0.2em] text-xs">{t('loading')}</p>
                         </div>
                     ) : filteredShops.length > 0 ? (
                         filteredShops.map((shop, idx) => (
                             <motion.div
                                 key={shop.id || shop.ownerId}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: idx * 0.1 }}
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ delay: idx * 0.1, duration: 0.5 }}
                                 whileHover={{ y: -10 }}
-                                className="glass p-8 rounded-[3rem] border border-white/60 bg-white shadow-xl hover:shadow-2xl hover:shadow-primary/5 transition-all group cursor-pointer"
+                                className="relative group p-[2px] rounded-[3rem] overflow-hidden shadow-xl shadow-black/5 cursor-pointer"
                                 onClick={() => {
-                                    // Parse services correctly (handle JSON strings in array)
                                     const parsedServices = (shop.services || []).map(s => {
                                         if (typeof s === 'string' && s.startsWith('{')) {
                                             try { return JSON.parse(s); } catch (e) { return s; }
@@ -128,32 +114,45 @@ const Gateway = () => {
                                     navigate('/booking');
                                 }}
                             >
-                                <div className="w-16 h-16 bg-black border border-gray-800 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:shadow-lg transition-all overflow-hidden p-1">
-                                    <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                                </div>
-                                <h3 className="text-2xl font-black text-dark mb-2 tracking-tight">{shop.name}</h3>
-                                <div className="flex items-center gap-3 text-gray-400 font-bold mb-6">
-                                    <MapPin size={18} />
-                                    <span>{t('locationDefault')}</span>
-                                </div>
-                                <div className="flex items-center justify-between pt-6 border-t border-gray-50">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">{t('workingHours')}</span>
-                                        <span className="font-bold text-dark">{shop.workingHours?.start || '09:00'} - {shop.workingHours?.end || '18:00'}</span>
+                                {/* Animated border gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-sky-400/40 to-secondary/40 opacity-20 group-hover:opacity-100 transition-opacity duration-500" />
+
+                                {/* Inner Card Content */}
+                                <div className="relative bg-white/95 backdrop-blur-2xl p-8 rounded-[3rem] border border-white/60 h-full flex flex-col z-10">
+                                    <div className="bg-black p-4 rounded-[1.5rem] shadow-2xl shadow-black/40 mb-6 group-hover:rotate-12 transition-transform w-[5rem] h-[5rem] flex items-center justify-center overflow-hidden border border-gray-800 relative">
+                                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain transform scale-110" />
                                     </div>
-                                    <div className="bg-dark text-white px-6 py-3 rounded-2xl font-black text-sm group-hover:bg-primary transition-colors">
-                                        {t('bookNow')}
+
+                                    <h3 className="text-2xl font-black text-dark mb-2 tracking-tight group-hover:text-primary transition-colors">{shop.name}</h3>
+
+                                    <div className="flex items-center gap-2 text-gray-400 font-bold text-sm mb-8">
+                                        <div className="p-1.5 bg-gray-50 rounded-lg group-hover:bg-primary/5 transition-colors">
+                                            <MapPin size={16} className="group-hover:text-primary transition-colors" />
+                                        </div>
+                                        <span>{t('locationDefault')}</span>
+                                    </div>
+
+                                    <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] uppercase font-black tracking-widest text-gray-400 mb-1 opacity-60">{t('workingHours')}</span>
+                                            <span className="font-bold text-dark text-sm">{shop.workingHours?.start || '09:00'} - {shop.workingHours?.end || '18:00'}</span>
+                                        </div>
+                                        <div className="relative overflow-hidden group/btn bg-dark text-white px-7 py-3.5 rounded-2xl font-black text-sm hover:shadow-xl hover:shadow-primary/20 hover:bg-black transition-all">
+                                            <div className="absolute inset-0 bg-white/10 -skew-x-12 -translate-x-full group-hover/btn:animate-shine" />
+                                            {t('bookNow')}
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
                         ))
                     ) : (
                         <div className="col-span-full py-20 text-center">
-                            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-200">
-                                <Search size={48} />
+                            <div className="w-24 h-24 bg-white/50 backdrop-blur-xl border border-white rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-primary shadow-xl">
+                                <Search size={40} />
                             </div>
-                            <h3 className="text-2xl font-black text-gray-400">{t('noBusinessesFound')}</h3>
-                            <p className="text-gray-400 mt-2 font-medium italic">{t('searchHint')}</p>
+                            <h3 className="text-3xl font-black text-dark mb-4">{t('noBusinessesFound')}</h3>
+                            <p className="text-gray-400 font-bold italic tracking-wide max-w-sm mx-auto">{t('searchHint')}</p>
                         </div>
                     )}
                 </div>
