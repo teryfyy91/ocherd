@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       manifest: {
-        name: 'Barber Shop',
-        short_name: 'Barber',
+        name: 'QueueFlow',
+        short_name: 'QueueFlow',
         description: 'Premium Barber Shop Web Application',
         theme_color: '#000000',
         background_color: '#ffffff',
