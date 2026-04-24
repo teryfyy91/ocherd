@@ -42,10 +42,10 @@ const Navbar = () => {
             <nav className="sticky top-0 z-50 px-4 py-4 pointer-events-none">
                 <div className="max-w-7xl mx-auto glass rounded-[2rem] px-8 py-4 flex justify-between items-center bg-white/60 pointer-events-auto">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="bg-primary p-2.5 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
-                            <Scissors size={24} className="text-white" />
+                        <div className="bg-white p-1 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-black/5 w-11 h-11 flex items-center justify-center overflow-hidden">
+                            <img src="/logo.png" alt="Barber Logo" className="w-full h-full object-contain transform scale-110" />
                         </div>
-                        <span className="text-2xl font-black text-dark tracking-tighter">QueueFlow</span>
+                        <span className="text-2xl font-black text-dark tracking-tighter">Barber Shop</span>
                     </Link>
 
                     <div className="flex items-center gap-6">

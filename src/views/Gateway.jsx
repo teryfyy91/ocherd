@@ -128,8 +128,8 @@ const Gateway = () => {
                                     navigate('/booking');
                                 }}
                             >
-                                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-                                    <Scissors size={32} />
+                                <div className="w-16 h-16 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:shadow-lg transition-all overflow-hidden p-1">
+                                    <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                                 </div>
                                 <h3 className="text-2xl font-black text-dark mb-2 tracking-tight">{shop.name}</h3>
                                 <div className="flex items-center gap-3 text-gray-400 font-bold mb-6">

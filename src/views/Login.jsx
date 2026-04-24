@@ -95,8 +95,8 @@ const Login = ({ onLogin }) => {
                 className="glass p-10 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-white/60 max-w-md w-full relative z-10"
             >
                 <div className="flex flex-col items-center mb-10">
-                    <div className="bg-primary p-3.5 rounded-2xl text-white shadow-2xl shadow-primary/30 mb-6 group hover:rotate-12 transition-transform">
-                        <Scissors size={28} />
+                    <div className="bg-white p-2 rounded-2xl shadow-2xl shadow-black/10 mb-6 group hover:rotate-12 transition-transform w-20 h-20 flex items-center justify-center overflow-hidden border border-gray-100">
+                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain transform scale-110" />
                     </div>
                     <h2 className="text-3xl font-black text-dark tracking-tight">
                         {role ? (isLoginMode ? t('signIn') : t('signUp')) : "Kim sifatida kirasiz?"}
