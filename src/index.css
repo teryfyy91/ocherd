@@ -4,14 +4,15 @@
 @theme {
   --color-primary: #00C897;
   --color-primary-dark: #00A67E;
-  --color-secondary: #1A1F2B;
-  --color-bg: #0B0F14;
-  --color-text-main: #FFFFFF;
-  --color-text-muted: #94A3B8;
+  --color-secondary: var(--secondary);
+  --color-bg: var(--bg);
+  --color-text-main: var(--text);
+  --color-text-muted: var(--text-muted);
   --color-accent-gradient: linear-gradient(135deg, #00C897 0%, #00DAC2 100%);
   --radius-xl: 20px;
   --radius-2xl: 24px;
 }
+
 
 :root {
   --primary: #00C897;
@@ -23,6 +24,31 @@
   --dark-gradient: linear-gradient(180deg, #0B0F14 0%, #111827 100%);
   --emerald-glow: 0 0 20px rgba(0, 200, 151, 0.3);
 }
+
+.light {
+  --bg: #F8FAFC;
+  --secondary: #FFFFFF;
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --dark-gradient: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+}
+
+.light .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+.light .glass-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .glass-card:hover {
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
 
 * {
   margin: 0;

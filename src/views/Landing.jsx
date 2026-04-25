@@ -35,7 +35,7 @@ const Landing = () => {
                         <div className="h-0.5 w-8 bg-primary rounded-full" />
                         <span className="text-secondary-foreground text-xs font-bold uppercase tracking-widest text-primary">Premium Service</span>
                     </motion.div>
-                    <h1 className="text-4xl font-black text-white leading-tight mb-4 tracking-tight">
+                    <h1 className="text-4xl font-black text-text-main leading-tight mb-4 tracking-tight">
                         Navbatingizni <br />
                         <span className="text-primary italic">soniyalarda</span> band qiling
                     </h1>
@@ -70,7 +70,7 @@ const Landing = () => {
 
             {/* Features / Steps Section */}
             <div className="flex flex-col gap-6">
-                <h2 className="text-2xl font-black text-white px-1 tracking-tight">Qanday ishlaydi?</h2>
+                <h2 className="text-2xl font-black text-text-main px-1 tracking-tight">Qanday ishlaydi?</h2>
                 <div className="flex flex-col gap-4">
                     <StepCard
                         number="01"
@@ -103,7 +103,7 @@ const Landing = () => {
                 <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-2">
                     <Scissors size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-white">Mening salonim bor</h3>
+                <h3 className="text-xl font-bold text-text-main">Mening salonim bor</h3>
                 <p className="text-text-muted text-sm font-medium">Navbatlarni boshqaring va mijozlar oqimini oshiring</p>
                 <button
                     onClick={() => { setShopInfo({}); navigate('/dashboard'); }}
@@ -127,7 +127,7 @@ const GlassActionCard = ({ icon, label, onClick, delay }) => (
         <div className="w-12 h-12 glass rounded-2xl flex items-center justify-center shadow-lg">
             {icon}
         </div>
-        <span className="font-bold text-white text-sm leading-tight">{label}</span>
+        <span className="font-bold text-text-main text-sm leading-tight">{label}</span>
     </motion.button>
 );
 
@@ -141,7 +141,7 @@ const StepCard = ({ number, title, desc, delay }) => (
     >
         <div className="text-2xl font-black text-primary/20 group-hover:text-primary transition-colors duration-500">{number}</div>
         <div className="flex flex-col gap-1">
-            <h4 className="text-lg font-bold text-white">{title}</h4>
+            <h4 className="text-lg font-bold text-text-main">{title}</h4>
             <p className="text-text-muted text-xs font-medium leading-relaxed">{desc}</p>
         </div>
     </motion.div>

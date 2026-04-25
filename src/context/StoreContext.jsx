@@ -13,6 +13,21 @@ export const StoreProvider = ({ children }) => {
     // Local storage keys
     const shopKey = userRole === 'owner' ? `shopInfo_${ownerId}` : 'shopInfo_global';
 
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+
+    useEffect(() => {
+        localStorage.setItem('theme', theme);
+        if (theme === 'light') {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    };
+
     // Dynamic queue key based on active shop
     const getQueueKey = () => {
         if (userRole !== 'owner') return 'queue_global';
@@ -472,7 +487,9 @@ export const StoreProvider = ({ children }) => {
             myShops,
             loadingShops: loading,
             refreshShops: fetchShops,
-            refreshMyBookings: fetchMyBookings
+            refreshMyBookings: fetchMyBookings,
+            theme,
+            toggleTheme
         }}>
 
 

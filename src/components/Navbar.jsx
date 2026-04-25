@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Scissors, LogOut } from 'lucide-react';
+import { Scissors, LogOut, Sun, Moon, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../context/StoreContext';
@@ -11,7 +11,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [showConfirm, setShowConfirm] = useState(false);
     const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
-    const { myShops, setShopInfo, signOut } = useStore();
+    const { myShops, setShopInfo, signOut, theme, toggleTheme, currentUser } = useStore();
     const userRole = localStorage.getItem('userRole');
 
     const handleSignOut = () => {
@@ -43,7 +43,7 @@ const Navbar = () => {
                         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
                             <Scissors size={18} className="text-bg" />
                         </div>
-                        <span className="text-xl font-black tracking-widest text-white">OCHERD</span>
+                        <span className="text-xl font-black tracking-widest text-text-main">OCHERD</span>
                     </Link>
 
                     <div className="flex items-center gap-2">
@@ -67,12 +67,31 @@ const Navbar = () => {
             </nav>
 
             {/* Top Bar for Desktop/Mobile Status */}
-            <div className="fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-40 bg-gradient-to-b from-bg to-transparent pointer-events-none">
-                <div className="flex items-center gap-2 pointer-events-auto">
-                    <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain opacity-80" />
+            <div className="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 z-40 bg-gradient-to-b from-bg to-transparent pointer-events-none">
+                <div className="flex items-center gap-2 pointer-events-auto cursor-pointer group" onClick={() => navigate('/')}>
+                    <img src="/logo.png" alt="Logo" className="w-14 h-14 object-contain group-hover:scale-110 transition-all duration-300 drop-shadow-[0_0_15px_rgba(0,200,151,0.3)]" />
                 </div>
-                <div className="w-10 h-10 rounded-full glass border border-white/10 flex items-center justify-center overflow-hidden pointer-events-auto cursor-pointer">
-                    <img src="/barber_1.png" alt="Profile" className="w-full h-full object-cover" />
+
+                <div className="flex items-center gap-3 pointer-events-auto">
+                    <button
+                        onClick={toggleTheme}
+                        className="w-11 h-11 rounded-2xl glass flex items-center justify-center text-text hover:text-primary transition-all active:scale-90 border border-white/5"
+                    >
+                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/my-bookings')}
+                        className="glass-card p-1 pr-4 flex items-center gap-3 hover:border-primary/30 transition-all group"
+                    >
+                        <div className="w-9 h-9 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors">
+                            <img src="/barber_1.png" alt="Profile" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        </div>
+                        <div className="flex flex-col items-start">
+                            <span className="text-[10px] text-text-muted font-black uppercase tracking-[0.1em] leading-none mb-0.5">Kabinet</span>
+                            <span className="text-xs font-black text-text group-hover:text-primary transition-colors">PROFIL</span>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -106,7 +125,7 @@ const Navbar = () => {
                                 <LogOut size={40} />
                             </div>
 
-                            <h2 className="text-3xl font-black text-dark mb-3 tracking-tight">
+                            <h2 className="text-3xl font-black text-text-main mb-3 tracking-tight">
                                 {t('confirmSignOut')}
                             </h2>
                             <p className="text-gray-500 font-bold mb-10 text-xs uppercase tracking-[0.2em] leading-relaxed opacity-60">
