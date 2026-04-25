@@ -4,13 +4,20 @@ import Navbar from './Navbar';
 
 const Layout = () => {
     return (
-        <div className="min-h-screen flex flex-col bg-light">
+        <div className="min-h-screen bg-bg text-text selection:bg-primary selection:text-bg">
             <Navbar />
-            <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Outlet />
+            <main className="w-full max-w-md mx-auto min-h-[calc(100vh-64px)] relative overflow-hidden">
+                {/* Background decorative glow */}
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+                <div className="relative px-5 py-6">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );
 };
+
 
 export default Layout;

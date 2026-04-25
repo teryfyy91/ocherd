@@ -1,14 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { Globe } from 'lucide-react';
 
 const LanguageSelect = ({ onSelect }) => {
     const { t, i18n } = useTranslation();
 
     const languages = [
-        { code: 'en', label: 'English', flag: '🇺🇸' },
+        { code: 'uz', label: 'Oʻzbekcha', flag: '🇺🇿' },
         { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-        { code: 'uz', label: 'Oʻzbekcha', flag: '🇺🇿' }
+        { code: 'en', label: 'English', flag: '🇺🇸' }
     ];
 
     const handleSelect = (code) => {
@@ -18,32 +19,39 @@ const LanguageSelect = ({ onSelect }) => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center antigravity-bg px-4 relative overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
-
+        <div className="flex flex-col items-center justify-center min-h-[85vh] px-4 w-full max-w-sm mx-auto">
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="glass p-12 rounded-[3rem] max-w-md w-full text-center relative z-10"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full flex flex-col gap-10"
             >
-                <div className="w-20 h-20 bg-primary/10 rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
-                    <span className="text-3xl">🌍</span>
+                <div className="text-center flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 glass rounded-[2.5rem] flex items-center justify-center text-primary shadow-glow">
+                        <Globe size={40} />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <h2 className="text-3xl font-black text-white tracking-tight uppercase">Tilni tanlang</h2>
+                        <p className="text-text-muted font-bold tracking-widest text-[10px] uppercase">Select Language • Выберите язык</p>
+                    </div>
                 </div>
-
-                <h2 className="text-3xl font-black text-dark mb-10 tracking-tight">{t('selectLanguage')}</h2>
 
                 <div className="flex flex-col gap-4">
                     {languages.map((lang) => (
-                        <button
+                        <motion.button
                             key={lang.code}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => handleSelect(lang.code)}
-                            className="flex items-center gap-5 w-full bg-white/50 border border-white/60 p-5 rounded-2xl hover:border-primary hover:bg-white hover:shadow-2xl hover:shadow-primary/10 transition-all group active:scale-[0.98]"
+                            className="glass-card p-6 flex items-center justify-between bg-white/5 border-white/5 hover:border-primary/40 hover:bg-white/10 transition-all group"
                         >
-                            <span className="text-3xl filter drop-shadow-md group-hover:scale-110 transition-transform">{lang.flag}</span>
-                            <span className="text-xl font-extrabold text-gray-700 group-hover:text-primary">{lang.label}</span>
-                        </button>
+                            <div className="flex items-center gap-5">
+                                <span className="text-3xl filter saturate-50 group-hover:saturate-100 transition-all">{lang.flag}</span>
+                                <span className="text-xl font-black text-white group-hover:text-primary transition-colors">{lang.label}</span>
+                            </div>
+                            <div className="w-8 h-8 rounded-full border-2 border-white/10 flex items-center justify-center group-hover:border-primary group-hover:bg-primary/10 transition-all">
+                                <div className="w-2 h-2 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                        </motion.button>
                     ))}
                 </div>
             </motion.div>

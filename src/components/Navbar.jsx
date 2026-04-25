@@ -11,14 +11,11 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [showConfirm, setShowConfirm] = useState(false);
     const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
-    const { myShops, setShopInfo } = useStore();
+    const { myShops, setShopInfo, signOut } = useStore();
     const userRole = localStorage.getItem('userRole');
 
     const handleSignOut = () => {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('hasSelectedLang');
-        localStorage.removeItem('userRole');
-        window.location.href = '/';
+        signOut();
     };
 
     const handleShopSelect = (shop) => {
@@ -39,113 +36,46 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="sticky top-0 z-50 px-4 py-4 pointer-events-none">
-                <div className="max-w-7xl mx-auto glass rounded-[2rem] px-8 py-4 flex justify-between items-center bg-white/60 pointer-events-auto">
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <div className="bg-black p-1 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-black/5 w-11 h-11 flex items-center justify-center overflow-hidden">
-                            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain transform scale-110" />
+            <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md pointer-events-auto">
+
+                <div className="glass rounded-3xl p-3 flex justify-between items-center shadow-2xl">
+                    <Link to="/" className="flex items-center gap-3 px-4">
+                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                            <Scissors size={18} className="text-bg" />
                         </div>
-                        <span className="text-2xl font-black text-dark tracking-tighter">QueueFlow</span>
+                        <span className="text-xl font-black tracking-widest text-white">OCHERD</span>
                     </Link>
 
-                    <div className="flex items-center gap-6">
-                        <InstallPWA />
-                        {userRole !== 'owner' && (
-                            <>
-                                <Link to="/discovery" className="hidden sm:block font-bold text-gray-500 hover:text-dark transition-colors">
-                                    {t('discoverServices')}
-                                </Link>
-                                <Link to="/my-bookings" className="hidden sm:block font-bold text-gray-500 hover:text-dark transition-colors">
-                                    {t('myBookings')}
-                                </Link>
-                            </>
-                        )}
-                        {userRole === 'owner' && (
-                            <div className="relative flex items-stretch bg-dark rounded-xl shadow-xl shadow-dark/10 overflow-hidden group/btn">
-                                <button
-                                    onClick={() => { setShopInfo({}); navigate('/dashboard'); }}
-                                    className="bg-dark text-white pl-6 pr-4 py-3 font-black transition-all hover:bg-gray-800 active:scale-95 flex items-center gap-2 border-r border-white/10"
-                                >
-                                    {t('ownerPanel')}
-                                </button>
-                                <button
-                                    onClick={() => setShowOwnerDropdown(!showOwnerDropdown)}
-                                    className="bg-dark text-white px-3 py-3 transition-colors hover:bg-gray-800 active:scale-95"
-                                >
-                                    <motion.div
-                                        animate={{ rotate: showOwnerDropdown ? 180 : 0 }}
-                                        transition={{ duration: 0.2 }}
-                                    >
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </motion.div>
-                                </button>
-
-                                <AnimatePresence>
-                                    {showOwnerDropdown && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            className="absolute right-0 mt-4 w-72 glass bg-white/90 rounded-[1.5rem] border border-white p-2 shadow-2xl z-50 overflow-hidden"
-                                        >
-                                            <div className="max-h-60 overflow-y-auto mb-2 custom-scrollbar">
-                                                {myShops.length > 0 ? (
-                                                    myShops.map((shop) => (
-                                                        <button
-                                                            key={shop.id}
-                                                            onClick={() => handleShopSelect(shop)}
-                                                            className="w-full text-left px-4 py-3 rounded-xl hover:bg-primary/5 transition-colors group flex items-center gap-3"
-                                                        >
-                                                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                                                <Scissors size={18} />
-                                                            </div>
-                                                            <div className="flex flex-col truncate">
-                                                                <span className="font-bold text-dark truncate">{shop.name}</span>
-                                                                <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">{t('id')}: {shop.id?.slice(0, 8)}</span>
-                                                            </div>
-                                                        </button>
-                                                    ))
-                                                ) : (
-                                                    <div className="px-4 py-6 text-center text-gray-400 text-sm font-medium italic">
-                                                        {t('noShops')}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="border-t border-gray-50 pt-2">
-                                                <button
-                                                    onClick={handleNewSalon}
-                                                    className="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20 active:scale-95"
-                                                >
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                    </svg>
-                                                    {t('newSalon')}
-                                                </button>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                                {showOwnerDropdown && (
-                                    <div
-                                        className="fixed inset-0 z-40 bg-transparent"
-                                        onClick={() => setShowOwnerDropdown(false)}
-                                    />
-                                )}
-                            </div>
+                    <div className="flex items-center gap-2">
+                        {userRole !== 'owner' ? (
+                            <Link to="/discovery" className="p-3 text-text-muted hover:text-primary transition-colors">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </Link>
+                        ) : (
+                            <button onClick={() => navigate('/dashboard')} className="p-3 text-text-muted hover:text-primary transition-colors">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                            </button>
                         )}
                         <button
                             onClick={() => setShowConfirm(true)}
-                            className="p-3 bg-red-100/50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all active:scale-95 border border-red-200"
+                            className="p-3 text-text-muted hover:text-red-400 transition-colors"
                         >
-                            <LogOut size={20} />
+                            <LogOut size={22} />
                         </button>
                     </div>
                 </div>
             </nav>
+
+            {/* Top Bar for Desktop/Mobile Status */}
+            <div className="fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-40 bg-gradient-to-b from-bg to-transparent pointer-events-none">
+                <div className="flex items-center gap-2 pointer-events-auto">
+                    <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain opacity-80" />
+                </div>
+                <div className="w-10 h-10 rounded-full glass border border-white/10 flex items-center justify-center overflow-hidden pointer-events-auto cursor-pointer">
+                    <img src="/barber_1.png" alt="Profile" className="w-full h-full object-cover" />
+                </div>
+            </div>
+
 
             <AnimatePresence>
                 {showConfirm && (

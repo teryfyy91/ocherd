@@ -132,7 +132,7 @@ export const StoreProvider = ({ children }) => {
 
     const addReview = async (review) => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const user = currentUser;
             const { error } = await supabase
                 .from('reviews')
                 .insert([{
@@ -158,25 +158,30 @@ export const StoreProvider = ({ children }) => {
             fetchBookings();
             fetchReviews();
         }
-    }, [shopInfo.id, userRole]);
+    }, [shopInfo.id]);
 
     const [allShops, setAllShops] = useState([]);
     const [myShops, setMyShops] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [currentUserId, setCurrentUserId] = useState(null);
+    const [loadingUser, setLoadingUser] = useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    // Initial fetch of all shops and user
+    // Initial fetch of shops and user
     useEffect(() => {
         const init = async () => {
+            setLoadingUser(true);
             const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setCurrentUserId(user.id);
-            }
+            setCurrentUser(user);
+            setLoadingUser(false);
             fetchShops();
             fetchMyBookings();
             if (shopInfo.id) fetchReviews();
         };
         init();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setCurrentUser(session?.user ?? null);
+        });
 
         // Polling for new data (every 10 seconds)
         const interval = setInterval(() => {
@@ -184,7 +189,11 @@ export const StoreProvider = ({ children }) => {
             fetchMyBookings();
             if (shopInfo.id) fetchReviews();
         }, 10000);
-        return () => clearInterval(interval);
+
+        return () => {
+            subscription.unsubscribe();
+            clearInterval(interval);
+        };
     }, [shopInfo.id]);
 
     const fetchShops = async () => {
@@ -213,10 +222,8 @@ export const StoreProvider = ({ children }) => {
                 }));
                 setAllShops(formattedShops);
 
-                // Get current user again to be sure
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    const ownerShops = formattedShops.filter(s => s.ownerId === user.id);
+                if (currentUser) {
+                    const ownerShops = formattedShops.filter(s => s.ownerId === currentUser.id);
                     setMyShops(ownerShops);
 
                     // If no shopInfo set yet, pick the first one
@@ -313,7 +320,7 @@ export const StoreProvider = ({ children }) => {
 
     const updateShopInfo = async (info) => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const user = currentUser;
             if (!user) {
                 alert("Please log in first");
                 return;
@@ -358,7 +365,7 @@ export const StoreProvider = ({ children }) => {
                     const { data: newData } = await supabase
                         .from('shops')
                         .select('*')
-                        .eq('owner_id', user.id)
+                        .eq('owner_id', currentUser.id)
                         .order('created_at', { ascending: false })
                         .limit(1);
                     if (newData && newData[0]) {
@@ -410,7 +417,7 @@ export const StoreProvider = ({ children }) => {
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                console.error("Delete failed: No rows returned. This usually means RLS blocked the delete or the ID is wrong.", { id, user: (await supabase.auth.getUser()).data.user?.id });
+                console.error("Delete failed: No rows returned. This usually means RLS blocked the delete or the ID is wrong.", { id, user: currentUser?.id });
                 throw new Error("Salonni o'chirish imkoni bo'lmadi. Iltimos, sahifani yangilab qaytadan urinib ko'ring.");
             }
 
@@ -433,6 +440,15 @@ export const StoreProvider = ({ children }) => {
         }
     };
 
+    const signOut = async () => {
+        await supabase.auth.signOut();
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('currentUserPhone');
+        localStorage.removeItem('hasSelectedLang');
+        window.location.href = '/';
+    };
+
 
 
     return (
@@ -450,6 +466,9 @@ export const StoreProvider = ({ children }) => {
             deleteBooking,
             deleteShop,
             getAllShops,
+            currentUser,
+            loadingUser,
+            signOut,
             myShops,
             loadingShops: loading,
             refreshShops: fetchShops,
