@@ -4,14 +4,14 @@ import Navbar from './Navbar';
 
 const Layout = () => {
     return (
-        <div className="min-h-screen bg-bg text-text selection:bg-primary selection:text-bg">
+        <div className="min-h-screen bg-bg text-text-main selection:bg-primary selection:text-bg">
             <Navbar />
-            <main className="w-full max-w-md mx-auto min-h-[calc(100vh-64px)] relative overflow-hidden">
-                {/* Background decorative glow */}
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <main className="w-full max-w-7xl mx-auto min-h-screen relative overflow-hidden pt-10">
+                {/* Background decorative glow - moved further up/down */}
+                <div className="absolute -top-48 -right-24 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+                <div className="absolute -bottom-48 -left-24 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px] pointer-events-none" />
 
-                <div className="relative px-5 py-6">
+                <div className="relative px-6 pt-16 pb-40">
                     <Outlet />
                 </div>
             </main>

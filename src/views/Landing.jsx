@@ -22,7 +22,7 @@ const Landing = () => {
             >
                 <img
                     src="/barber_hero.png"
-                    alt="Barber Shop"
+                    alt=""
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent flex flex-col justify-end p-8 pb-10">
@@ -93,25 +93,6 @@ const Landing = () => {
                 </div>
             </div>
 
-            {/* Business CTA */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="glass-card p-10 text-center border-emerald-500/10 flex flex-col items-center gap-4 mt-4"
-            >
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-2">
-                    <Scissors size={32} />
-                </div>
-                <h3 className="text-xl font-bold text-text-main">Mening salonim bor</h3>
-                <p className="text-text-muted text-sm font-medium">Navbatlarni boshqaring va mijozlar oqimini oshiring</p>
-                <button
-                    onClick={() => { setShopInfo({}); navigate('/dashboard'); }}
-                    className="btn-secondary w-full"
-                >
-                    {t('ownerPanel')}
-                </button>
-            </motion.div>
         </div>
     );
 };

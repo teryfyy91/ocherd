@@ -19,7 +19,7 @@ const QueueDisplay = () => {
     const waitingQueue = activeQueue.filter(q => q.status === 'Waiting');
 
     return (
-        <div className="min-h-screen bg-[#06080B] text-white flex flex-col p-12 overflow-hidden relative">
+        <div className="min-h-screen bg-bg text-text-main flex flex-col p-12 overflow-hidden relative">
             {/* Background Glows */}
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10" />
             <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px] -z-10" />
@@ -39,7 +39,7 @@ const QueueDisplay = () => {
                     </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                    <div className="text-7xl font-black text-white tracking-tight tabular-nums">
+                    <div className="text-7xl font-black text-text-main tracking-tight tabular-nums">
                         {currentTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })}
                     </div>
                     <div className="text-xl font-bold text-text-muted uppercase tracking-widest">
@@ -73,12 +73,12 @@ const QueueDisplay = () => {
                                     <div className="flex items-center gap-6 glass px-10 py-6 rounded-[2rem] border-white/5">
                                         <div className="flex flex-col items-center">
                                             <span className="text-xs font-black text-text-muted uppercase tracking-widest mb-1">Xizmat</span>
-                                            <span className="text-2xl font-black text-white">{servingNow.service}</span>
+                                            <span className="text-2xl font-black text-text-main">{servingNow.service}</span>
                                         </div>
                                         <div className="w-px h-10 bg-white/10" />
                                         <div className="flex flex-col items-center">
                                             <span className="text-xs font-black text-text-muted uppercase tracking-widest mb-1">Vaqt</span>
-                                            <span className="text-2xl font-black text-white">{servingNow.time}</span>
+                                            <span className="text-2xl font-black text-text-main">{servingNow.time}</span>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -130,7 +130,7 @@ const QueueDisplay = () => {
                                     </div>
                                     <div className="flex items-center gap-4 bg-white/5 px-8 py-4 rounded-[1.5rem] border border-white/5">
                                         <Clock size={24} className="text-primary" />
-                                        <span className="text-3xl font-black text-white tabular-nums">{item.time}</span>
+                                        <span className="text-3xl font-black text-text-main tabular-nums">{item.time}</span>
                                     </div>
                                 </motion.div>
                             ))}

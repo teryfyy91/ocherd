@@ -65,7 +65,7 @@ const Login = ({ onLogin }) => {
                 {!role ? (
                     <div className="flex flex-col gap-8 w-full">
                         <div className="text-center flex flex-col gap-3">
-                            <h1 className="text-4xl font-black text-white tracking-tight uppercase">OCHERD</h1>
+                            <h1 className="text-4xl font-black text-text-main tracking-tight uppercase">OCHERD</h1>
                             <p className="text-text-muted font-bold tracking-widest text-[10px] uppercase">Xush kelibsiz</p>
                         </div>
 
@@ -80,7 +80,7 @@ const Login = ({ onLogin }) => {
                                     <User size={32} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-black text-white">Mijozman</h4>
+                                    <h4 className="text-xl font-black text-text-main">Mijozman</h4>
                                     <p className="text-[10px] font-black text-text-muted uppercase tracking-widest mt-1">Navbat olish uchun</p>
                                 </div>
                             </motion.button>
@@ -95,7 +95,7 @@ const Login = ({ onLogin }) => {
                                     <Building2 size={32} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-black text-white">Salon egasiman</h4>
+                                    <h4 className="text-xl font-black text-text-main">Salon egasiman</h4>
                                     <p className="text-[10px] font-black text-text-muted uppercase tracking-widest mt-1">Biznes boshqarish</p>
                                 </div>
                             </motion.button>
@@ -103,12 +103,12 @@ const Login = ({ onLogin }) => {
                     </div>
                 ) : (
                     <div className="flex flex-col gap-8">
-                        <button onClick={() => setRole(null)} className="flex items-center gap-2 text-text-muted font-bold text-xs uppercase tracking-widest hover:text-white transition-colors">
+                        <button onClick={() => setRole(null)} className="flex items-center gap-2 text-text-muted font-bold text-xs uppercase tracking-widest hover:text-text-main transition-colors">
                             <ChevronLeft size={16} /> Orqaga
                         </button>
 
                         <div className="flex flex-col gap-2">
-                            <h2 className="text-3xl font-black text-white tracking-tight">{isLoginMode ? 'Kirish' : 'Ro\'yxatdan o\'tish'}</h2>
+                            <h2 className="text-3xl font-black text-text-main tracking-tight">{isLoginMode ? 'Kirish' : 'Ro\'yxatdan o\'tish'}</h2>
                             <p className="text-text-muted font-medium text-sm">{role === 'owner' ? 'Salon boshqaruviga kirish' : 'Xizmatlardan foydalanish'}</p>
                         </div>
 
@@ -129,7 +129,7 @@ const Login = ({ onLogin }) => {
                             {!isLoginMode && (
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">To'liq ism</label>
-                                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl outline-none text-white font-bold" placeholder="Shuhrat Karimov" required />
+                                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl outline-none text-text-main font-bold" placeholder="Shuhrat Karimov" required />
                                 </div>
                             )}
 
@@ -137,7 +137,7 @@ const Login = ({ onLogin }) => {
                                 <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Telefon</label>
                                 <div className="relative">
                                     <Phone size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted" />
-                                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full pl-14 pr-6 py-5 glass-card bg-white/5 border-white/5 rounded-2xl outline-none text-white font-bold" placeholder="+998 90 123 45 67" required />
+                                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full pl-14 pr-6 py-5 glass-card bg-white/5 border-white/5 rounded-2xl outline-none text-text-main font-bold" placeholder="+998 90 123 45 67" required />
                                 </div>
                             </div>
 
@@ -145,7 +145,7 @@ const Login = ({ onLogin }) => {
                                 <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Parol</label>
                                 <div className="relative">
                                     <Lock size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted" />
-                                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-14 pr-6 py-5 glass-card bg-white/5 border-white/5 rounded-2xl outline-none text-white font-bold" placeholder="••••••••" required />
+                                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-14 pr-6 py-5 glass-card bg-white/5 border-white/5 rounded-2xl outline-none text-text-main font-bold" placeholder="••••••••" required />
                                 </div>
                             </div>
 

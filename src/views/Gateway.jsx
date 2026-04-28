@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Scissors } from 'lucide-react';
+import { Search, MapPin, Scissors, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
@@ -33,7 +33,7 @@ const Gateway = () => {
     const shops = getAllShops();
 
     const filteredShops = shops.filter(shop =>
-        shop.name.toLowerCase().includes(searchQuery.toLowerCase())
+        (shop.name || '').toLowerCase().includes((searchQuery || '').toLowerCase())
     );
 
     return (
@@ -42,9 +42,9 @@ const Gateway = () => {
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col gap-2 mt-4"
+                className="flex flex-col gap-2 mt-8"
             >
-                <h1 className="text-4xl font-black text-white tracking-tight">
+                <h1 className="text-4xl font-black text-text-main tracking-tight">
                     Salonlar
                 </h1>
                 <p className="text-text-muted font-medium">O'zingizga ma'qulini kashf eting</p>
@@ -60,8 +60,16 @@ const Gateway = () => {
                     placeholder="Salon nomini qidiring..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full glass-card bg-white/5 border-white/5 pl-14 pr-6 py-5 rounded-2xl outline-none text-white font-bold placeholder:text-text-muted focus:bg-white/10 focus:border-primary/20 transition-all"
+                    className="w-full glass-card bg-white/5 border-white/5 pl-14 pr-14 py-5 rounded-2xl outline-none text-text-main font-bold placeholder:text-text-muted focus:bg-white/10 focus:border-primary/20 transition-all"
                 />
+                {searchQuery && (
+                    <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute inset-y-0 right-5 flex items-center text-text-muted hover:text-primary transition-colors"
+                    >
+                        <X size={18} />
+                    </button>
+                )}
             </div>
 
             {/* Shops Grid */}
@@ -101,7 +109,7 @@ const Gateway = () => {
                                 <div className="w-2/3 p-6 flex flex-col justify-between">
                                     <div>
                                         <div className="flex justify-between items-start mb-2">
-                                            <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{shop.name}</h3>
+                                            <h3 className="text-xl font-bold text-text-main group-hover:text-primary transition-colors">{shop.name}</h3>
                                             <div className="flex items-center gap-1 text-amber-400 font-black">
                                                 <span className="text-sm">4.9</span>
                                                 <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
@@ -115,7 +123,7 @@ const Gateway = () => {
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] text-text-muted font-black uppercase mb-0.5">Ish vaqti</span>
-                                            <span className="text-xs font-bold text-white">{shop.workingHours?.start || '09:00'} - {shop.workingHours?.end || '18:00'}</span>
+                                            <span className="text-xs font-bold text-text-main">{shop.workingHours?.start || '09:00'} - {shop.workingHours?.end || '18:00'}</span>
                                         </div>
                                         <div className="btn-primary !p-3 !rounded-xl !text-xs !bg-white/10 !text-white group-hover:!bg-primary group-hover:!text-bg transition-all">
                                             Band qilish
@@ -130,7 +138,7 @@ const Gateway = () => {
                         <div className="w-20 h-20 glass rounded-3xl flex items-center justify-center text-text-muted opacity-30">
                             <Search size={32} />
                         </div>
-                        <h3 className="text-xl font-bold text-white">Hech narsa topilmadi</h3>
+                        <h3 className="text-xl font-bold text-text-main">Hech narsa topilmadi</h3>
                         <p className="text-text-muted text-sm font-medium">Boshqa nom bilan qidirib ko'ring</p>
                     </div>
                 )}

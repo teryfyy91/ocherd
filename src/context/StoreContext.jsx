@@ -185,12 +185,25 @@ export const StoreProvider = ({ children }) => {
     useEffect(() => {
         const init = async () => {
             setLoadingUser(true);
-            const { data: { user } } = await supabase.auth.getUser();
-            setCurrentUser(user);
-            setLoadingUser(false);
-            fetchShops();
-            fetchMyBookings();
-            if (shopInfo.id) fetchReviews();
+            try {
+                // Add a timeout to prevent infinite loading if Supabase hangs
+                const authPromise = supabase.auth.getUser();
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Auth timeout')), 5000)
+                );
+
+                const { data: { user } } = await Promise.race([authPromise, timeoutPromise]);
+                setCurrentUser(user);
+            } catch (err) {
+                console.error('Error during auth initialization:', err);
+                // Even if auth fails, we clear loading state to show login or public views
+                setCurrentUser(null);
+            } finally {
+                setLoadingUser(false);
+                fetchShops();
+                fetchMyBookings();
+                if (shopInfo.id) fetchReviews();
+            }
         };
         init();
 

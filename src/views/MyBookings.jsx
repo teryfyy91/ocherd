@@ -47,10 +47,10 @@ const MyBookings = () => {
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between mt-4"
+                className="flex items-center justify-between mt-8"
             >
                 <div className="flex flex-col gap-2">
-                    <h1 className="text-3xl font-black text-white tracking-tight">
+                    <h1 className="text-3xl font-black text-text-main tracking-tight">
                         Mening navbatlarim
                     </h1>
                     <p className="text-text-muted font-medium">Barcha uchrashuvlaringiz bir joyda</p>
@@ -61,7 +61,7 @@ const MyBookings = () => {
             <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Faol navbatlar</h2>
+                    <h2 className="text-sm font-black text-text-main uppercase tracking-widest">Faol navbatlar</h2>
                 </div>
 
                 {activeBookings.length === 0 ? (
@@ -94,7 +94,7 @@ const MyBookings = () => {
 
                                 <div className="flex justify-between items-start ml-2">
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold text-white tracking-tight">{item.shopName}</h3>
+                                        <h3 className="text-xl font-bold text-text-main tracking-tight">{item.shopName}</h3>
                                         <div className="flex items-center gap-4 text-xs font-bold text-text-muted">
                                             <span className="flex items-center gap-1.5"><Scissors size={14} className="text-primary" /> {item.service}</span>
                                             <span className="flex items-center gap-1.5"><Clock size={14} className="text-primary" /> {item.time}</span>
@@ -109,7 +109,7 @@ const MyBookings = () => {
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-1">Taxminiy vaqt</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-lg font-black text-white">~15 daqiqa</span>
+                                            <span className="text-lg font-black text-text-main">~15 daqiqa</span>
                                             {item.status === 'In progress' && <div className="w-1.5 h-1.5 bg-primary rounded-full animate-ping" />}
                                         </div>
                                     </div>
@@ -128,19 +128,19 @@ const MyBookings = () => {
 
             {/* Past Bookings */}
             {pastBookings.length > 0 && (
-                <div className="flex flex-col gap-6 opacity-60">
+                <div className="flex flex-col gap-6">
                     <div className="flex items-center gap-3">
-                        <h2 className="text-sm font-black text-white/50 uppercase tracking-widest">Tugallanganlar</h2>
+                        <h2 className="text-sm font-black text-text-muted uppercase tracking-widest">Tugallanganlar</h2>
                     </div>
                     <div className="flex flex-col gap-4">
                         {pastBookings.map((item) => (
-                            <div key={item.id} className="glass-card p-5 flex items-center justify-between bg-white/2 border-white/2">
+                            <div key={item.id} className="glass-card p-5 flex items-center justify-between bg-white/5 border-white/5">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 glass rounded-xl flex items-center justify-center text-text-muted/30">
                                         <Check size={20} />
                                     </div>
                                     <div className="flex flex-col">
-                                        <h4 className="font-bold text-white/70">{item.shopName}</h4>
+                                        <h4 className="font-bold text-text-main">{item.shopName}</h4>
                                         <p className="text-xs font-bold text-text-muted">{item.service} • {item.time}</p>
                                     </div>
                                 </div>
@@ -179,7 +179,7 @@ const MyBookings = () => {
                                 <div className="w-20 h-20 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center mx-auto mb-6">
                                     <MessageSquare size={32} />
                                 </div>
-                                <h3 className="text-2xl font-black text-white tracking-tight">Fikringiz</h3>
+                                <h3 className="text-2xl font-black text-text-main tracking-tight">Fikringiz</h3>
                                 <p className="text-text-muted font-bold mt-2 text-sm">{selectedBooking?.shopName}</p>
                             </div>
 
@@ -201,7 +201,7 @@ const MyBookings = () => {
                                     <textarea
                                         value={comment}
                                         onChange={(e) => setComment(e.target.value)}
-                                        className="w-full h-32 glass-card bg-white/5 border-white/5 p-6 rounded-2xl outline-none text-white font-bold placeholder:text-text-muted transition-all resize-none"
+                                        className="w-full h-32 glass-card bg-white/5 border-white/5 p-6 rounded-2xl outline-none text-text-main font-bold placeholder:text-text-muted transition-all resize-none"
                                         placeholder="Xizmat haqida nima deysiz?..."
                                     />
                                 </div>

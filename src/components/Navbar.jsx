@@ -10,91 +10,53 @@ const Navbar = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [showConfirm, setShowConfirm] = useState(false);
-    const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
-    const { myShops, setShopInfo, signOut, theme, toggleTheme, currentUser } = useStore();
+    const { signOut, theme, toggleTheme } = useStore();
     const userRole = localStorage.getItem('userRole');
 
     const handleSignOut = () => {
         signOut();
     };
 
-    const handleShopSelect = (shop) => {
-        setShopInfo(shop);
-        setShowOwnerDropdown(false);
-        navigate('/dashboard');
-    };
-
-    const handleNewSalon = () => {
-        setShopInfo({
-            name: '',
-            services: [],
-            workingHours: { start: '09:00', end: '18:00' }
-        });
-        setShowOwnerDropdown(false);
-        navigate('/dashboard');
-    };
-
     return (
         <>
-            <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md pointer-events-auto">
-
-                <div className="glass rounded-3xl p-3 flex justify-between items-center shadow-2xl">
-                    <Link to="/" className="flex items-center gap-3 px-4">
-                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
-                            <Scissors size={18} className="text-bg" />
-                        </div>
-                        <span className="text-xl font-black tracking-widest text-text-main">OCHERD</span>
-                    </Link>
-
-                    <div className="flex items-center gap-2">
-                        {userRole !== 'owner' ? (
-                            <Link to="/discovery" className="p-3 text-text-muted hover:text-primary transition-colors">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            </Link>
-                        ) : (
-                            <button onClick={() => navigate('/dashboard')} className="p-3 text-text-muted hover:text-primary transition-colors">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                            </button>
-                        )}
+            <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-auto">
+                <div className="glass rounded-3xl p-2 flex justify-around items-center shadow-2xl border border-white/5">
+                    {userRole !== 'owner' ? (
                         <button
-                            onClick={() => setShowConfirm(true)}
-                            className="p-3 text-text-muted hover:text-red-400 transition-colors"
+                            onClick={() => {
+                                if (window.location.pathname === '/discovery') {
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    const searchInput = document.querySelector('input[placeholder*="Salon nomini"]');
+                                    if (searchInput) searchInput.focus();
+                                } else {
+                                    navigate('/discovery');
+                                }
+                            }}
+                            className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/discovery' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}
                         >
-                            <LogOut size={22} />
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </button>
-                    </div>
-                </div>
-            </nav>
+                    ) : (
+                        <button onClick={() => navigate('/dashboard')} className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/dashboard' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        </button>
+                    )}
 
-            {/* Top Bar for Desktop/Mobile Status */}
-            <div className="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 z-40 bg-gradient-to-b from-bg to-transparent pointer-events-none">
-                <div className="flex items-center gap-2 pointer-events-auto cursor-pointer group" onClick={() => navigate('/')}>
-                    <img src="/logo.png" alt="Logo" className="w-14 h-14 object-contain group-hover:scale-110 transition-all duration-300 drop-shadow-[0_0_15px_rgba(0,200,151,0.3)]" />
-                </div>
-
-                <div className="flex items-center gap-3 pointer-events-auto">
                     <button
                         onClick={toggleTheme}
-                        className="w-11 h-11 rounded-2xl glass flex items-center justify-center text-text hover:text-primary transition-all active:scale-90 border border-white/5"
+                        className="p-4 text-text-muted hover:text-primary transition-all active:scale-90"
                     >
-                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
                     </button>
 
                     <button
-                        onClick={() => navigate('/my-bookings')}
-                        className="glass-card p-1 pr-4 flex items-center gap-3 hover:border-primary/30 transition-all group"
+                        onClick={() => setShowConfirm(true)}
+                        className="p-4 text-text-muted hover:text-red-400 transition-all active:scale-90"
                     >
-                        <div className="w-9 h-9 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors">
-                            <img src="/barber_1.png" alt="Profile" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <span className="text-[10px] text-text-muted font-black uppercase tracking-[0.1em] leading-none mb-0.5">Kabinet</span>
-                            <span className="text-xs font-black text-text group-hover:text-primary transition-colors">PROFIL</span>
-                        </div>
+                        <LogOut size={24} />
                     </button>
                 </div>
-            </div>
-
+            </nav>
 
             <AnimatePresence>
                 {showConfirm && (
@@ -104,52 +66,46 @@ const Navbar = () => {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] flex items-center justify-center p-4"
                     >
-                        {/* Backdrop with heavy blur */}
                         <motion.div
-                            initial={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(15, 23, 42, 0)" }}
-                            animate={{ backdropFilter: "blur(12px)", backgroundColor: "rgba(15, 23, 42, 0.4)" }}
-                            exit={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(15, 23, 42, 0)" }}
+                            initial={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(0, 0, 0, 0)" }}
+                            animate={{ backdropFilter: "blur(12px)", backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+                            exit={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(0, 0, 0, 0)" }}
                             className="absolute inset-0"
                             onClick={() => setShowConfirm(false)}
                         />
 
-                        {/* Modal Card */}
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 30 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 30 }}
                             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-                            className="glass max-w-sm w-full p-10 rounded-[3.5rem] text-center relative z-10 border border-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] bg-white/90"
+                            className="glass max-w-sm w-full p-10 rounded-[3rem] text-center relative z-10 border border-white/10 [background:var(--card-bg)]"
                         >
-                            <div className="w-24 h-24 bg-red-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-red-500 shadow-inner">
-                                <LogOut size={40} />
+                            <div className="w-20 h-20 bg-red-400/10 rounded-3xl flex items-center justify-center mx-auto mb-6 text-red-400 shadow-inner">
+                                <LogOut size={36} />
                             </div>
 
-                            <h2 className="text-3xl font-black text-text-main mb-3 tracking-tight">
+                            <h2 className="text-2xl font-black text-text-main mb-2 tracking-tight">
                                 {t('confirmSignOut')}
                             </h2>
-                            <p className="text-gray-500 font-bold mb-10 text-xs uppercase tracking-[0.2em] leading-relaxed opacity-60">
+                            <p className="text-text-muted font-bold mb-8 text-xs uppercase tracking-widest opacity-60">
                                 {t('areYouSure')}
                             </p>
 
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-3">
                                 <button
                                     onClick={handleSignOut}
-                                    className="w-full bg-red-500 text-white py-5 rounded-[1.5rem] font-black text-lg hover:bg-red-600 transition-all shadow-2xl shadow-red-500/20 active:scale-95"
+                                    className="w-full bg-red-500 text-white py-4 rounded-2xl font-black text-lg hover:bg-red-600 transition-all shadow-xl shadow-red-500/20"
                                 >
                                     {t('yesSignOut')}
                                 </button>
                                 <button
                                     onClick={() => setShowConfirm(false)}
-                                    className="w-full bg-gray-100 text-gray-500 py-5 rounded-[1.5rem] font-black text-lg hover:bg-gray-200 transition-all active:scale-95"
+                                    className="w-full glass-card border-white/5 py-4 rounded-2xl font-black text-lg hover:bg-white/5 transition-all text-text-main"
                                 >
                                     {t('cancel')}
                                 </button>
                             </div>
-
-                            {/* Decorative elements to match Anti-gravity style */}
-                            <div className="absolute top-10 right-10 w-2 h-2 bg-red-500/20 rounded-full blur-[1px]" />
-                            <div className="absolute bottom-10 left-10 w-3 h-3 bg-red-500/10 rounded-full blur-[1px]" />
                         </motion.div>
                     </motion.div>
                 )}

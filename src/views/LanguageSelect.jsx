@@ -30,7 +30,7 @@ const LanguageSelect = ({ onSelect }) => {
                         <Globe size={40} />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <h2 className="text-3xl font-black text-white tracking-tight uppercase">Tilni tanlang</h2>
+                        <h2 className="text-3xl font-black text-text-main tracking-tight uppercase">Tilni tanlang</h2>
                         <p className="text-text-muted font-bold tracking-widest text-[10px] uppercase">Select Language • Выберите язык</p>
                     </div>
                 </div>
@@ -46,7 +46,7 @@ const LanguageSelect = ({ onSelect }) => {
                         >
                             <div className="flex items-center gap-5">
                                 <span className="text-3xl filter saturate-50 group-hover:saturate-100 transition-all">{lang.flag}</span>
-                                <span className="text-xl font-black text-white group-hover:text-primary transition-colors">{lang.label}</span>
+                                <span className="text-xl font-black text-text-main group-hover:text-primary transition-colors">{lang.label}</span>
                             </div>
                             <div className="w-8 h-8 rounded-full border-2 border-white/10 flex items-center justify-center group-hover:border-primary group-hover:bg-primary/10 transition-all">
                                 <div className="w-2 h-2 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />

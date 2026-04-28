@@ -127,7 +127,7 @@ const Dashboard = () => {
                 <div className="flex flex-col gap-6 mt-4">
                     <div className="flex justify-between items-end">
                         <div className="flex flex-col gap-2">
-                            <h1 className="text-4xl font-black text-white tracking-tight">Mening salonlarim</h1>
+                            <h1 className="text-4xl font-black text-text-main tracking-tight">Mening salonlarim</h1>
                             <p className="text-text-muted font-medium">Barcha bizneslaringizni boshqaring</p>
                         </div>
                         <button onClick={handleAddNew} className="btn-primary flex items-center gap-2 !py-4">
@@ -158,7 +158,7 @@ const Dashboard = () => {
                                             <Store size={32} />
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <h3 className="text-2xl font-black text-white group-hover:text-primary transition-colors">{shop.name}</h3>
+                                            <h3 className="text-2xl font-black text-text-main group-hover:text-primary transition-colors">{shop.name}</h3>
                                             <div className="flex items-center gap-4 text-xs font-bold text-text-muted">
                                                 <span className="flex items-center gap-1.5"><Clock size={14} /> {shop.workingHours?.start} - {shop.workingHours?.end}</span>
                                                 <span className="flex items-center gap-1.5"><Users size={14} /> Bugun 12 kishi</span>
@@ -191,11 +191,11 @@ const Dashboard = () => {
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteModalOpen(false)} className="absolute inset-0 bg-bg/80 backdrop-blur-xl" />
                             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="glass-card p-10 max-w-sm w-full relative z-10">
                                 <div className="w-20 h-20 bg-red-400/10 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6"><AlertTriangle size={40} /></div>
-                                <h2 className="text-2xl font-black text-white mb-2">Ishonchingiz komilmi?</h2>
+                                <h2 className="text-2xl font-black text-text-main mb-2">Ishonchingiz komilmi?</h2>
                                 <p className="text-text-muted text-sm font-medium mb-8">"{shopToDelete?.name}" butunlay o'chirib tashlanadi.</p>
                                 <div className="flex flex-col gap-3">
                                     <button onClick={async () => { await deleteShop(shopToDelete.id); setDeleteModalOpen(false); showToast("O'chirildi!"); }} className="py-4 bg-red-500 text-white rounded-2xl font-black">Ha, o'chirish</button>
-                                    <button onClick={() => setDeleteModalOpen(false)} className="py-4 glass-card border-white/5 font-black text-white">Bekor qilish</button>
+                                    <button onClick={() => setDeleteModalOpen(false)} className="py-4 glass-card border-white/5 font-black text-text-main">Bekor qilish</button>
                                 </div>
                             </motion.div>
                         </div>
@@ -222,7 +222,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-4">
                     <button onClick={() => setViewMode('list')} className="w-12 h-12 glass rounded-2xl flex items-center justify-center text-text-muted hover:text-white transition-colors"><ChevronLeft size={24} /></button>
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-3xl font-black text-white tracking-tight">{shopInfo.name}</h1>
+                        <h1 className="text-3xl font-black text-text-main tracking-tight">{shopInfo.name}</h1>
                         <p className="text-text-muted font-medium text-xs uppercase tracking-widest">Boshqaruv</p>
                     </div>
                 </div>
@@ -247,22 +247,22 @@ const Dashboard = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="glass-card p-6 border-primary/20 bg-primary/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Faol</p>
-                                <p className="text-3xl font-black text-white">{confirmedQueue.length}</p>
+                                <p className="text-3xl font-black text-text-main">{confirmedQueue.length}</p>
                             </div>
                             <div className="glass-card p-6 border-amber-500/20 bg-amber-500/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Kutilmoqda</p>
-                                <p className="text-3xl font-black text-white">{pendingQueue.length}</p>
+                                <p className="text-3xl font-black text-text-main">{pendingQueue.length}</p>
                             </div>
                         </div>
 
                         {/* Queue List */}
                         <div className="flex flex-col gap-6">
-                            <h2 className="text-xl font-bold text-white">Bugunlik navbat</h2>
+                            <h2 className="text-xl font-bold text-text-main">Bugunlik navbat</h2>
                             <div className="flex flex-col gap-4">
                                 {pendingQueue.map(item => (
                                     <motion.div key={item.id} layout className="glass-card p-6 border-amber-500/20 bg-amber-500/5 flex items-center justify-between">
                                         <div className="flex flex-col gap-1">
-                                            <h4 className="font-bold text-white text-lg">{item.name}</h4>
+                                            <h4 className="font-bold text-text-main text-lg">{item.name}</h4>
                                             <p className="text-xs text-amber-200/60 font-bold">{item.service} • {item.time}</p>
                                         </div>
                                         <div className="flex gap-2">
@@ -279,7 +279,7 @@ const Dashboard = () => {
                                             </div>
                                             <div onClick={() => setSelectedUserDetails(item)} className="flex flex-col gap-1 cursor-pointer">
                                                 <div className="flex items-center gap-2">
-                                                    <h4 className="font-bold text-white text-lg">{item.name}</h4>
+                                                    <h4 className="font-bold text-text-main text-lg">{item.name}</h4>
                                                     {item.status === 'In progress' && <span className="text-[8px] bg-primary text-bg px-2 py-0.5 rounded-full font-black uppercase">Service</span>}
                                                 </div>
                                                 <p className="text-xs text-text-muted font-bold">{item.service} • {item.time}</p>
@@ -289,7 +289,7 @@ const Dashboard = () => {
                                             {item.status === 'In progress' ? (
                                                 <button onClick={() => updateBookingStatus(item.id, 'Done')} className="px-6 py-3 bg-primary text-bg rounded-xl font-black text-xs shadow-lg shadow-primary/20">Tugatish</button>
                                             ) : (
-                                                <button onClick={() => updateBookingStatus(item.id, 'In progress')} className="px-6 py-3 glass rounded-xl font-black text-xs text-white border-white/10 hover:bg-white/10">Boshlash</button>
+                                                <button onClick={() => updateBookingStatus(item.id, 'In progress')} className="px-6 py-3 glass rounded-xl font-black text-xs text-text-main border-white/10 hover:bg-white/10">Boshlash</button>
                                             )}
                                         </div>
                                     </motion.div>

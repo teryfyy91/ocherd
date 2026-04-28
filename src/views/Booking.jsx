@@ -82,7 +82,7 @@ const Booking = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col gap-2 mt-4"
             >
-                <h1 className="text-3xl font-black text-white tracking-tight">
+                <h1 className="text-3xl font-black text-text-main tracking-tight">
                     Band qilish
                 </h1>
                 <p className="text-text-muted font-medium">{shopInfo.name}</p>
@@ -128,7 +128,7 @@ const Booking = () => {
                             exit={{ opacity: 0, x: -20 }}
                             className="flex flex-col gap-6"
                         >
-                            <h2 className="text-xl font-bold text-white mb-2">Xizmatni tanlang</h2>
+                            <h2 className="text-xl font-bold text-text-main mb-2">Xizmatni tanlang</h2>
                             <div className="grid grid-cols-1 gap-4">
                                 {shopInfo.services.map((service, idx) => {
                                     const parsedService = typeof service === 'string' && service.startsWith('{') ? JSON.parse(service) : service;
@@ -142,7 +142,7 @@ const Booking = () => {
                                             className={`glass-card p-6 flex items-center justify-between border-2 transition-all ${selectedService === sName ? 'border-primary/40 bg-white/10' : 'border-transparent'}`}
                                         >
                                             <div className="flex flex-col text-left gap-1">
-                                                <span className="font-bold text-white">{sName}</span>
+                                                <span className="font-bold text-text-main">{sName}</span>
                                                 <span className="text-sm font-black text-primary">{sPrice.toLocaleString()} UZS</span>
                                             </div>
                                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedService === sName ? 'bg-primary border-primary text-bg' : 'border-white/20'}`}>
@@ -171,7 +171,7 @@ const Booking = () => {
                             className="flex flex-col gap-6"
                         >
                             <div className="flex justify-between items-center mb-2">
-                                <h2 className="text-xl font-bold text-white">Vaqtni tanlang</h2>
+                                <h2 className="text-xl font-bold text-text-main">Vaqtni tanlang</h2>
                                 <button onClick={() => setStep(1)} className="text-sm font-bold text-text-muted">Orqaga</button>
                             </div>
                             <div className="grid grid-cols-3 gap-3">
@@ -211,7 +211,7 @@ const Booking = () => {
                             className="flex flex-col gap-8"
                         >
                             <div className="flex justify-between items-center mb-2">
-                                <h2 className="text-xl font-bold text-white">Ma'lumotlaringiz</h2>
+                                <h2 className="text-xl font-bold text-text-main">Ma'lumotlaringiz</h2>
                                 <button onClick={() => setStep(2)} className="text-sm font-bold text-text-muted">Orqaga</button>
                             </div>
 
@@ -251,11 +251,11 @@ const Booking = () => {
                                 <div className="flex flex-col gap-3">
                                     <div className="flex justify-between items-center">
                                         <span className="text-text-muted text-sm">Xizmat:</span>
-                                        <span className="text-white font-bold">{selectedService}</span>
+                                        <span className="text-text-main font-bold">{selectedService}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-text-muted text-sm">Vaqt:</span>
-                                        <span className="text-white font-bold">{selectedTime}</span>
+                                        <span className="text-text-main font-bold">{selectedTime}</span>
                                     </div>
                                     <div className="h-px bg-white/5 my-1" />
                                     <div className="flex justify-between items-center">
