@@ -31,10 +31,10 @@ const InstallPWA = () => {
     return (
         <button
             onClick={onClick}
-            className="flex items-center gap-2 glass px-6 py-3 rounded-2xl text-primary font-black text-xs uppercase tracking-widest border-primary/20 hover:bg-primary hover:text-bg transition-all shadow-glow"
+            className="flex items-center justify-center w-12 h-12 glass rounded-2xl text-primary border-primary/20 hover:bg-primary hover:text-bg transition-all shadow-glow"
+            title="Ilovani o'rnatish"
         >
-            <Download size={16} />
-            {t('installApp') || 'Ilovani o\'rnatish'}
+            <Download size={20} />
         </button>
     );
 };

@@ -56,32 +56,33 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[85vh] px-4 w-full max-w-sm mx-auto">
+        <div className="flex flex-col items-center justify-center min-h-screen px-4 w-full max-w-sm md:max-w-4xl mx-auto py-10">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full"
             >
                 {!role ? (
-                    <div className="flex flex-col gap-8 w-full">
-                        <div className="text-center flex flex-col gap-3">
-                            <h1 className="text-4xl font-black text-text-main tracking-tight uppercase">OCHERD</h1>
-                            <p className="text-text-muted font-bold tracking-widest text-[10px] uppercase">Xush kelibsiz</p>
+                    <div className="flex flex-col gap-10 md:gap-16 w-full">
+                        <div className="text-center flex flex-col gap-3 mb-4 md:mb-10">
+                            <h1 className="text-5xl md:text-8xl font-black text-text-main tracking-tighter uppercase italic">OCHERD</h1>
+                            <p className="text-text-muted font-bold tracking-[0.3em] text-[10px] md:text-sm uppercase opacity-40">Xush kelibsiz</p>
                         </div>
 
-                        <div className="flex flex-col gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setRole('user')}
-                                className="glass-card p-8 flex flex-col items-center gap-4 bg-white/5 border-white/5 hover:border-primary/40 hover:bg-white/10 transition-all text-center group"
+                                className="glass-card p-10 md:p-16 flex flex-col items-center gap-6 bg-white/5 border-white/5 hover:border-primary/40 hover:bg-white/10 transition-all text-center group relative overflow-hidden"
                             >
-                                <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                    <User size={32} />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                                <div className="w-20 h-20 md:w-28 md:h-28 glass rounded-3xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-bg transition-all duration-500 shadow-glow">
+                                    <User size={48} className="md:size-12" />
                                 </div>
-                                <div>
-                                    <h4 className="text-xl font-black text-text-main">Mijozman</h4>
-                                    <p className="text-[10px] font-black text-text-muted uppercase tracking-widest mt-1">Navbat olish uchun</p>
+                                <div className="relative z-10">
+                                    <h4 className="text-2xl md:text-4xl font-black text-text-main mb-2">Mijozman</h4>
+                                    <p className="text-[10px] md:text-xs font-black text-text-muted uppercase tracking-[0.2em] opacity-60">Navbat olish uchun</p>
                                 </div>
                             </motion.button>
 
@@ -89,20 +90,21 @@ const Login = ({ onLogin }) => {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setRole('owner')}
-                                className="glass-card p-8 flex flex-col items-center gap-4 bg-white/5 border-white/5 hover:border-primary/40 hover:bg-white/10 transition-all text-center group"
+                                className="glass-card p-10 md:p-16 flex flex-col items-center gap-6 bg-white/5 border-white/5 hover:border-primary/40 hover:bg-white/10 transition-all text-center group relative overflow-hidden"
                             >
-                                <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                    <Building2 size={32} />
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+                                <div className="w-20 h-20 md:w-28 md:h-28 glass rounded-3xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-bg transition-all duration-500 shadow-glow">
+                                    <Building2 size={48} className="md:size-12" />
                                 </div>
-                                <div>
-                                    <h4 className="text-xl font-black text-text-main">Salon egasiman</h4>
-                                    <p className="text-[10px] font-black text-text-muted uppercase tracking-widest mt-1">Biznes boshqarish</p>
+                                <div className="relative z-10">
+                                    <h4 className="text-2xl md:text-4xl font-black text-text-main mb-2">Salon egasiman</h4>
+                                    <p className="text-[10px] md:text-xs font-black text-text-muted uppercase tracking-[0.2em] opacity-60">Biznes boshqarish</p>
                                 </div>
                             </motion.button>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-8 w-full max-w-sm mx-auto">
                         <button onClick={() => setRole(null)} className="flex items-center gap-2 text-text-muted font-bold text-xs uppercase tracking-widest hover:text-text-main transition-colors">
                             <ChevronLeft size={16} /> Orqaga
                         </button>

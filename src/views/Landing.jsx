@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, Users, CalendarCheck, ArrowRight, Scissors } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import InstallPWA from '../components/InstallPWA';
 
 import { useStore } from '../context/StoreContext';
 
@@ -42,13 +43,18 @@ const Landing = () => {
                     <p className="text-text-muted text-sm font-medium mb-8 max-w-[280px] leading-relaxed">
                         {t('heroDesc')}
                     </p>
-                    <button
-                        onClick={() => navigate('/discovery')}
-                        className="btn-primary w-fit animate-glow"
-                    >
-                        {t('getStarted')}
-                        <ArrowRight size={20} />
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate('/discovery')}
+                            className="btn-primary w-fit animate-glow"
+                        >
+                            {t('getStarted')}
+                            <ArrowRight size={20} />
+                        </button>
+                        <div className="md:hidden">
+                            <InstallPWA />
+                        </div>
+                    </div>
                 </div>
             </motion.div>
 

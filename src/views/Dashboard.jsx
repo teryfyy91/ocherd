@@ -140,6 +140,20 @@ const Dashboard = () => {
                     <div className="flex flex-col gap-6">
                         {[1, 2].map(i => <div key={i} className="h-44 w-full skeleton" />)}
                     </div>
+                ) : myShops.length === 0 ? (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="py-24 text-center flex flex-col items-center gap-4 glass-card border-dashed border-white/5 bg-transparent"
+                    >
+                        <div className="w-20 h-20 glass rounded-3xl flex items-center justify-center text-text-muted/20 mb-2">
+                            <Store size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-text-main">Hozircha sizda salon yo'q</h3>
+                        <p className="text-text-muted text-sm font-medium max-w-[250px] mx-auto leading-relaxed">
+                            Biznesingizni boshlash uchun yuqoridagi <span className="text-primary font-black">"Salon qo'shish"</span> tugmasini bosing
+                        </p>
+                    </motion.div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6">
                         {myShops.map((shop, index) => (
@@ -390,7 +404,7 @@ const Dashboard = () => {
                                 <div className="flex flex-col gap-4">
                                     <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Xizmatlar</label>
                                     <div className="flex flex-col gap-3">
-                                        <input type="text" value={serviceInput} onChange={e => setServiceInput(e.target.value)} className="glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl text-white font-bold" placeholder="Xizmat nomi..." />
+                                        <input type="text" value={serviceInput} onChange={e => setServiceInput(e.target.value)} className="glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl text-white font-bold" placeholder="Xizmat turi..." />
                                         <div className="flex gap-3">
                                             <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)} className="flex-1 glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl text-white font-bold" placeholder="Narxi..." />
                                             <button type="button" onClick={addService} className="w-16 glass rounded-2xl text-primary border-primary flex items-center justify-center"><Plus /></button>
