@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const InstallPWA = () => {
-    const { t } = useTranslation();
-    const [supportsPWA, setSupportsPWA] = useState(false);
     const [promptInstall, setPromptInstall] = useState(null);
+    const [isInstalled, setIsInstalled] = useState(false);
 
     useEffect(() => {
+        // Agar allaqachon standalone rejimda ishlayotgan bo'lsa (o'rnatilgan)
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            setIsInstalled(true);
+            return;
+        }
+
         const handler = e => {
             e.preventDefault();
-            setSupportsPWA(true);
             setPromptInstall(e);
         };
-        window.addEventListener("beforeinstallprompt", handler);
-        return () => window.removeEventListener("beforeinstallprompt", handler);
+
+        const installedHandler = () => {
+            setIsInstalled(true);
+            setPromptInstall(null);
+        };
+
+        window.addEventListener('beforeinstallprompt', handler);
+        window.addEventListener('appinstalled', installedHandler);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handler);
+            window.removeEventListener('appinstalled', installedHandler);
+        };
     }, []);
 
     const onClick = async evt => {
@@ -22,19 +36,23 @@ const InstallPWA = () => {
         if (!promptInstall) return;
         await promptInstall.prompt();
         const { outcome } = await promptInstall.userChoice;
-        if (outcome === 'accepted') setSupportsPWA(false);
+        if (outcome === 'accepted') {
+            setIsInstalled(true);
+        }
         setPromptInstall(null);
     };
 
-    if (!supportsPWA) return null;
+    // Faqat prompt mavjud bo'lganda va hali o'rnatilmagan bo'lganda ko'rsat
+    if (!promptInstall || isInstalled) return null;
 
     return (
         <button
             onClick={onClick}
-            className="flex items-center justify-center w-12 h-12 glass rounded-2xl text-primary border-primary/20 hover:bg-primary hover:text-bg transition-all shadow-glow"
-            title="Ilovani o'rnatish"
+            className="flex items-center justify-center w-12 h-12 glass rounded-2xl text-primary border border-primary/30 hover:bg-primary hover:text-bg transition-all duration-300 shadow-lg active:scale-95"
+            title="Ilovani telefoningizga o'rnatish"
+            aria-label="Ilovani o'rnatish"
         >
-            <Download size={20} />
+            <Download size={20} strokeWidth={2.5} />
         </button>
     );
 };

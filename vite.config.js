@@ -11,12 +11,17 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       manifest: {
-        name: 'QueueFlow',
-        short_name: 'QueueFlow',
-        description: 'Premium Barber Shop Web Application',
-        theme_color: '#000000',
-        background_color: '#ffffff',
+        name: 'Ocherd - Navbat Tizimi',
+        short_name: 'Ocherd',
+        description: 'O\'zbekistondagi salonlar uchun onlayn navbat tizimi',
+        theme_color: '#00C470',
+        background_color: '#0B0F14',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
+        start_url: '/',
+        scope: '/',
+        orientation: 'portrait',
+        lang: 'uz',
         icons: [
           {
             src: '/pwa-192x192.png',
@@ -32,7 +37,7 @@ export default defineConfig({
             src: '/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'maskable'
           }
         ]
       },
