@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Building2, Phone, Lock, Loader2, CheckCircle2, ChevronLeft } from 'lucide-react';
+import { User, Building2, Phone, Lock, Loader2, CheckCircle2, ChevronLeft, Camera } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 
 const Login = ({ onLogin }) => {
@@ -14,6 +14,16 @@ const Login = ({ onLogin }) => {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState(null);
+    const fileInputRef = useRef(null);
+
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setAvatarFile(file);
+        setAvatarPreview(URL.createObjectURL(file));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,6 +33,13 @@ const Login = ({ onLogin }) => {
 
         const cleanPhone = phone.replace(/[^\d+]/g, '');
         const email = `${cleanPhone}@ocherd.app`;
+
+        // Salon egasi uchun rasm majburiy
+        if (!isLoginMode && role === 'owner' && !avatarFile) {
+            setErrorMsg('Iltimos, profil rasmingizni yuklang.');
+            setLoading(false);
+            return;
+        }
 
         try {
             if (isLoginMode) {
@@ -34,10 +51,39 @@ const Login = ({ onLogin }) => {
                 if (role === 'owner') localStorage.setItem('currentUserPhone', phone);
                 onLogin(role);
             } else {
+                // Upload avatar first if provided
+                let avatarUrl = null;
+                if (avatarFile && role === 'owner') {
+                    try {
+                        const fileExt = avatarFile.name.split('.').pop();
+                        const fileName = `${cleanPhone}_${Date.now()}.${fileExt}`;
+                        const { error: uploadError } = await supabase.storage
+                            .from('avatars')
+                            .upload(fileName, avatarFile, { upsert: true });
+                        if (!uploadError) {
+                            const { data: urlData } = supabase.storage
+                                .from('avatars')
+                                .getPublicUrl(fileName);
+                            avatarUrl = urlData?.publicUrl || null;
+                        } else {
+                            console.warn('Avatar upload failed:', uploadError.message);
+                        }
+                    } catch (uploadErr) {
+                        console.warn('Avatar upload error:', uploadErr);
+                    }
+                }
+
                 const { data, error } = await supabase.auth.signUp({
                     email: email,
                     password: password,
-                    options: { data: { full_name: name, phone: phone, role: role } }
+                    options: {
+                        data: {
+                            full_name: name,
+                            phone: phone,
+                            role: role,
+                            avatar_url: avatarUrl,
+                        }
+                    }
                 });
                 if (error) throw error;
                 if (data.user) {
@@ -128,6 +174,42 @@ const Login = ({ onLogin }) => {
                         </AnimatePresence>
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                            {!isLoginMode && role === 'owner' && (
+                                <div className="flex flex-col items-center gap-3 mb-2">
+                                    <label className="text-[10px] font-black text-text-muted uppercase tracking-widest">Profil rasmi</label>
+                                    <div
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="relative w-24 h-24 rounded-full cursor-pointer group"
+                                        style={{
+                                            background: avatarPreview ? 'transparent' : 'rgba(255,255,255,0.05)',
+                                            border: '2px dashed rgba(255,255,255,0.15)',
+                                        }}
+                                    >
+                                        {avatarPreview ? (
+                                            <img
+                                                src={avatarPreview}
+                                                alt="avatar"
+                                                className="w-full h-full object-cover rounded-full"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
+                                                <Camera size={32} />
+                                            </div>
+                                        )}
+                                        <div className="absolute bottom-0 right-0 w-7 h-7 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-bg">
+                                            <Camera size={13} className="text-black" />
+                                        </div>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleAvatarChange}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             {!isLoginMode && (
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">To'liq ism</label>

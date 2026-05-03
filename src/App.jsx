@@ -12,6 +12,7 @@ import LanguageSelect from './views/LanguageSelect';
 import Success from './views/Success';
 import MyBookings from './views/MyBookings';
 import SplashScreen from './components/SplashScreen';
+import PwaInstallPopup from './components/PwaInstallPopup';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -63,30 +64,33 @@ function App() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {!isLoggedIn ? (
-        <Login key="login" onLogin={handleLogin} />
-      ) : !hasSelectedLang ? (
-        <LanguageSelect key="lang" onSelect={handleLanguageSelect} />
-      ) : (
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Landing />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="discovery" element={<Gateway />} />
-              <Route path="booking" element={<Booking />} />
-              <Route path="success" element={<Success />} />
-              <Route path="my-bookings" element={<MyBookings />} />
-            </Route>
+    <>
+      <AnimatePresence mode="wait">
+        {!isLoggedIn ? (
+          <Login key="login" onLogin={handleLogin} />
+        ) : !hasSelectedLang ? (
+          <LanguageSelect key="lang" onSelect={handleLanguageSelect} />
+        ) : (
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Landing />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="discovery" element={<Gateway />} />
+                <Route path="booking" element={<Booking />} />
+                <Route path="success" element={<Success />} />
+                <Route path="my-bookings" element={<MyBookings />} />
+              </Route>
 
-            {/* Display doesn't use the main Layout with Navbar */}
-            <Route path="/display" element={<QueueDisplay />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
-      )}
-    </AnimatePresence>
+              {/* Display doesn't use the main Layout with Navbar */}
+              <Route path="/display" element={<QueueDisplay />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        )}
+      </AnimatePresence>
+      <PwaInstallPopup />
+    </>
   );
 }
 

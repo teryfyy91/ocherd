@@ -240,15 +240,16 @@ const Dashboard = () => {
                         <p className="text-text-muted font-medium text-xs uppercase tracking-widest">Boshqaruv</p>
                     </div>
                 </div>
-                <div className="flex bg-white/5 p-1 rounded-2xl overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <div className="flex overflow-x-auto scrollbar-hide flex-nowrap items-center gap-2 bg-white/5 p-1.5 rounded-[1.25rem] w-full lg:w-auto max-w-full">
                     {[
                         { id: 'queue', icon: Users, label: 'Navbat' },
                         { id: 'stats', icon: BarChart3, label: 'Stat' },
                         { id: 'reviews', icon: Star, label: 'Izoh' },
                         { id: 'settings', icon: Settings, label: 'Sozlama' }
                     ].map(tab => (
-                        <button key={tab.id} onClick={() => setManagementTab(tab.id)} className={`px-5 py-3 rounded-xl text-xs font-black transition-all ${managementTab === tab.id ? 'bg-primary text-bg' : 'text-text-muted hover:text-white'}`}>
-                            <tab.icon size={16} className="inline mr-2" /> {tab.label}
+                        <button key={tab.id} onClick={() => setManagementTab(tab.id)} className={`flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black transition-all whitespace-nowrap ${managementTab === tab.id ? 'bg-primary text-bg shadow-md' : 'text-text-muted hover:text-white'}`}>
+                            <tab.icon size={16} className="flex-none" />
+                            <span>{tab.label}</span>
                         </button>
                     ))}
                 </div>
@@ -258,12 +259,12 @@ const Dashboard = () => {
                 {managementTab === 'queue' && (
                     <div className="flex flex-col gap-8">
                         {/* Summary Stats */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="glass-card p-6 border-primary/20 bg-primary/5">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Faol</p>
+                        <div className="grid grid-cols-2 gap-4 md:gap-6">
+                            <div className="p-6 rounded-3xl border border-[#00C897]/20 bg-[#00C897]/10" style={{ backdropFilter: 'blur(10px)' }}>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-[#00C897] mb-1">Faol</p>
                                 <p className="text-3xl font-black text-text-main">{confirmedQueue.length}</p>
                             </div>
-                            <div className="glass-card p-6 border-amber-500/20 bg-amber-500/5">
+                            <div className="p-6 rounded-3xl border border-amber-500/20 bg-amber-500/10" style={{ backdropFilter: 'blur(10px)' }}>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Kutilmoqda</p>
                                 <p className="text-3xl font-black text-text-main">{pendingQueue.length}</p>
                             </div>
@@ -316,13 +317,13 @@ const Dashboard = () => {
 
                 {managementTab === 'stats' && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="glass-card p-6 bg-white/5">
+                        <div className="grid grid-cols-2 gap-4 md:gap-6">
+                            <div className="p-6 rounded-3xl border border-white/5 bg-white/5" style={{ backdropFilter: 'blur(10px)' }}>
                                 <p className="text-[10px] font-black uppercase text-text-muted mb-1">Mijozlar</p>
                                 <p className="text-3xl font-black text-white">{completedToday.length}</p>
                                 <div className="text-[10px] font-bold text-primary mt-2 flex items-center gap-1"><TrendingUp size={12} /> +12%</div>
                             </div>
-                            <div className="glass-card p-6 bg-white/5">
+                            <div className="p-6 rounded-3xl border border-white/5 bg-white/5" style={{ backdropFilter: 'blur(10px)' }}>
                                 <p className="text-[10px] font-black uppercase text-text-muted mb-1">Daromad</p>
                                 <p className="text-3xl font-black text-white">{incomeToday.toLocaleString()}</p>
                                 <p className="text-[10px] font-bold text-text-muted mt-2">UZS</p>
