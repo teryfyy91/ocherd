@@ -49,7 +49,6 @@ const PwaInstallPopup = () => {
     }, []);
 
     const [isDownloading, setIsDownloading] = useState(false);
-    const [showIosInstruction, setShowIosInstruction] = useState(false);
 
     const handleInstall = async () => {
         setIsDownloading(true);
@@ -58,14 +57,8 @@ const PwaInstallPopup = () => {
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         if (!promptInstall) {
-            // Agar install prompt topilmasa, ehtimol bu iOS yoki Safari
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             setIsDownloading(false);
-            if (isIOS) {
-                setShowIosInstruction(true);
-            } else {
-                alert("Ilovani ekranga qo'shish uchun brauzer menyusidan 'O'rnatish' yoki 'Ekranga qo'shish' ni tanlang.");
-            }
+            alert("Ilovani asosiy ekranga qo'shish uchun brauzer menyusidan 'Add to Home Screen' (Ekranga qo'shish) ni tanlang.");
             return;
         }
 
@@ -111,7 +104,7 @@ const PwaInstallPopup = () => {
                                 <X size={20} />
                             </button>
 
-                            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-1">
+                            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-4">
                                 <div className="w-12 h-12 rounded-2xl bg-black/40 border border-primary/30 flex items-center justify-center flex-shrink-0 animate-glow backdrop-blur-md">
                                     <Download className="text-primary" size={24} />
                                 </div>
@@ -125,32 +118,20 @@ const PwaInstallPopup = () => {
                                 </div>
                             </div>
 
-                            {showIosInstruction ? (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="bg-primary/20 border border-primary/30 rounded-xl p-4 text-center mt-[-10px]"
-                                >
-                                    <p className="text-white text-xs leading-relaxed font-medium">
-                                        iOS da o'rnatish uchun pastdagi <strong className="text-primary">Ulashish (Share)</strong> ikonkasini bosing va <strong className="text-primary">"Add to Home Screen"</strong> (Ekranga qo'shish) tugmasini tanlang.
-                                    </p>
-                                </motion.div>
-                            ) : (
-                                <button
-                                    onClick={handleInstall}
-                                    disabled={isDownloading}
-                                    className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-primary to-[#00DAC2] text-[#0B0F14] shadow-[0_0_20px_rgba(0,200,151,0.3)] hover:shadow-[0_0_30px_rgba(0,200,151,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:active:scale-100"
-                                >
-                                    {isDownloading ? (
-                                        <>
-                                            <Loader2 className="animate-spin" size={20} />
-                                            Yuklanmoqda...
-                                        </>
-                                    ) : (
-                                        "⬇ Yuklab olish"
-                                    )}
-                                </button>
-                            )}
+                            <button
+                                onClick={handleInstall}
+                                disabled={isDownloading}
+                                className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-primary to-[#00DAC2] text-[#0B0F14] shadow-[0_0_20px_rgba(0,200,151,0.3)] hover:shadow-[0_0_30px_rgba(0,200,151,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:active:scale-100"
+                            >
+                                {isDownloading ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={20} />
+                                        Yuklanmoqda...
+                                    </>
+                                ) : (
+                                    "⬇ Yuklab olish"
+                                )}
+                            </button>
                         </div>
                     </div>
                 </motion.div>
