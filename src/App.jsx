@@ -13,6 +13,7 @@ import Success from './views/Success';
 import MyBookings from './views/MyBookings';
 import SplashScreen from './components/SplashScreen';
 import PwaInstallPopup from './components/PwaInstallPopup';
+import PwaUpdatePopup from './components/PwaUpdatePopup';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -90,6 +91,7 @@ function App() {
         )}
       </AnimatePresence>
       <PwaInstallPopup />
+      <PwaUpdatePopup />
     </>
   );
 }
