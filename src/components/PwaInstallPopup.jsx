@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Loader2 } from 'lucide-react';
+import { Download, X, Loader2, Share, PlusSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PwaInstallPopup = () => {
     const [promptInstall, setPromptInstall] = useState(null);
     const [isInstalled, setIsInstalled] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    const [showIosInstruction, setShowIosInstruction] = useState(false);
 
     useEffect(() => {
         // Agar allaqachon standalone rejimda ishlayotgan bo'lsa (o'rnatilgan)
@@ -58,6 +59,7 @@ const PwaInstallPopup = () => {
 
         if (!promptInstall) {
             setIsDownloading(false);
+            setShowIosInstruction(true);
             return;
         }
 
@@ -103,34 +105,67 @@ const PwaInstallPopup = () => {
                                 <X size={20} />
                             </button>
 
-                            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-4">
-                                <div className="w-12 h-12 rounded-2xl bg-black/40 border border-primary/30 flex items-center justify-center flex-shrink-0 animate-glow backdrop-blur-md">
-                                    <Download className="text-primary" size={24} />
-                                </div>
-                                <div className="pr-4">
-                                    <h3 className="text-white font-bold text-sm leading-tight mb-1">
-                                        App sifatida o‘rnatmoqchimisiz?
+                            {showIosInstruction ? (
+                                <div className="flex flex-col gap-4 py-2 mt-2 animate-in fade-in zoom-in duration-300">
+                                    <h3 className="text-white font-bold text-sm leading-tight text-center mb-2">
+                                        iPhone'da o'rnatish yo'riqnomasi
                                     </h3>
-                                    <p className="text-white/60 text-xs font-medium">
-                                        Tezroq va qulayroq foydalanish uchun
-                                    </p>
-                                </div>
-                            </div>
 
-                            <button
-                                onClick={handleInstall}
-                                disabled={isDownloading}
-                                className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-primary to-[#00DAC2] text-[#0B0F14] shadow-[0_0_20px_rgba(0,200,151,0.3)] hover:shadow-[0_0_30px_rgba(0,200,151,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:active:scale-100"
-                            >
-                                {isDownloading ? (
-                                    <>
-                                        <Loader2 className="animate-spin" size={20} />
-                                        Yuklanmoqda...
-                                    </>
-                                ) : (
-                                    "⬇ Yuklab olish"
-                                )}
-                            </button>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center">
+                                            <Share className="text-primary" size={20} />
+                                        </div>
+                                        <p className="text-white/80 text-xs font-medium leading-snug">
+                                            Pastdagi menyudan <strong className="text-white">Ulashish (Share)</strong> tugmasini bosing.
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center">
+                                            <PlusSquare className="text-primary" size={20} />
+                                        </div>
+                                        <p className="text-white/80 text-xs font-medium leading-snug">
+                                            Menyudan <strong className="text-white">Asosiy ekranga qo'shish (Add to Home Screen)</strong> ni tanlang.
+                                        </p>
+                                    </div>
+
+                                    <div className="w-full flex flex-col items-center mt-3 animate-bounce">
+                                        <span className="text-primary/70 text-[10px] uppercase font-bold tracking-widest mb-1">Pastga bosing</span>
+                                        <div className="w-1 h-8 rounded-full bg-gradient-to-b from-primary/50 to-transparent"></div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-black/40 border border-primary/30 flex items-center justify-center flex-shrink-0 animate-glow backdrop-blur-md">
+                                            <Download className="text-primary" size={24} />
+                                        </div>
+                                        <div className="pr-4">
+                                            <h3 className="text-white font-bold text-sm leading-tight mb-1">
+                                                App sifatida o‘rnatmoqchimisiz?
+                                            </h3>
+                                            <p className="text-white/60 text-xs font-medium">
+                                                Tezroq va qulayroq foydalanish uchun
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={handleInstall}
+                                        disabled={isDownloading}
+                                        className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-primary to-[#00DAC2] text-[#0B0F14] shadow-[0_0_20px_rgba(0,200,151,0.3)] hover:shadow-[0_0_30px_rgba(0,200,151,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:active:scale-100"
+                                    >
+                                        {isDownloading ? (
+                                            <>
+                                                <Loader2 className="animate-spin" size={20} />
+                                                Yuklanmoqda...
+                                            </>
+                                        ) : (
+                                            "⬇ Yuklab olish"
+                                        )}
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </motion.div>

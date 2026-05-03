@@ -14,7 +14,7 @@ export default defineConfig({
         name: 'Ocherd - Navbat Tizimi',
         short_name: 'Ocherd',
         description: 'O\'zbekistondagi salonlar uchun onlayn navbat tizimi',
-        theme_color: '#00C470',
+        theme_color: '#0B0F14',
         background_color: '#0B0F14',
         display: 'standalone',
         display_override: ['standalone', 'minimal-ui'],
