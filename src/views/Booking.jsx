@@ -245,7 +245,7 @@ const Booking = () => {
                             </div>
 
                             {/* Summary Card */}
-                            <div className="glass-card p-8 border-primary/10 relative overflow-hidden">
+                            <div className="glass-card px-6 py-8 sm:px-8 border-primary/10 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl" />
                                 <h4 className="text-xs font-black text-text-muted uppercase tracking-[0.2em] mb-4">Xulosa</h4>
                                 <div className="flex flex-col gap-3">
