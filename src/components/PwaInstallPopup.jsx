@@ -58,7 +58,6 @@ const PwaInstallPopup = () => {
 
         if (!promptInstall) {
             setIsDownloading(false);
-            alert("Ilovani asosiy ekranga qo'shish uchun brauzer menyusidan 'Add to Home Screen' (Ekranga qo'shish) ni tanlang.");
             return;
         }
 
