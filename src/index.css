@@ -1,5 +1,6 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
 
 @theme {
   --color-primary: #00C897;
@@ -23,6 +24,7 @@
   --gradient: linear-gradient(135deg, #00C897 0%, #00DAC2 100%);
   --dark-gradient: linear-gradient(180deg, #0B0F14 0%, #111827 100%);
   --emerald-glow: 0 0 20px rgba(0, 200, 151, 0.3);
+  --card-bg: rgba(255, 255, 255, 0.03);
 }
 
 .light {
@@ -31,6 +33,7 @@
   --text: #1E293B;
   --text-muted: #64748B;
   --dark-gradient: linear-gradient(180deg, #F0F4F8 0%, #E2E8F0 100%);
+  --card-bg: rgba(255, 255, 255, 0.8);
 }
 
 .light .glass {
@@ -85,17 +88,23 @@ body {
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 200, 151, 0.1);
+}
+
+/* Prevent inputs/textarea from jumping on hover as they often have absolute icons */
+input.glass-card:hover,
+textarea.glass-card:hover {
+  transform: scale(1.01);
 }
 
 /* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
 
   to {
@@ -107,23 +116,30 @@ body {
 @keyframes pulse-glow {
   0% {
     box-shadow: 0 0 0 0 rgba(0, 200, 151, 0.4);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 20px 10px rgba(0, 200, 151, 0.2);
+    transform: scale(1.02);
   }
 
   70% {
-    box-shadow: 0 0 0 15px rgba(0, 200, 151, 0);
+    box-shadow: 0 0 0 20px rgba(0, 200, 151, 0);
   }
 
   100% {
     box-shadow: 0 0 0 0 rgba(0, 200, 151, 0);
+    transform: scale(1);
   }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-glow {
-  animation: pulse-glow 2s infinite;
+  animation: pulse-glow 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Layout Utilities */
@@ -161,14 +177,19 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .text-gradient {
   background: var(--gradient);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(0, 200, 151, 0.2);
 }
 
 /* Buttons */
@@ -222,4 +243,25 @@ h4 {
   100% {
     background-position: -200% 0;
   }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hide number input arrows */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }

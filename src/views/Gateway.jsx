@@ -27,10 +27,10 @@ const floatingReverse = {
 
 const Gateway = () => {
     const { t } = useTranslation();
-    const { getAllShops, loadingShops, setShopInfo } = useStore();
+    const { allShops, loadingShops, setShopInfo } = useStore();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = React.useState('');
-    const shops = getAllShops();
+    const shops = (allShops || []).filter(s => s.status === 'Active' || !s.status);
 
     const filteredShops = shops.filter(shop =>
         (shop.name || '').toLowerCase().includes((searchQuery || '').toLowerCase())
@@ -101,7 +101,7 @@ const Gateway = () => {
                             <div className="flex">
                                 <div className="w-1/3 h-44 overflow-hidden">
                                     <img
-                                        src={idx % 2 === 0 ? "/barber_1.png" : "/barber_2.png"}
+                                        src={shop.imageUrl || (idx % 2 === 0 ? "/barber_1.png" : "/barber_2.png")}
                                         alt={shop.name}
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />

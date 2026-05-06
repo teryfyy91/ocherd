@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'prompt',
       injectRegister: 'auto',
       manifest: {
-        name: 'Ocherd - Navbat Tizimi',
-        short_name: 'Ocherd',
+        name: 'BarberOS - Navbat Tizimi',
+        short_name: 'BarberOS',
         description: 'O\'zbekistondagi salonlar uchun onlayn navbat tizimi',
         theme_color: '#0B0F14',
         background_color: '#0B0F14',
@@ -47,7 +47,7 @@ export default defineConfig({
         clientsClaim: true,
       },
       devOptions: {
-        enabled: true
+        enabled: false // Dev mode-da PWA popup chiqmasligi uchun
       }
     })
   ],

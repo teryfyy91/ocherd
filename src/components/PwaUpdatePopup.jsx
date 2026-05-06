@@ -22,24 +22,20 @@ const PwaUpdatePopup = () => {
     });
 
     const handleUpdate = async () => {
-        // Eski keshni tozalash funksiyasi, pwa worker bilan conflicti oldini oladi
-        try {
-            if ('caches' in window) {
-                const cacheNames = await window.caches.keys();
-                await Promise.all(cacheNames.map(name => window.caches.delete(name)));
-            }
-        } catch (err) {
-            console.error("Keshni tozalashda xatolik:", err);
-        }
-
-        // Bu skipWaiting ni chaqiradi va app ni reload qiladi
+        // Update function
         updateServiceWorker(true);
     };
 
     const handleClose = () => {
-        // Agar ignor qilinsa, prosto popup yopiladi va eskicha ishlashda davom etadi
         setNeedRefresh(false);
+        // Sessiya davomida boshqa bezovta qilmasligi uchun
+        sessionStorage.setItem('pwa_update_dismissed', 'true');
     };
+
+    // Agar sessiyada yopilgan bo'lsa, ko'rsatmaymiz
+    if (sessionStorage.getItem('pwa_update_dismissed') === 'true') {
+        return null;
+    }
 
     return (
         <AnimatePresence>

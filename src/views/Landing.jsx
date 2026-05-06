@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Users, CalendarCheck, ArrowRight, Scissors } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import InstallPWA from '../components/InstallPWA';
@@ -10,11 +10,51 @@ import { useStore } from '../context/StoreContext';
 const Landing = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { setShopInfo } = useStore();
+    const { setShopInfo, myShops } = useStore();
     const userRole = localStorage.getItem('userRole');
+    const [showSuccess, setShowSuccess] = React.useState(false);
+
+    React.useEffect(() => {
+        const justReg = sessionStorage.getItem('justRegistered');
+        if (justReg === 'true') {
+            setShowSuccess(true);
+        }
+    }, []);
+
+    // Check if user has a pending shop request (secondary check)
+    const pendingShop = myShops.find(s => s.status === 'Pending');
 
     return (
-        <div className="flex flex-col gap-10 pb-20">
+        <div className="flex flex-col gap-10 pb-20 relative">
+            <AnimatePresence>
+                {(showSuccess || pendingShop) && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 50 }}
+                        className="fixed inset-x-6 top-1/2 -translate-y-1/2 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-[1000] glass-card p-10 md:p-16 border-emerald-500/50 bg-bg/90 backdrop-blur-3xl shadow-[0_0_100px_rgba(16,185,129,0.4)] text-center max-w-xl w-full border-2"
+                    >
+                        <div className="w-24 h-24 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center text-bg shadow-2xl shadow-emerald-500/50 mx-auto mb-10">
+                            <CalendarCheck size={48} />
+                        </div>
+                        <h4 className="text-3xl md:text-5xl font-black text-white italic tracking-tighter uppercase mb-6 leading-none">
+                            Sorovnomangiz <br /> yuborildi!
+                        </h4>
+                        <p className="text-emerald-400 font-black uppercase tracking-[0.4em] text-[10px] md:text-xs mb-10 opacity-90">
+                            Admin tasdiqlashini kuting. <br /> Tez orada faol bo'ladi.
+                        </p>
+                        <button
+                            onClick={() => {
+                                setShowSuccess(false);
+                                sessionStorage.removeItem('justRegistered');
+                            }}
+                            className="w-full py-6 bg-emerald-500 text-bg rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-emerald-500/30"
+                        >
+                            Tushunarli
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* Hero Section */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -45,7 +85,14 @@ const Landing = () => {
                     </p>
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => navigate('/discovery')}
+                            onClick={() => {
+                                const isAdmin = localStorage.getItem('currentUserPhone') === '+998505521107';
+                                if (isAdmin) {
+                                    navigate('/dashboard');
+                                } else {
+                                    navigate('/discovery');
+                                }
+                            }}
                             className="btn-primary w-fit animate-glow"
                         >
                             {t('getStarted')}

@@ -77,7 +77,7 @@ const SplashScreen = () => {
                         className="flex flex-col items-center gap-3"
                     >
                         <h1 className="text-5xl md:text-7xl font-black tracking-[0.3em] text-white">
-                            OCHERD
+                            BarberOS
                         </h1>
                         <p className="text-primary font-black tracking-[0.5em] text-[10px] md:text-sm uppercase opacity-70">
                             Navbatda kuting

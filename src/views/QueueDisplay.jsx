@@ -31,7 +31,7 @@ const QueueDisplay = () => {
                         <div className="w-12 h-12 glass rounded-2xl flex items-center justify-center text-primary">
                             <Users size={28} />
                         </div>
-                        <h1 className="text-5xl font-black tracking-tight">{shopInfo.name || 'OCHERD'}</h1>
+                        <h1 className="text-5xl font-black tracking-tight">{shopInfo.name || 'BarberOS'}</h1>
                     </div>
                     <div className="flex items-center gap-3 text-text-muted font-bold text-xl ml-16">
                         <span className="w-3 h-3 bg-primary rounded-full animate-pulse" />
@@ -156,7 +156,7 @@ const QueueDisplay = () => {
             {/* Footer */}
             <footer className="mt-12 flex justify-center opacity-30">
                 <p className="text-xs font-black uppercase tracking-[0.5em] text-white">
-                    OCHERD Smart Queue Management • Premium Experience
+                    BarberOS Smart Queue Management • Premium Experience
                 </p>
             </footer>
         </div>

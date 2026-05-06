@@ -7,7 +7,7 @@ const InstallPWA = () => {
 
     useEffect(() => {
         // Agar allaqachon standalone rejimda ishlayotgan bo'lsa (o'rnatilgan)
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
             setIsInstalled(true);
             return;
         }

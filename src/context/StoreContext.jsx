@@ -181,47 +181,55 @@ export const StoreProvider = ({ children }) => {
     const [loadingUser, setLoadingUser] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // Initial fetch of shops and user
+    // Handle auth state and user initialization
     useEffect(() => {
-        const init = async () => {
+        const initUser = async () => {
             setLoadingUser(true);
             try {
-                // Add a timeout to prevent infinite loading if Supabase hangs
-                const authPromise = supabase.auth.getUser();
-                const timeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Auth timeout')), 5000)
-                );
-
-                const { data: { user } } = await Promise.race([authPromise, timeoutPromise]);
+                const { data: { user } } = await supabase.auth.getUser();
                 setCurrentUser(user);
             } catch (err) {
-                console.error('Error during auth initialization:', err);
-                // Even if auth fails, we clear loading state to show login or public views
+                console.error('Auth init error:', err);
                 setCurrentUser(null);
             } finally {
                 setLoadingUser(false);
                 fetchShops();
                 fetchMyBookings();
-                if (shopInfo.id) fetchReviews();
             }
         };
-        init();
+        initUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setCurrentUser(session?.user ?? null);
         });
 
-        // Polling for new data (every 10 seconds)
+        return () => subscription.unsubscribe();
+    }, []);
+
+    // Sync myShops whenever allShops or currentUser changes
+    useEffect(() => {
+        if (currentUser && allShops.length > 0) {
+            const ownerShops = allShops.filter(s => s.ownerId === currentUser.id);
+            setMyShops(ownerShops);
+            // Auto-select first shop if none selected
+            if (!shopInfo.id && ownerShops.length > 0) {
+                // Don't auto-set if it's already set to something valid
+                // setShopInfo(ownerShops[0]);
+            }
+        } else if (!currentUser) {
+            setMyShops([]);
+        }
+    }, [allShops, currentUser]);
+
+    // Polling for new data (every 10 seconds)
+    useEffect(() => {
         const interval = setInterval(() => {
             fetchBookings();
             fetchMyBookings();
             if (shopInfo.id) fetchReviews();
         }, 10000);
 
-        return () => {
-            subscription.unsubscribe();
-            clearInterval(interval);
-        };
+        return () => clearInterval(interval);
     }, [shopInfo.id]);
 
     const fetchShops = async () => {
@@ -244,26 +252,34 @@ export const StoreProvider = ({ children }) => {
                     id: s.id,
                     ownerId: s.owner_id,
                     name: s.name,
+                    imageUrl: s.image_url,
                     services: parseServices(s.services),
                     workingHours: s.working_hours,
+                    status: s.status || 'Active', // Default to Active for older entries
                     createdAt: s.created_at
                 }));
                 setAllShops(formattedShops);
-
-                if (currentUser) {
-                    const ownerShops = formattedShops.filter(s => s.ownerId === currentUser.id);
-                    setMyShops(ownerShops);
-
-                    // If no shopInfo set yet, pick the first one
-                    if (!shopInfo.name && ownerShops.length > 0) {
-                        setShopInfo(ownerShops[0]);
-                    }
-                }
             }
         } catch (error) {
             console.error('Error fetching shops:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const approveShop = async (id) => {
+        try {
+            const { error } = await supabase
+                .from('shops')
+                .update({ status: 'Active' })
+                .eq('id', id);
+
+            if (error) throw error;
+            await fetchShops();
+            return { success: true };
+        } catch (err) {
+            console.error('Error approving shop:', err);
+            return { success: false, error: err.message };
         }
     };
 
@@ -365,6 +381,7 @@ export const StoreProvider = ({ children }) => {
             const payload = {
                 owner_id: user.id,
                 name: info.name,
+                image_url: info.imageUrl,
                 services: normalizedServices,
                 working_hours: info.workingHours
             };
@@ -401,6 +418,7 @@ export const StoreProvider = ({ children }) => {
                             id: newData[0].id,
                             ownerId: newData[0].owner_id,
                             name: newData[0].name,
+                            imageUrl: newData[0].image_url,
                             services: newData[0].services,
                             workingHours: newData[0].working_hours
                         };
@@ -411,6 +429,7 @@ export const StoreProvider = ({ children }) => {
                     setShopInfo({
                         ...shopInfo,
                         name: info.name,
+                        imageUrl: info.imageUrl,
                         services: info.services,
                         workingHours: info.workingHours
                     });
@@ -493,7 +512,9 @@ export const StoreProvider = ({ children }) => {
             updateBookingStatus,
             deleteBooking,
             deleteShop,
+            approveShop,
             getAllShops,
+            allShops,
             currentUser,
             loadingUser,
             signOut,

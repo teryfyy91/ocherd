@@ -320,8 +320,8 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: savedLang,
-        fallbackLng: "en",
+        lng: localStorage.getItem('i18nextLng') || 'uz',
+        fallbackLng: "uz",
         interpolation: {
             escapeValue: false
         }

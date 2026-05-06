@@ -6,11 +6,81 @@ import {
     MonitorPlay, Users, Phone, Scissors,
     ChevronLeft, Plus, LayoutGrid, Store,
     ArrowRight, MapPin, MoreVertical, AlertTriangle, Check,
-    BarChart3, TrendingUp, Star, MessageSquare, X
+    BarChart3, TrendingUp, Star, MessageSquare, X, Camera
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '../utils/supabase';
+
+const CustomTimePicker = ({ label, value, onChange }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [hour, minute] = (value || "09:00").split(':');
+
+    const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+    const minutes = ["00", "15", "30", "45"]; // Simplified minutes for better UX, or use full 0-59
+
+    const handleSelect = (newH, newM) => {
+        onChange(`${newH}:${newM}`);
+    };
+
+    return (
+        <div className="flex flex-col gap-2 relative z-[60]">
+            <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">{label}</label>
+            <div
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full glass-card bg-white/5 border-white/5 px-6 py-4 rounded-xl text-white font-bold cursor-pointer flex items-center justify-between hover:bg-white/10 transition-all border border-white/5"
+            >
+                <span className="text-sm">{hour}:{minute}</span>
+                <Clock size={16} className="text-text-muted" />
+            </div>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        <div className="fixed inset-0 z-[100]" onClick={() => setIsOpen(false)} />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="absolute top-full left-0 right-0 z-[110] glass shadow-2xl rounded-2xl p-3 flex gap-2 mt-1 min-w-[220px]"
+                        >
+                            <div className="flex-1 flex flex-col gap-1">
+                                <span className="text-[7px] font-black uppercase text-text-muted text-center opacity-50">HR</span>
+                                <div className="h-32 overflow-y-auto scrollbar-hide flex flex-col gap-0.5">
+                                    {hours.map(h => (
+                                        <button
+                                            key={h}
+                                            onClick={() => handleSelect(h, minute)}
+                                            className={`py-2 rounded-lg font-black text-xs transition-all ${h === hour ? 'bg-primary text-bg shadow-lg' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}
+                                        >
+                                            {h}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="w-[1px] bg-white/5 my-2" />
+                            <div className="flex-1 flex flex-col gap-1">
+                                <span className="text-[7px] font-black uppercase text-text-muted text-center opacity-50">MIN</span>
+                                <div className="h-32 overflow-y-auto scrollbar-hide flex flex-col gap-0.5">
+                                    {minutes.map(m => (
+                                        <button
+                                            key={m}
+                                            onClick={() => handleSelect(hour, m)}
+                                            className={`py-2 rounded-lg font-black text-xs transition-all ${m === minute ? 'bg-primary text-bg shadow-lg' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}
+                                        >
+                                            {m}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const Dashboard = () => {
     const { t } = useTranslation();
@@ -35,6 +105,9 @@ const Dashboard = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedUserDetails, setSelectedUserDetails] = useState(null);
     const [chartType, setChartType] = useState('customers'); // 'customers' or 'income'
+    const [salonImageFile, setSalonImageFile] = useState(null);
+    const [salonImagePreview, setSalonImagePreview] = useState(null);
+    const salonFileInputRef = React.useRef(null);
 
     const showToast = (msg) => {
         setSuccessMessage(msg);
@@ -58,11 +131,42 @@ const Dashboard = () => {
     const handleSave = async (e) => {
         e.preventDefault();
         const firstTime = !shopInfo.id;
-        const result = await updateShopInfo(formData);
+
+        let imageUrl = formData.imageUrl;
+
+        if (salonImageFile) {
+            try {
+                const fileExt = salonImageFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('avatars') // Using same bucket for simplicity, or create 'shops' bucket
+                    .upload(fileName, salonImageFile);
+
+                if (!uploadError) {
+                    const { data: urlData } = supabase.storage
+                        .from('avatars')
+                        .getPublicUrl(fileName);
+                    imageUrl = urlData.publicUrl;
+                }
+            } catch (err) {
+                console.error("Image upload error:", err);
+            }
+        }
+
+        const result = await updateShopInfo({ ...formData, imageUrl });
         if (result && (result.success || !result.error)) {
             showToast("Muvaffaqiyatli saqlandi!");
             setIsEditing(false);
+            setSalonImageFile(null);
             if (firstTime) navigate('/success');
+        }
+    };
+
+    const handleSalonImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSalonImageFile(file);
+            setSalonImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -89,6 +193,8 @@ const Dashboard = () => {
         setShopInfo(shop);
         setViewMode('manage');
         setManagementTab('queue');
+        setSalonImagePreview(null);
+        setSalonImageFile(null);
     };
 
     const getStatsData = () => {
@@ -119,6 +225,8 @@ const Dashboard = () => {
         setViewMode('manage');
         setIsEditing(true);
         setManagementTab('settings');
+        setSalonImagePreview(null);
+        setSalonImageFile(null);
     };
 
     if (viewMode === 'list') {
@@ -168,8 +276,12 @@ const Dashboard = () => {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl" />
                                 <div className="flex justify-between items-center relative z-10">
                                     <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-bg transition-all">
-                                            <Store size={32} />
+                                        <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-bg transition-all overflow-hidden">
+                                            {shop.imageUrl ? (
+                                                <img src={shop.imageUrl} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Store size={32} />
+                                            )}
                                         </div>
                                         <div className="flex flex-col gap-1">
                                             <h3 className="text-2xl font-black text-text-main group-hover:text-primary transition-colors">{shop.name}</h3>
@@ -388,19 +500,51 @@ const Dashboard = () => {
                                 <h3 className="text-2xl font-black text-white">Sozlamalar</h3>
                             </div>
                             <form onSubmit={handleSave} className="flex flex-col gap-8">
+                                <div className="flex flex-col items-center gap-4 mb-6">
+                                    <label className="text-[10px] font-black text-text-muted uppercase tracking-widest">Salon rasmi / Logotip</label>
+                                    <div
+                                        onClick={() => salonFileInputRef.current?.click()}
+                                        className="relative w-full h-48 rounded-3xl cursor-pointer group overflow-hidden border-2 border-dashed border-white/10 hover:border-primary/40 transition-all bg-white/5"
+                                    >
+                                        {salonImagePreview || formData.imageUrl ? (
+                                            <img
+                                                src={salonImagePreview || formData.imageUrl}
+                                                alt="Salon"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex flex-col items-center justify-center text-text-muted group-hover:text-primary transition-colors gap-2">
+                                                <Camera size={40} />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Rasm yuklash</span>
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                            <Camera size={32} className="text-white" />
+                                        </div>
+                                        <input
+                                            ref={salonFileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleSalonImageChange}
+                                        />
+                                    </div>
+                                </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Salon nomi</label>
                                     <input type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl outline-none text-white font-bold transition-all" required />
                                 </div>
                                 <div className="grid grid-cols-2 gap-6">
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Ochilish</label>
-                                        <input type="time" value={formData.workingHours?.start || '09:00'} onChange={e => setFormData({ ...formData, workingHours: { ...formData.workingHours, start: e.target.value } })} className="w-full glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl text-white font-bold" />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Yopilish</label>
-                                        <input type="time" value={formData.workingHours?.end || '18:00'} onChange={e => setFormData({ ...formData, workingHours: { ...formData.workingHours, end: e.target.value } })} className="w-full glass-card bg-white/5 border-white/5 px-6 py-5 rounded-2xl text-white font-bold" />
-                                    </div>
+                                    <CustomTimePicker
+                                        label="Ochilish"
+                                        value={formData.workingHours?.start || '09:00'}
+                                        onChange={val => setFormData({ ...formData, workingHours: { ...formData.workingHours, start: val } })}
+                                    />
+                                    <CustomTimePicker
+                                        label="Yopilish"
+                                        value={formData.workingHours?.end || '18:00'}
+                                        onChange={val => setFormData({ ...formData, workingHours: { ...formData.workingHours, end: val } })}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-4">
                                     <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Xizmatlar</label>

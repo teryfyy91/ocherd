@@ -219,7 +219,7 @@ const Booking = () => {
                                 <div className="flex flex-col gap-2">
                                     <label className="text-xs font-black text-text-muted uppercase tracking-widest ml-1">To'liq ism</label>
                                     <div className="relative">
-                                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" size={18} />
                                         <input
                                             type="text"
                                             value={formData.name}
@@ -232,7 +232,7 @@ const Booking = () => {
                                 <div className="flex flex-col gap-2">
                                     <label className="text-xs font-black text-text-muted uppercase tracking-widest ml-1">Telefon raqam</label>
                                     <div className="relative">
-                                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" size={18} />
                                         <input
                                             type="tel"
                                             value={formData.phone}

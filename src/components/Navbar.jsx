@@ -21,7 +21,15 @@ const Navbar = () => {
         <>
             <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-auto">
                 <div className="glass rounded-3xl p-2 flex justify-around items-center shadow-2xl border border-white/5">
-                    {userRole !== 'owner' ? (
+                    {/* Only Show Dashboard for Super Admin */}
+                    {localStorage.getItem('currentUserPhone') === '+998505521107' && (
+                        <button onClick={() => navigate('/dashboard')} className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/dashboard' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        </button>
+                    )}
+
+                    {/* Show Discovery only for non-admins */}
+                    {localStorage.getItem('currentUserPhone') !== '+998505521107' && (
                         <button
                             onClick={() => {
                                 if (window.location.pathname === '/discovery') {
@@ -35,10 +43,6 @@ const Navbar = () => {
                             className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/discovery' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}
                         >
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </button>
-                    ) : (
-                        <button onClick={() => navigate('/dashboard')} className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/dashboard' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         </button>
                     )}
 

@@ -106,7 +106,7 @@ const Success = () => {
                 transition={{ delay: 1 }}
                 className="absolute bottom-32 text-[10px] font-black uppercase tracking-[0.4em] text-white"
             >
-                OCHERD Queue System
+                BarberOS Queue System
             </motion.p>
         </div>
     );

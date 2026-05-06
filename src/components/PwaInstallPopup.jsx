@@ -8,9 +8,11 @@ const PwaInstallPopup = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [showIosInstruction, setShowIosInstruction] = useState(false);
 
+    const deferredPromptRef = React.useRef(null);
+
     useEffect(() => {
         // Agar allaqachon standalone rejimda ishlayotgan bo'lsa (o'rnatilgan)
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
             setIsInstalled(true);
             return;
         }
@@ -21,6 +23,7 @@ const PwaInstallPopup = () => {
 
         const handler = e => {
             e.preventDefault();
+            deferredPromptRef.current = e;
             setPromptInstall(e);
         };
 
@@ -36,9 +39,10 @@ const PwaInstallPopup = () => {
         // 2.5 soniyadan keyin ko'rsatish
         const timer = setTimeout(() => {
             if (!sessionStorage.getItem('pwa_popup_dismissed') && !isInstalled) {
-                // If there's no prompt, usually Android PWA shows an add to home screen anyway.
-                // We show this to prompt the user.
-                setIsVisible(true);
+                const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+                if (deferredPromptRef.current || isIos) {
+                    setIsVisible(true);
+                }
             }
         }, 2500);
 
@@ -47,7 +51,7 @@ const PwaInstallPopup = () => {
             window.removeEventListener('appinstalled', installedHandler);
             clearTimeout(timer);
         };
-    }, []);
+    }, [isInstalled]);
 
     const [isDownloading, setIsDownloading] = useState(false);
 
