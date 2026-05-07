@@ -288,23 +288,23 @@ const Login = ({ onLogin }) => {
                 className={regStep === 1 ? "w-full max-w-7xl" : "w-full max-w-6xl"}
             >
                 {!role ? (
-                    <div className="flex flex-col gap-12 md:gap-20 w-full pt-10 relative">
+                    <div className="flex flex-col gap-8 md:gap-20 w-full pt-6 md:pt-10 relative">
                         <div className="absolute -top-10 -left-10 w-72 h-72 bg-primary/20 rounded-full blur-[120px] animate-pulse" />
                         <div className="absolute -bottom-10 -right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
 
-                        <div className="text-center relative z-10 scale-100 md:scale-110">
-                            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="inline-flex items-center gap-3 mb-6">
+                        <div className="text-center relative z-10">
+                            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="inline-flex items-center gap-3 mb-4">
                                 <div className="h-px w-8 bg-gradient-to-r from-transparent to-primary" />
-                                <span className="text-primary text-[10px] font-black uppercase tracking-[0.5em]">Welcome to</span>
+                                <span className="text-primary text-[9px] font-black uppercase tracking-[0.5em]">Welcome to</span>
                                 <div className="h-px w-8 bg-gradient-to-l from-transparent to-primary" />
                             </motion.div>
-                            <h1 className="text-7xl md:text-9xl font-black text-text-main uppercase italic leading-none tracking-tighter">
+                            <h1 className="text-5xl md:text-9xl font-black text-text-main uppercase italic leading-none tracking-tighter">
                                 <span className="text-gradient">Barber</span>OS
                             </h1>
-                            <p className="text-text-muted mt-6 font-bold tracking-widest text-xs md:text-lg opacity-60 uppercase">Sizga qulay va zamonaviy xizmat ko'rsatish tizimi</p>
+                            <p className="text-text-muted mt-3 font-bold tracking-widest text-[9px] md:text-lg opacity-60 uppercase">Sizga qulay va zamonaviy xizmat ko'rsatish tizimi</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full relative z-10 px-4 md:px-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 w-full relative z-10 px-2 md:px-0">
                             <motion.button
                                 whileHover={{ scale: 1.02, y: -10 }}
                                 whileTap={{ scale: 0.98 }}
@@ -312,13 +312,13 @@ const Login = ({ onLogin }) => {
                                 className="group relative glass-card p-1 overflow-hidden"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative glass-card bg-bg/40 border-white/5 group-hover:border-primary/30 p-12 md:p-24 flex flex-col items-center gap-10 transition-all duration-500">
-                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] flex items-center justify-center bg-white/5 border border-white/10 text-primary group-hover:bg-primary group-hover:text-bg transition-all">
-                                        <User size={48} className="md:size-16" />
+                                <div className="relative glass-card bg-bg/40 border-white/5 group-hover:border-primary/30 p-8 md:p-24 flex flex-col items-center gap-5 md:gap-10 transition-all duration-500">
+                                    <div className="w-16 h-16 md:w-32 md:h-32 rounded-2xl md:rounded-[2rem] flex items-center justify-center bg-white/5 border border-white/10 text-primary group-hover:bg-primary group-hover:text-bg transition-all">
+                                        <User size={28} className="md:size-16" />
                                     </div>
                                     <div className="text-center">
-                                        <h4 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter transition-colors group-hover:text-primary leading-none mb-3">Mijozman</h4>
-                                        <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] opacity-70">Navbat olish uchun</p>
+                                        <h4 className="text-2xl md:text-6xl font-black text-white italic uppercase tracking-tighter transition-colors group-hover:text-primary leading-none mb-2">Mijozman</h4>
+                                        <p className="text-[9px] font-black text-text-muted uppercase tracking-[0.3em] opacity-70">Navbat olish uchun</p>
                                     </div>
                                 </div>
                             </motion.button>
@@ -330,33 +330,33 @@ const Login = ({ onLogin }) => {
                                 className="group relative glass-card p-1 overflow-hidden"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative glass-card bg-bg/40 border-white/5 group-hover:border-emerald-500/30 p-12 md:p-24 flex flex-col items-center gap-10 transition-all duration-500">
-                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] flex items-center justify-center bg-white/5 border border-white/10 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-bg transition-all">
-                                        <Building2 size={48} className="md:size-16" />
+                                <div className="relative glass-card bg-bg/40 border-white/5 group-hover:border-emerald-500/30 p-8 md:p-24 flex flex-col items-center gap-5 md:gap-10 transition-all duration-500">
+                                    <div className="w-16 h-16 md:w-32 md:h-32 rounded-2xl md:rounded-[2rem] flex items-center justify-center bg-white/5 border border-white/10 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-bg transition-all">
+                                        <Building2 size={28} className="md:size-16" />
                                     </div>
                                     <div className="text-center">
-                                        <h4 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter transition-colors group-hover:text-emerald-400 leading-none mb-3">Salon egasi</h4>
-                                        <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] opacity-70">Biznes boshqarish</p>
+                                        <h4 className="text-2xl md:text-6xl font-black text-white italic uppercase tracking-tighter transition-colors group-hover:text-emerald-400 leading-none mb-2">Salon egasi</h4>
+                                        <p className="text-[9px] font-black text-text-muted uppercase tracking-[0.3em] opacity-70">Biznes boshqarish</p>
                                     </div>
                                 </div>
                             </motion.button>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-10 w-full max-w-sm md:max-w-6xl mx-auto py-4">
+                    <div className="flex flex-col gap-6 w-full max-w-sm md:max-w-6xl mx-auto py-2">
                         <button
                             onClick={() => regStep === 1 ? setRegStep(0) : setRole(null)}
                             className="flex items-center gap-3 text-text-muted font-black text-xs uppercase tracking-widest hover:text-text-main transition-colors group"
                         >
-                            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Orqaga
+                            <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Orqaga
                         </button>
 
                         {regStep !== 1 && (
-                            <div className="flex flex-col gap-3">
-                                <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none">
+                            <div className="flex flex-col gap-2">
+                                <h2 className="text-3xl md:text-7xl font-black text-white tracking-tighter uppercase italic leading-none">
                                     {isLoginMode ? 'Kirish' : 'Ro\'yxatdan o\'tish'}
                                 </h2>
-                                <p className="text-text-muted font-black text-[10px] md:text-sm uppercase tracking-[0.4em] opacity-50 ml-1">
+                                <p className="text-text-muted font-black text-[9px] md:text-sm uppercase tracking-[0.4em] opacity-50 ml-1">
                                     {role === 'owner' ? 'Salon boshqaruviga kirish' : 'Xizmatlardan foydalanish'}
                                 </p>
                             </div>
@@ -458,39 +458,39 @@ const Login = ({ onLogin }) => {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 w-full">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-12 w-full">
                                         {!isLoginMode && (
-                                            <div className="flex flex-col gap-4">
-                                                <label className="text-xs md:text-xl font-black text-text-muted uppercase tracking-[0.3em] ml-2">To'liq ism</label>
+                                            <div className="flex flex-col gap-3">
+                                                <label className="text-[10px] md:text-xl font-black text-text-muted uppercase tracking-[0.3em] ml-2">To'liq ism</label>
                                                 <div className="relative w-full">
-                                                    <User size={28} className="absolute left-10 top-1/2 -translate-y-1/2 text-text-muted z-20 pointer-events-none" />
-                                                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full !pl-24 pr-10 py-6 glass-card bg-white/5 border-white/10 rounded-[2.5rem] outline-none text-white font-black text-lg md:text-xl focus:border-primary/50 relative z-10" placeholder="Ism..." required />
+                                                    <User size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted z-20 pointer-events-none" />
+                                                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full !pl-12 pr-4 py-4 glass-card bg-white/5 border-white/10 rounded-2xl outline-none text-white font-black text-base focus:border-primary/50 relative z-10" placeholder="Ism..." required />
                                                 </div>
                                             </div>
                                         )}
-                                        <div className={`flex flex-col gap-4 ${isLoginMode ? 'md:col-span-2' : ''}`}>
-                                            <label className="text-xs md:text-xl font-black text-text-muted uppercase tracking-[0.3em] ml-2">Telefon</label>
+                                        <div className={`flex flex-col gap-3 ${isLoginMode ? 'md:col-span-2' : ''}`}>
+                                            <label className="text-[10px] md:text-xl font-black text-text-muted uppercase tracking-[0.3em] ml-2">Telefon</label>
                                             <div className="relative">
-                                                <Phone size={24} className="absolute left-10 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
-                                                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full pl-24 pr-10 py-6 glass-card bg-white/5 border-white/10 rounded-[2.5rem] outline-none text-white font-black text-lg md:text-xl focus:border-primary/50" placeholder="90 123 45 67" required />
+                                                <Phone size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+                                                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full pl-12 pr-4 py-4 glass-card bg-white/5 border-white/10 rounded-2xl outline-none text-white font-black text-base focus:border-primary/50" placeholder="90 123 45 67" required />
                                             </div>
                                         </div>
-                                        <div className="md:col-span-2 flex flex-col gap-4">
-                                            <label className="text-xs md:text-xl font-black text-text-muted uppercase tracking-[0.3em] ml-2">Parol</label>
+                                        <div className="md:col-span-2 flex flex-col gap-3">
+                                            <label className="text-[10px] md:text-xl font-black text-text-muted uppercase tracking-[0.3em] ml-2">Parol</label>
                                             <div className="relative">
-                                                <Lock size={24} className="absolute left-10 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
-                                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-24 pr-10 py-6 glass-card bg-white/5 border-white/10 rounded-[2.5rem] outline-none text-white font-black text-lg md:text-xl focus:border-primary/50" placeholder="••••••••" required />
+                                                <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+                                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-12 pr-4 py-4 glass-card bg-white/5 border-white/10 rounded-2xl outline-none text-white font-black text-base focus:border-primary/50" placeholder="••••••••" required />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <button type="submit" disabled={loading} className="w-full py-8 md:py-10 bg-primary text-bg rounded-[3rem] font-black text-2xl md:text-3xl mt-8 shadow-2xl shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-6 group">
-                                        {loading ? <Loader2 className="animate-spin size-8" /> : (isLoginMode ? 'Kirish' : (role === 'owner' && regStep === 0 ? 'Davom etish' : 'Ro\'yxatdan o\'tish'))}
+                                    <button type="submit" disabled={loading} className="w-full py-5 md:py-10 bg-primary text-bg rounded-2xl md:rounded-[3rem] font-black text-lg md:text-3xl mt-4 shadow-2xl shadow-primary/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-4 group">
+                                        {loading ? <Loader2 className="animate-spin size-6" /> : (isLoginMode ? 'Kirish' : (role === 'owner' && regStep === 0 ? 'Davom etish' : 'Ro\'yxatdan o\'tish'))}
                                     </button>
 
-                                    <p className="text-center text-text-muted font-black text-base md:text-xl mt-10 opacity-60">
+                                    <p className="text-center text-text-muted font-black text-sm md:text-xl mt-4 opacity-60">
                                         {isLoginMode ? 'Hisobingiz yo\'qmi?' : 'Hisobingiz bormi?'}{' '}
-                                        <button type="button" onClick={() => { setIsLoginMode(!isLoginMode); setRegStep(0); }} className="text-primary font-black hover:underline uppercase text-xs md:text-base ml-4 tracking-widest">
+                                        <button type="button" onClick={() => { setIsLoginMode(!isLoginMode); setRegStep(0); }} className="text-primary font-black hover:underline uppercase text-[10px] md:text-base ml-2 tracking-widest">
                                             {isLoginMode ? 'Ro\'yxatdan o\'tish' : 'Kirish'}
                                         </button>
                                     </p>
