@@ -33,7 +33,7 @@ const AdminDashboard = () => {
     const {
         shopInfo, queue, updateBookingStatus,
         deleteBooking, reviews, currentUser, allShops: contextShops,
-        deleteShop, approveShop, refreshShops
+        deleteShop, approveShop, refreshShops, signOut
     } = useStore();
 
     const userPhone = localStorage.getItem('currentUserPhone');
@@ -375,7 +375,7 @@ const AdminDashboard = () => {
                 ))}
             </nav>
             <div className="p-4 border-t border-white/5">
-                <button onClick={() => window.location.href = '/'} className="flex items-center gap-4 px-4 py-6 rounded-xl text-rose-400 hover:bg-rose-400/5 w-full transition-all group">
+                <button onClick={signOut} className="flex items-center gap-4 px-4 py-6 rounded-xl text-rose-400 hover:bg-rose-400/5 w-full transition-all group">
                     <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
                     {isSidebarOpen && <span className="font-black text-sm uppercase tracking-widest">Chiqish</span>}
                 </button>
@@ -438,7 +438,7 @@ const AdminDashboard = () => {
 
                     {isSuperAdmin && (
                         <button
-                            onClick={() => window.location.href = '/'}
+                            onClick={signOut}
                             className="p-3 text-rose-400 hover:bg-rose-400/5 rounded-xl transition-all ml-2"
                             title="Chiqish"
                         >

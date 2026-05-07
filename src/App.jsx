@@ -48,14 +48,37 @@ function App() {
 
   // Synchronize local login state with current user from Supabase
   useEffect(() => {
-    if (!loadingUser) {
-      if (currentUser && !showApprovalGate) {
-        setIsLoggedIn(true);
-      } else if (!currentUser) {
-        setIsLoggedIn(false);
-        localStorage.removeItem('isLoggedIn');
+    const checkAndSync = async () => {
+      if (!loadingUser) {
+        if (currentUser && !showApprovalGate) {
+          const userMeta = currentUser.user_metadata || {};
+          const userPhone = userMeta.phone || '';
+          const isAdmin = userPhone.includes('505521107');
+          const isOwner = userMeta.role === 'owner';
+
+          // For non-admin salon owners, verify shop approval before granting access
+          if (isOwner && !isAdmin) {
+            const { data: shopData } = await supabase
+              .from('shops')
+              .select('status')
+              .eq('owner_id', currentUser.id)
+              .single();
+
+            if (shopData && shopData.status === 'Pending') {
+              // Block access — show approval gate and sign out
+              sessionStorage.setItem('awaitingApproval', 'true');
+              await supabase.auth.signOut();
+              return;
+            }
+          }
+          setIsLoggedIn(true);
+        } else if (!currentUser) {
+          setIsLoggedIn(false);
+          localStorage.removeItem('isLoggedIn');
+        }
       }
-    }
+    };
+    checkAndSync();
   }, [currentUser, loadingUser, showApprovalGate]);
 
   // Handle Splash Screen timeout
