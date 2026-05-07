@@ -25,26 +25,16 @@ const Navbar = () => {
                     <button
                         key={item.path}
                         onClick={() => navigate(item.path)}
-                        className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${isActive(item.path)
-                            ? 'text-[#7C3AED]'
-                            : 'text-slate-400'
-                            }`}
+                        className="relative flex flex-col items-center gap-1.5 transition-all duration-300 py-1"
                     >
-                        <div className="relative">
+                        <div className={`w-14 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${isActive(item.path) ? 'bg-[#7C3AED]/10' : 'bg-transparent'}`}>
                             <item.icon
                                 size={22}
                                 strokeWidth={isActive(item.path) ? 2.5 : 2}
-                                fill={isActive(item.path) ? "currentColor" : "none"}
-                                className={isActive(item.path) ? "opacity-100" : "opacity-70"}
+                                className={isActive(item.path) ? "text-[#7C3AED]" : "text-slate-400"}
                             />
-                            {isActive(item.path) && (
-                                <motion.div
-                                    layoutId="nav-dot"
-                                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#7C3AED] rounded-full"
-                                />
-                            )}
                         </div>
-                        <span className={`text-[9px] font-bold tracking-tight ${isActive(item.path) ? 'opacity-100' : 'opacity-60'}`}>
+                        <span className={`text-[9px] font-black uppercase tracking-tighter ${isActive(item.path) ? 'text-[#7C3AED]' : 'text-slate-400 opacity-60'}`}>
                             {item.label}
                         </span>
                     </button>

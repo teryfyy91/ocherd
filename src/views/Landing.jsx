@@ -54,9 +54,9 @@ const Landing = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-6 pb-32 -mt-6">
+        <div className="flex flex-col gap-6 pb-32 -mt-6 bg-white min-h-screen">
             {/* Main Purple Header Section */}
-            <div className="bg-[#7C3AED] -mx-6 px-6 pt-10 pb-12 rounded-b-[2.5rem] relative shadow-2xl shadow-purple-500/20">
+            <div className="bg-[#7C3AED] -mx-6 px-6 pt-12 pb-16 rounded-b-[3.5rem] relative shadow-2xl shadow-purple-500/20 overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
 
                 {/* User Info & Actions */}
@@ -70,9 +70,9 @@ const Landing = () => {
                             />
                         </div>
                         <div>
-                            <p className="text-white/70 text-[10px] font-medium tracking-wide">Hello Jobby,</p>
-                            <h4 className="text-base font-bold text-white">
-                                Good Morning
+                            <p className="text-white/70 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Xush kelibsiz,</p>
+                            <h4 className="text-xl font-black text-white italic tracking-tighter uppercase">
+                                {currentUser?.user_metadata?.full_name?.split(' ')[0] || 'Mijoz'}
                             </h4>
                         </div>
                     </div>
