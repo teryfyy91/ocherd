@@ -1,105 +1,140 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBag, User, LogOut } from 'lucide-react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Home, Search, ShoppingBag, User, LogOut, Settings, Phone, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../context/StoreContext';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { signOut } = useStore();
+    const { signOut, currentUser } = useStore();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     const navItems = [
-        { path: '/', icon: Home, label: 'Home' },
-        { path: '/discovery', icon: Search, label: 'Search' },
-        { path: '/my-bookings', icon: ShoppingBag, label: 'Shop' },
+        { path: '/', icon: Home, label: 'Asosiy' },
+        { path: '/discovery', icon: Search, label: 'Qidiruv' },
+        { path: '/my-bookings', icon: Calendar, label: 'Navbatlar' },
     ];
 
     const isActive = (path) => location.pathname === path;
 
     return (
         <>
-            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-slate-100 px-6 pb-6 pt-3 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                {navItems.map((item) => (
-                    <button
-                        key={item.path}
-                        onClick={() => navigate(item.path)}
-                        className="relative flex flex-col items-center gap-1.5 transition-all duration-300 py-1"
-                    >
-                        <div className={`w-14 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${isActive(item.path) ? 'bg-[#7C3AED]/10' : 'bg-transparent'}`}>
-                            <item.icon
-                                size={22}
-                                strokeWidth={isActive(item.path) ? 2.5 : 2}
-                                className={isActive(item.path) ? "text-[#7C3AED]" : "text-slate-400"}
-                            />
-                        </div>
-                        <span className={`text-[9px] font-black uppercase tracking-tighter ${isActive(item.path) ? 'text-[#7C3AED]' : 'text-slate-400 opacity-60'}`}>
-                            {item.label}
-                        </span>
-                    </button>
-                ))}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] max-w-[400px] z-[1100]">
+                <nav className="bg-slate-900/90 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] px-4 py-2 flex justify-between items-center shadow-2xl shadow-slate-400/20">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.path}
+                            onClick={() => navigate(item.path)}
+                            className="relative flex items-center justify-center py-3 px-4 rounded-full transition-all group overflow-hidden"
+                        >
+                            {isActive(item.path) && (
+                                <motion.div layoutId="nav-glow" className="absolute inset-0 bg-primary opacity-100 rounded-full" />
+                            )}
+                            <div className="relative z-10 flex items-center gap-2">
+                                <item.icon
+                                    size={20}
+                                    strokeWidth={isActive(item.path) ? 2.5 : 2}
+                                    className={`transition-colors duration-300 ${isActive(item.path) ? "text-white" : "text-slate-400 group-hover:text-white"}`}
+                                />
+                                {isActive(item.path) && (
+                                    <motion.span
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="text-[10px] font-black text-white uppercase tracking-widest hidden sm:block"
+                                    >
+                                        {item.label}
+                                    </motion.span>
+                                )}
+                            </div>
+                        </button>
+                    ))}
 
-                <button
-                    onClick={() => setShowProfileMenu(true)}
-                    className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${showProfileMenu ? 'text-[#7C3AED]' : 'text-slate-400'}`}
-                >
-                    <User
-                        size={22}
-                        strokeWidth={showProfileMenu ? 2.5 : 2}
-                        fill={showProfileMenu ? "currentColor" : "none"}
-                        className={showProfileMenu ? "opacity-100" : "opacity-70"}
-                    />
-                    <span className={`text-[9px] font-bold tracking-tight ${showProfileMenu ? 'opacity-100' : 'opacity-60'}`}>
-                        Profile
-                    </span>
-                </button>
-            </nav>
+                    <button
+                        onClick={() => setShowProfileMenu(true)}
+                        className={`flex items-center justify-center p-3 rounded-full transition-all group ${showProfileMenu ? 'bg-white/10' : ''}`}
+                    >
+                        <User
+                            size={20}
+                            className={`transition-colors duration-300 ${showProfileMenu ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}
+                        />
+                    </button>
+                </nav>
+            </div>
 
             <AnimatePresence>
                 {showProfileMenu && (
-                    <div className="fixed inset-0 z-[100] flex items-end justify-center">
+                    <div className="fixed inset-0 z-[1200] flex items-end justify-center">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+                            className="absolute inset-0 bg-white/80 backdrop-blur-md"
                             onClick={() => setShowProfileMenu(false)}
                         />
                         <motion.div
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="bg-white w-full max-w-lg rounded-t-[2.5rem] p-8 pb-12 relative z-10 shadow-2xl"
+                            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                            className="bg-white w-full max-w-lg rounded-t-[4rem] p-10 pb-16 relative z-10 shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.1)] border-t border-slate-50"
                         >
-                            <div className="w-12 h-1 bg-slate-100 rounded-full mx-auto mb-6" />
-                            <h2 className="text-xl font-bold text-slate-800 mb-6 text-center">Settings</h2>
+                            <div className="w-16 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
+
+                            <div className="flex items-center gap-5 mb-10 px-2">
+                                <div className="w-16 h-16 rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-sm overflow-hidden border border-primary/10">
+                                    <img
+                                        src={currentUser?.user_metadata?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"}
+                                        alt="avatar"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">
+                                        {currentUser?.user_metadata?.full_name || 'Mijoz'}
+                                    </h3>
+                                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px]">{currentUser?.user_metadata?.phone || '+998'}</p>
+                                </div>
+                            </div>
 
                             <div className="flex flex-col gap-3">
+                                <Link
+                                    to="/my-bookings"
+                                    onClick={() => setShowProfileMenu(false)}
+                                    className="flex items-center justify-between p-6 rounded-[2rem] bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-all group"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-slate-400 group-hover:text-primary transition-all shadow-sm">
+                                            <Calendar size={20} />
+                                        </div>
+                                        <span className="text-sm font-black text-slate-700 uppercase italic tracking-tight">Buyurtmalar tarixi</span>
+                                    </div>
+                                    <div className="text-slate-300 group-hover:translate-x-1 transition-transform">→</div>
+                                </Link>
+
                                 <button
                                     onClick={() => {
                                         signOut();
                                         setShowProfileMenu(false);
                                     }}
-                                    className="flex items-center gap-4 p-4 rounded-2xl bg-red-50 text-red-500 font-bold hover:bg-red-100 transition-all border border-red-100"
+                                    className="flex items-center justify-between p-6 rounded-[2rem] bg-red-50 border border-red-100 hover:bg-red-500 group transition-all"
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-white border border-red-200 flex items-center justify-center shadow-sm">
-                                        <LogOut size={20} />
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-red-500 shadow-sm">
+                                            <LogOut size={20} />
+                                        </div>
+                                        <span className="text-sm font-black text-red-500 group-hover:text-white uppercase italic tracking-tight">Chiqish</span>
                                     </div>
-                                    <div className="flex flex-col items-start">
-                                        <span className="text-base">Sign Out</span>
-                                        <span className="text-red-400/80 text-[10px] font-medium tracking-tight">Log out of your account</span>
-                                    </div>
-                                </button>
-
-                                <button
-                                    onClick={() => setShowProfileMenu(false)}
-                                    className="w-full py-4 rounded-2xl font-bold text-slate-400 hover:text-slate-600 transition-all text-sm"
-                                >
-                                    Cancel
+                                    <div className="text-red-200 group-hover:translate-x-1 group-hover:text-white transition-all">→</div>
                                 </button>
                             </div>
+
+                            <button
+                                onClick={() => setShowProfileMenu(false)}
+                                className="w-full mt-8 py-5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-slate-200 active:scale-95 transition-all"
+                            >
+                                Yopish
+                            </button>
                         </motion.div>
                     </div>
                 )}
@@ -109,4 +144,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

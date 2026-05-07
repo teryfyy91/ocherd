@@ -22,7 +22,7 @@ const generateTimeSlots = (start, end) => {
         const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`;
         slots.push(timeString);
 
-        currentMin += 30; // 30 min intervals
+        currentMin += 30;
         if (currentMin >= 60) {
             currentMin -= 60;
             currentHour += 1;
@@ -44,7 +44,7 @@ const Booking = () => {
     const [errorMsg, setErrorMsg] = useState('');
 
     if (!shopInfo || !shopInfo.name) {
-        return <Navigate to="/discovery" replace />;
+        return <Navigate to="/" replace />;
     }
 
     const timeSlots = generateTimeSlots(shopInfo.workingHours?.start || '09:00', shopInfo.workingHours?.end || '18:00');
@@ -87,124 +87,113 @@ const Booking = () => {
     ];
 
     return (
-        <div className="flex flex-col gap-6 pb-40 -mt-6 -mx-6">
-            {/* Top Detail View */}
-            <div className="relative h-[45vh] w-full">
+        <div className="flex flex-col gap-6 pb-40 -mt-8 -mx-6 bg-white min-h-screen">
+            <div className="relative h-[50vh] w-full overflow-hidden rounded-b-[4rem] shadow-2xl">
                 <img
                     src={shopInfo.imageUrl || "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1000&q=80"}
                     alt={shopInfo.name}
                     className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                {/* Header Controls */}
-                <div className="absolute top-10 left-6 right-6 flex justify-between items-center z-10">
+                <div className="absolute top-12 left-8 right-8 flex justify-between items-center z-10">
                     <button
                         onClick={() => navigate(-1)}
-                        className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform"
+                        className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-95 transition-all"
                     >
-                        <ChevronLeft size={22} />
+                        <ChevronLeft size={24} />
                     </button>
-                    <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform">
+                    <button className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-95 transition-all">
                         <Share2 size={20} />
                     </button>
                 </div>
 
-                <div className="absolute bottom-10 left-6 right-6 z-10">
-                    <h1 className="text-3xl font-black text-white mb-2">{shopInfo.name}</h1>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1.5 bg-[#7C3AED] text-white px-3 py-1 rounded-full text-xs font-black">
-                            <Star size={12} fill="white" /> 4.8 (292 Reviews)
-                        </div>
-                        <div className="flex items-center gap-1 text-white/80 text-xs font-bold">
-                            <MapPin size={14} /> Tashkent, Uzbekistan
+                <div className="absolute bottom-12 left-8 right-8 z-10">
+                    <div className="flex flex-col gap-2">
+                        <span className="bg-primary/20 backdrop-blur-md text-primary px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] w-fit border border-primary/20">PREMIUM SALON</span>
+                        <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{shopInfo.name}</h1>
+                        <div className="flex flex-wrap items-center gap-4 mt-3">
+                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[10px] font-black border border-white/10">
+                                <Star size={12} fill="#fbbf24" className="text-[#fbbf24]" /> 4.9 (500+ Izoh)
+                            </div>
+                            <div className="flex items-center gap-1.5 text-white/70 text-[10px] font-black uppercase tracking-widest">
+                                <MapPin size={14} className="text-primary" /> Toshkent, O'zbekiston
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="px-6 grid grid-cols-4 gap-3 mt-2">
+            <div className="px-8 grid grid-cols-4 gap-4 mt-4">
                 {[
-                    { icon: Phone, label: 'Call', color: 'text-blue-500 bg-blue-50' },
-                    { icon: MessageSquare, label: 'Message', color: 'text-purple-500 bg-purple-50' },
-                    { icon: Navigation, label: 'Direction', color: 'text-emerald-500 bg-emerald-50' },
-                    { icon: Globe, label: 'Website', color: 'text-orange-500 bg-orange-50' }
+                    { icon: Phone, label: 'Qo\'ng\'iroq', color: 'text-blue-500 bg-blue-50' },
+                    { icon: MessageSquare, label: 'Chat', color: 'text-primary bg-purple-50' },
+                    { icon: Navigation, label: 'Manzil', color: 'text-emerald-500 bg-emerald-50' },
+                    { icon: Globe, label: 'Sayt', color: 'text-orange-500 bg-orange-50' }
                 ].map((btn, i) => (
-                    <button key={i} className="flex flex-col items-center gap-2">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${btn.color} active:scale-95 transition-transform`}>
-                            <btn.icon size={20} />
+                    <button key={i} className="flex flex-col items-center gap-3">
+                        <div className={`w-14 h-14 rounded-[1.5rem] flex items-center justify-center ${btn.color} shadow-sm active:scale-90 transition-all border border-slate-50`}>
+                            <btn.icon size={22} />
                         </div>
-                        <span className="text-[10px] font-bold text-slate-500">{btn.label}</span>
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{btn.label}</span>
                     </button>
                 ))}
             </div>
 
-            {/* Description / Info */}
-            <div className="px-6 flex flex-col gap-3">
-                <h2 className="text-lg font-black text-slate-800">About Salon</h2>
-                <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                    Enjoy a premium grooming experience at {shopInfo.name}. Our expert barbers specialize in classic cuts, modern fades, and professional styling tailored just for you.
+            <div className="px-8 flex flex-col gap-4 mt-4">
+                <h2 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Salon haqida</h2>
+                <p className="text-slate-400 text-sm leading-relaxed font-bold uppercase tracking-wide opacity-80">
+                    {shopInfo.name} da premium xizmatdan bahra oling. Professional ustalarimiz sizga eng zamonaviy stildagi ko'rinishni taqdim etadilar.
                 </p>
             </div>
 
-            {/* Recent Work */}
-            <div className="px-6 flex flex-col gap-4">
+            <div className="px-8 flex flex-col gap-6 mt-4 pb-12">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-black text-slate-800">Our Recent Work</h2>
-                    <button className="text-[#7C3AED] text-xs font-bold">See All »</button>
+                    <h2 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Ishlardan namunalar</h2>
+                    <button className="text-primary text-[10px] font-black uppercase tracking-widest border-b-2 border-primary/10">Barchasi</button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 pb-10">
+                <div className="grid grid-cols-2 gap-4">
                     {recentWork.map((img, i) => (
-                        <div key={i} className="aspect-square rounded-[1.5rem] overflow-hidden border border-slate-100">
-                            <img src={img} alt="work" className="w-full h-full object-cover" />
+                        <div key={i} className="aspect-square rounded-[2.5rem] overflow-hidden bg-slate-100 shadow-xl shadow-slate-100 ring-4 ring-slate-50">
+                            <img src={img} alt="work" className="w-full h-full object-cover transition-transform hover:scale-110 duration-700" />
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Book Now Fixed Button */}
-            <div className="fixed bottom-8 left-6 right-6 z-40">
+            <div className="fixed bottom-10 left-8 right-8 z-40">
                 <button
                     onClick={() => setIsBookingOpen(true)}
-                    className="w-full h-16 bg-[#7C3AED] text-white rounded-[1.5rem] font-black text-lg shadow-2xl shadow-purple-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                    className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 active:scale-95 transition-all flex items-center justify-center gap-4"
                 >
-                    Book Appointment
+                    <Clock size={18} className="text-primary" /> Navbat olish
                 </button>
             </div>
 
-            {/* Booking Modal */}
             <AnimatePresence>
                 {isBookingOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-end justify-center">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsBookingOpen(false)}
-                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                        />
+                    <div className="fixed inset-0 z-[1000] flex items-end justify-center">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsBookingOpen(false)} className="absolute inset-0 bg-white/80 backdrop-blur-md" />
                         <motion.div
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="bg-white w-full max-w-lg rounded-t-[3rem] p-8 pb-12 relative z-10 shadow-2xl overflow-y-auto max-h-[85vh] scrollbar-hide"
+                            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                            className="bg-white w-full max-w-lg rounded-t-[4rem] p-10 pb-16 relative z-10 shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.1)] overflow-y-auto max-h-[90vh] scrollbar-hide border-t border-slate-50"
                         >
-                            <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8" />
+                            <div className="w-16 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
 
-                            {/* Stepper */}
-                            <div className="flex mb-8 gap-2">
+                            <div className="flex mb-10 gap-3">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className={`h-1.5 flex-1 rounded-full ${step >= i ? 'bg-[#7C3AED]' : 'bg-slate-100'}`} />
+                                    <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= i ? 'bg-primary' : 'bg-slate-100'}`} />
                                 ))}
                             </div>
 
                             <AnimatePresence mode="wait">
                                 {step === 1 && (
-                                    <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                                        <h3 className="text-xl font-black text-slate-800 mb-6">Choose Service</h3>
-                                        <div className="flex flex-col gap-3">
+                                    <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
+                                        <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Xizmatni tanlang</h3>
+                                        <div className="flex flex-col gap-4">
                                             {shopInfo.services.map((service, idx) => {
                                                 const parsed = typeof service === 'string' && service.startsWith('{') ? JSON.parse(service) : service;
                                                 const sName = typeof parsed === 'object' ? parsed.name : parsed;
@@ -214,28 +203,28 @@ const Booking = () => {
                                                     <button
                                                         key={idx}
                                                         onClick={() => setSelectedService(sName)}
-                                                        className={`p-5 rounded-2xl border-2 flex items-center justify-between transition-all ${isSel ? 'border-[#7C3AED] bg-purple-50/50' : 'border-slate-50 bg-slate-50/50'}`}
+                                                        className={`p-6 rounded-[2.5rem] border transition-all flex items-center justify-between ${isSel ? 'border-primary bg-purple-50/50 shadow-xl shadow-purple-100' : 'border-slate-100 bg-slate-50/50'}`}
                                                     >
                                                         <div className="text-left">
-                                                            <div className="font-bold text-slate-800">{sName}</div>
-                                                            <div className="text-xs font-black text-[#7C3AED]">{sPrice.toLocaleString()} UZS</div>
+                                                            <div className="font-black text-slate-800 uppercase italic tracking-tight">{sName}</div>
+                                                            <div className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">{sPrice.toLocaleString()} So'm</div>
                                                         </div>
-                                                        <div className={`w-5 h-5 rounded-full border-2 ${isSel ? 'bg-[#7C3AED] border-[#7C3AED]' : 'border-slate-200'}`} />
+                                                        <div className={`w-6 h-6 rounded-full border-2 transition-all ${isSel ? 'bg-primary border-primary scale-110' : 'border-slate-200 bg-white'}`} />
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <button disabled={!selectedService} onClick={() => setStep(2)} className="w-full h-14 bg-[#7C3AED] text-white rounded-2xl font-black mt-8 disabled:opacity-30">Next Step</button>
+                                        <button disabled={!selectedService} onClick={() => setStep(2)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Davom etish</button>
                                     </motion.div>
                                 )}
 
                                 {step === 2 && (
-                                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                                        <div className="flex justify-between items-center mb-6">
-                                            <h3 className="text-xl font-black text-slate-800">Select Time</h3>
-                                            <button onClick={() => setStep(1)} className="text-xs font-bold text-slate-400">Back</button>
+                                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Vaqtni tanlang</h3>
+                                            <button onClick={() => setStep(1)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
                                         </div>
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-3 gap-4">
                                             {timeSlots.map(time => {
                                                 const isBooked = bookedSlots.includes(time);
                                                 const isSel = selectedTime === time;
@@ -244,58 +233,56 @@ const Booking = () => {
                                                         key={time}
                                                         disabled={isBooked}
                                                         onClick={() => setSelectedTime(time)}
-                                                        className={`h-14 rounded-2xl border-2 flex flex-col items-center justify-center transition-all ${isBooked ? 'opacity-20 bg-slate-100 border-transparent' : isSel ? 'border-[#7C3AED] bg-purple-50 text-[#7C3AED]' : 'border-slate-50 bg-slate-50'}`}
+                                                        className={`h-16 rounded-[1.5rem] border flex flex-col items-center justify-center transition-all ${isBooked ? 'opacity-20 bg-slate-50 border-transparent grayscale' : isSel ? 'border-primary bg-purple-50 text-primary shadow-lg shadow-purple-100' : 'border-slate-100 bg-white shadow-sm'}`}
                                                     >
-                                                        <span className="text-base font-black">{time}</span>
-                                                        <span className="text-[7px] font-black uppercase opacity-50">{isBooked ? 'Full' : 'Free'}</span>
+                                                        <span className="text-lg font-black tracking-tighter leading-none">{time}</span>
+                                                        <span className="text-[7px] font-black uppercase tracking-widest mt-1">{isBooked ? 'Band' : 'Ochiq'}</span>
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <button disabled={!selectedTime} onClick={() => setStep(3)} className="w-full h-14 bg-[#7C3AED] text-white rounded-2xl font-black mt-8 disabled:opacity-30">Confirm Details</button>
+                                        <button disabled={!selectedTime} onClick={() => setStep(3)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Tasdiqlash</button>
                                     </motion.div>
                                 )}
 
                                 {step === 3 && (
-                                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                                        <div className="flex justify-between items-center mb-6">
-                                            <h3 className="text-xl font-black text-slate-800">Your Info</h3>
-                                            <button onClick={() => setStep(2)} className="text-xs font-bold text-slate-400">Back</button>
+                                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Ma'lumotlar</h3>
+                                            <button onClick={() => setStep(2)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
                                         </div>
                                         <div className="flex flex-col gap-4">
                                             <div className="relative">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                                <User className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                                                 <input
                                                     type="text"
                                                     value={formData.name}
                                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                    placeholder="Your Name"
-                                                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-[#7C3AED] transition-all font-bold text-sm outline-none"
+                                                    placeholder="Ismingiz"
+                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-black text-sm outline-none"
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                                <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                                                 <input
                                                     type="tel"
                                                     value={formData.phone}
                                                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                    placeholder="Phone Number"
-                                                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-[#7C3AED] transition-all font-bold text-sm outline-none"
+                                                    placeholder="Telefon raqamingiz"
+                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-black text-sm outline-none"
                                                 />
                                             </div>
-                                            <div className="p-5 rounded-2xl bg-slate-50/50 border border-slate-100 flex flex-col gap-2 mt-2">
-                                                <div className="flex justify-between text-xs font-bold">
-                                                    <span className="text-slate-400 uppercase">Summary</span>
-                                                </div>
+                                            <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 flex flex-col gap-3 mt-4">
                                                 <div className="flex justify-between">
-                                                    <span className="text-sm font-bold text-slate-800">{selectedService}</span>
-                                                    <span className="text-sm font-black text-[#7C3AED]">{selectedTime}</span>
+                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Ma'lumotlar</span>
+                                                </div>
+                                                <div className="flex justify-between items-end">
+                                                    <span className="text-lg font-black text-slate-800 uppercase italic leading-none">{selectedService}</span>
+                                                    <span className="text-2xl font-black text-primary tracking-tighter leading-none">{selectedTime}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={handleSubmit} className="w-full h-16 bg-[#7C3AED] text-white rounded-2xl font-black mt-8 shadow-xl shadow-purple-500/20 active:scale-[0.98] transition-all">
-                                            Finalize Appointment
-                                        </button>
+                                        <button onClick={handleSubmit} className="w-full h-16 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all">Yakunlash</button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -308,4 +295,3 @@ const Booking = () => {
 };
 
 export default Booking;
-

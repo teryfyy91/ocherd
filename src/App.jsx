@@ -97,15 +97,15 @@ function App() {
         <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#7C3AED]/5 rounded-full blur-[150px] pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-[#7C3AED]/5 rounded-full blur-[150px] pointer-events-none" />
 
-        <div className="glass-card bg-white border-slate-100 p-12 md:p-20 rounded-[3rem] flex flex-col items-center gap-10 shadow-2xl border-2 max-w-xl w-full">
-          <div className="w-24 h-24 md:w-32 md:h-32 bg-[#7C3AED] rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl shadow-purple-500/30">
-            <Clock size={48} className="md:size-16" />
+        <div className="bg-white border-slate-100 p-10 md:p-16 rounded-[2.5rem] flex flex-col items-center gap-8 shadow-2xl border max-w-sm w-full relative z-10">
+          <div className="w-20 h-20 bg-[#7C3AED] rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-purple-500/20">
+            <Clock size={40} />
           </div>
-          <div className="flex flex-col gap-6">
-            <h2 className="text-4xl md:text-6xl font-black text-slate-800 italic tracking-tighter uppercase leading-[0.9]">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-3xl font-black text-slate-800 italic tracking-tight uppercase leading-tight">
               Sorovnomangiz <br /> yuborildi!
             </h2>
-            <p className="text-[#7C3AED] font-black uppercase tracking-[0.4em] text-[10px] md:text-sm opacity-90 leading-relaxed">
+            <p className="text-[#7C3AED] font-black uppercase tracking-[0.3em] text-[10px] opacity-80 leading-relaxed">
               Admin tasdiqlashini kuting. <br /> Tez orada faol bo'ladi.
             </p>
           </div>
@@ -116,7 +116,7 @@ function App() {
               localStorage.clear();
               window.location.href = '/'; // HARD RESET
             }}
-            className="w-full py-8 md:py-10 bg-[#7C3AED] text-white rounded-[2rem] font-black text-sm uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-purple-500/30 mt-6"
+            className="w-full py-5 bg-[#7C3AED] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-purple-500/30 mt-4 active:scale-95 transition-all"
           >
             Tushunarli
           </button>

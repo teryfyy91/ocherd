@@ -42,80 +42,64 @@ const MyBookings = () => {
     };
 
     return (
-        <div className="flex flex-col gap-10 pb-32">
-            {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between mt-8"
-            >
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-3xl font-black text-text-main tracking-tight">
-                        Mening navbatlarim
-                    </h1>
-                    <p className="text-text-muted font-medium">Barcha uchrashuvlaringiz bir joyda</p>
-                </div>
-            </motion.div>
+        <div className="flex flex-col gap-10 pb-32 pt-8">
+            <header className="flex flex-col gap-2 mt-4 px-2">
+                <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Navbatlarim</h1>
+                <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">Uchrashuvlaringiz tarixi</p>
+            </header>
 
-            {/* Active Bookings */}
-            <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-8">
+                <div className="flex items-center gap-3 px-2">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <h2 className="text-sm font-black text-text-main uppercase tracking-widest">Faol navbatlar</h2>
+                    <h2 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Hozirda faol</h2>
                 </div>
 
                 {activeBookings.length === 0 ? (
-                    <div className="glass-card p-12 text-center flex flex-col items-center gap-4 border-dashed border-white/10">
-                        <div className="w-20 h-20 glass rounded-3xl flex items-center justify-center text-text-muted opacity-20">
+                    <div className="bg-slate-50 border-2 border-dashed border-slate-200 p-16 rounded-[3rem] text-center flex flex-col items-center gap-6">
+                        <div className="w-20 h-20 bg-white shadow-xl rounded-3xl flex items-center justify-center text-slate-200">
                             <Calendar size={32} />
                         </div>
-                        <p className="text-text-muted font-bold">Hozircha faol uchrashuvlar yo'q</p>
-                        <Link to="/discovery" className="btn-primary py-3 px-8 text-sm">
-                            Yangi band qilish
-                        </Link>
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-lg font-black text-slate-800 uppercase italic leading-none">Hali navbat yo'q</h3>
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[8px] max-w-[200px] mx-auto leading-loose">Yangi band qilish uchun asosiy sahifaga o'ting</p>
+                        </div>
+                        <Link to="/" className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Discovery</Link>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-5 px-2">
                         {activeBookings.map((item, idx) => (
                             <motion.div
                                 key={item.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="glass-card p-6 flex flex-col gap-6 relative overflow-hidden"
+                                className="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-xl shadow-slate-100 relative overflow-hidden group"
                             >
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20">
-                                    <motion.div
-                                        initial={{ height: 0 }}
-                                        animate={{ height: item.status === 'In progress' ? '100%' : '30%' }}
-                                        className="w-full bg-primary shadow-[0_0_15px_rgba(0,200,151,0.5)]"
-                                    />
-                                </div>
-
-                                <div className="flex justify-between items-start ml-2">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl opacity-50" />
+                                <div className="flex justify-between items-start mb-6">
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold text-text-main tracking-tight">{item.shopName}</h3>
-                                        <div className="flex items-center gap-4 text-xs font-bold text-text-muted">
-                                            <span className="flex items-center gap-1.5"><Scissors size={14} className="text-primary" /> {item.service}</span>
-                                            <span className="flex items-center gap-1.5"><Clock size={14} className="text-primary" /> {item.time}</span>
+                                        <h3 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">{item.shopName}</h3>
+                                        <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">
+                                            <span className="flex items-center gap-1.5"><Scissors size={12} className="text-primary" /> {item.service}</span>
+                                            <span className="flex items-center gap-1.5"><Clock size={12} className="text-primary" /> {item.time}</span>
                                         </div>
                                     </div>
-                                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-white/5 border border-white/5 ${item.status === 'In progress' ? 'text-primary border-primary/20 bg-primary/5' : 'text-amber-400'}`}>
+                                    <span className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest ${item.status === 'In progress' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-100 text-slate-500'}`}>
                                         {item.status === 'In progress' ? 'Xizmatda' : 'Kutilmoqda'}
                                     </span>
                                 </div>
 
-                                <div className="flex items-center justify-between ml-2 pt-4 border-t border-white/5">
+                                <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-1">Taxminiy vaqt</span>
+                                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Taxminiy vaqt</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-lg font-black text-text-main">~15 daqiqa</span>
+                                            <span className="text-lg font-black text-slate-800 tracking-tighter leading-none">~15 daqiqa</span>
                                             {item.status === 'In progress' && <div className="w-1.5 h-1.5 bg-primary rounded-full animate-ping" />}
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => deleteBooking(item.id)}
-                                        className="w-12 h-12 glass rounded-xl flex items-center justify-center text-text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                        className="w-12 h-12 bg-red-50 text-red-400 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"
                                     >
                                         <Trash2 size={20} />
                                     </button>
@@ -126,29 +110,26 @@ const MyBookings = () => {
                 )}
             </div>
 
-            {/* Past Bookings */}
             {pastBookings.length > 0 && (
-                <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-3">
-                        <h2 className="text-sm font-black text-text-muted uppercase tracking-widest">Tugallanganlar</h2>
-                    </div>
+                <div className="flex flex-col gap-6 px-2">
+                    <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">O'tmishdagi navbatlar</h2>
                     <div className="flex flex-col gap-4">
                         {pastBookings.map((item) => (
-                            <div key={item.id} className="glass-card p-5 flex items-center justify-between bg-white/5 border-white/5">
+                            <div key={item.id} className="bg-slate-50 border border-slate-100 p-6 rounded-[2rem] flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 glass rounded-xl flex items-center justify-center text-text-muted/30">
+                                    <div className="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-slate-300">
                                         <Check size={20} />
                                     </div>
                                     <div className="flex flex-col">
-                                        <h4 className="font-bold text-text-main">{item.shopName}</h4>
-                                        <p className="text-xs font-bold text-text-muted">{item.service} • {item.time}</p>
+                                        <h4 className="font-black text-slate-800 italic uppercase leading-none text-sm">{item.shopName}</h4>
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">{item.service} • {item.time}</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => handleOpenReview(item)}
-                                    className="px-4 py-2 bg-primary/10 text-primary rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-bg transition-all"
+                                    className="px-6 py-3 bg-white border border-slate-200 text-primary rounded-xl text-[9px] font-black uppercase tracking-widest shadow-sm hover:bg-primary hover:text-white transition-all"
                                 >
-                                    Izoh qoldirish
+                                    Fikr bildirish
                                 </button>
                             </div>
                         ))}
@@ -156,60 +137,44 @@ const MyBookings = () => {
                 </div>
             )}
 
-            {/* Review Modal */}
             <AnimatePresence>
                 {reviewModal && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setReviewModal(false)}
-                            className="absolute inset-0 bg-bg/80 backdrop-blur-xl"
-                        />
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="glass-card w-full max-w-md p-10 relative z-10 border-white/10 shadow-2xl"
-                        >
-                            <button onClick={() => setReviewModal(false)} className="absolute top-8 right-8 text-text-muted hover:text-white transition-colors"><X size={20} /></button>
+                    <div className="fixed inset-0 z-[1200] flex items-center justify-center p-6">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setReviewModal(false)} className="absolute inset-0 bg-white/80 backdrop-blur-md" />
+                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white border border-slate-100 p-10 rounded-[3rem] w-full max-w-md relative z-10 shadow-2xl">
+                            <button onClick={() => setReviewModal(false)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-800 transition-colors"><X size={20} /></button>
 
-                            <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+                            <div className="text-center mb-10">
+                                <div className="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
                                     <MessageSquare size={32} />
                                 </div>
-                                <h3 className="text-2xl font-black text-text-main tracking-tight">Fikringiz</h3>
-                                <p className="text-text-muted font-bold mt-2 text-sm">{selectedBooking?.shopName}</p>
+                                <h3 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Fikringiz</h3>
+                                <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-[9px]">{selectedBooking?.shopName}</p>
                             </div>
 
-                            <div className="flex flex-col gap-8">
+                            <div className="flex flex-col gap-10">
                                 <div className="flex justify-center gap-3">
                                     {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            onClick={() => setRating(star)}
-                                            className="transition-transform active:scale-90"
-                                        >
-                                            <Star size={32} className={star <= rating ? "fill-amber-400 text-amber-400" : "text-white/10"} />
+                                        <button key={star} onClick={() => setRating(star)} className="transition-transform active:scale-90">
+                                            <Star size={36} className={star <= rating ? "fill-amber-400 text-amber-400" : "text-slate-100"} />
                                         </button>
                                     ))}
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Izoh</label>
+                                <div className="flex flex-col gap-3">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Izoh qoldiring</label>
                                     <textarea
                                         value={comment}
                                         onChange={(e) => setComment(e.target.value)}
-                                        className="w-full h-32 glass-card bg-white/5 border-white/5 p-6 rounded-2xl outline-none text-text-main font-bold placeholder:text-text-muted transition-all resize-none"
-                                        placeholder="Xizmat haqida nima deysiz?..."
+                                        className="w-full h-32 bg-slate-50 border border-slate-100 p-6 rounded-[2rem] outline-none text-slate-800 font-bold placeholder:text-slate-300 transition-all resize-none"
+                                        placeholder="Xizmat qanday bo'ldi?..."
                                     />
                                 </div>
 
                                 <button
                                     onClick={handleSubmitReview}
                                     disabled={submitting || !comment.trim()}
-                                    className="btn-primary py-5 disabled:opacity-30 disabled:grayscale"
+                                    className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-slate-200 active:scale-95 disabled:opacity-50"
                                 >
                                     {submitting ? 'Yuborilmoqda...' : 'Yuborish'}
                                 </button>

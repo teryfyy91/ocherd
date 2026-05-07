@@ -27,15 +27,6 @@
   --card-bg: rgba(255, 255, 255, 0.9);
 }
 
-.dark {
-  --bg: #0B0F14;
-  --secondary: #1A1F2B;
-  --text: #FFFFFF;
-  --text-muted: #94A3B8;
-  --dark-gradient: linear-gradient(180deg, #0B0F14 0%, #111827 100%);
-  --card-bg: rgba(255, 255, 255, 0.03);
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -147,7 +138,7 @@ textarea.glass-card:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #E2E8F0;
   border-radius: 10px;
 }
 
@@ -196,23 +187,23 @@ h4 {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+  background: rgba(0, 0, 0, 0.05);
+  color: #1E293B;
   font-weight: 600;
   padding: 12px 24px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* Skeletons */
 .skeleton {
-  background: linear-gradient(90deg, #1A1F2B 25%, #2D3748 50%, #1A1F2B 75%);
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 12px;
