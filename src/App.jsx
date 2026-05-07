@@ -92,20 +92,20 @@ function App() {
 
   if (showApprovalGate) {
     return (
-      <div className="fixed inset-0 z-[99999] bg-[#05080A] flex flex-col items-center justify-center p-6 text-center select-none overflow-hidden">
+      <div className="fixed inset-0 z-[99999] bg-[#F8FAFC] flex flex-col items-center justify-center p-6 text-center select-none overflow-hidden">
         {/* Background Decor */}
-        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#10B981]/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#7C3AED]/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-[#7C3AED]/5 rounded-full blur-[150px] pointer-events-none" />
 
-        <div className="glass-card bg-[#0B0F14]/90 border-white/10 p-12 md:p-20 rounded-[3rem] flex flex-col items-center gap-10 shadow-[0_50px_100px_rgba(0,0,0,0.9)] border-2 max-w-xl w-full">
-          <div className="w-24 h-24 md:w-32 md:h-32 bg-[#10B981] rounded-[2.5rem] flex items-center justify-center text-bg shadow-[0_0_60px_rgba(16,185,129,0.4)]">
+        <div className="glass-card bg-white border-slate-100 p-12 md:p-20 rounded-[3rem] flex flex-col items-center gap-10 shadow-2xl border-2 max-w-xl w-full">
+          <div className="w-24 h-24 md:w-32 md:h-32 bg-[#7C3AED] rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl shadow-purple-500/30">
             <Clock size={48} className="md:size-16" />
           </div>
           <div className="flex flex-col gap-6">
-            <h2 className="text-4xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-[0.9]">
+            <h2 className="text-4xl md:text-6xl font-black text-slate-800 italic tracking-tighter uppercase leading-[0.9]">
               Sorovnomangiz <br /> yuborildi!
             </h2>
-            <p className="text-[#10B981] font-black uppercase tracking-[0.4em] text-[10px] md:text-sm opacity-90 leading-relaxed">
+            <p className="text-[#7C3AED] font-black uppercase tracking-[0.4em] text-[10px] md:text-sm opacity-90 leading-relaxed">
               Admin tasdiqlashini kuting. <br /> Tez orada faol bo'ladi.
             </p>
           </div>
@@ -116,7 +116,7 @@ function App() {
               localStorage.clear();
               window.location.href = '/'; // HARD RESET
             }}
-            className="w-full py-8 md:py-10 bg-[#10B981] text-bg rounded-[2rem] font-black text-sm uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-emerald-500/30 mt-6"
+            className="w-full py-8 md:py-10 bg-[#7C3AED] text-white rounded-[2rem] font-black text-sm uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-purple-500/30 mt-6"
           >
             Tushunarli
           </button>
