@@ -1,117 +1,117 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Scissors, LogOut, Sun, Moon, User } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Home, Search, ShoppingBag, User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../context/StoreContext';
-import InstallPWA from './InstallPWA';
 
 const Navbar = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
-    const [showConfirm, setShowConfirm] = useState(false);
-    const { signOut, theme, toggleTheme } = useStore();
-    const userRole = localStorage.getItem('userRole');
+    const location = useLocation();
+    const { signOut } = useStore();
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-    const handleSignOut = () => {
-        signOut();
-    };
+    const navItems = [
+        { path: '/', icon: Home, label: 'Home' },
+        { path: '/discovery', icon: Search, label: 'Search' },
+        { path: '/my-bookings', icon: ShoppingBag, label: 'Shop' },
+    ];
+
+    const isActive = (path) => location.pathname === path;
 
     return (
         <>
-            <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-auto">
-                <div className="glass rounded-3xl p-2 flex justify-around items-center shadow-2xl border border-white/5">
-                    {/* Only Show Dashboard for Super Admin */}
-                    {localStorage.getItem('currentUserPhone') === '+998505521107' && (
-                        <button onClick={() => navigate('/dashboard')} className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/dashboard' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                        </button>
-                    )}
-
-                    {/* Show Discovery only for non-admins */}
-                    {localStorage.getItem('currentUserPhone') !== '+998505521107' && (
-                        <button
-                            onClick={() => {
-                                if (window.location.pathname === '/discovery') {
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                    const searchInput = document.querySelector('input[placeholder*="Salon nomini"]');
-                                    if (searchInput) searchInput.focus();
-                                } else {
-                                    navigate('/discovery');
-                                }
-                            }}
-                            className={`p-4 transition-all active:scale-90 ${window.location.pathname === '/discovery' ? 'text-primary' : 'text-text-muted hover:text-primary'}`}
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </button>
-                    )}
-
+            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-t border-slate-100 px-6 pb-6 pt-3 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                {navItems.map((item) => (
                     <button
-                        onClick={toggleTheme}
-                        className="p-4 text-text-muted hover:text-primary transition-all active:scale-90"
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${isActive(item.path)
+                            ? 'text-[#7C3AED]'
+                            : 'text-slate-400'
+                            }`}
                     >
-                        {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+                        <div className="relative">
+                            <item.icon
+                                size={22}
+                                strokeWidth={isActive(item.path) ? 2.5 : 2}
+                                fill={isActive(item.path) ? "currentColor" : "none"}
+                                className={isActive(item.path) ? "opacity-100" : "opacity-70"}
+                            />
+                            {isActive(item.path) && (
+                                <motion.div
+                                    layoutId="nav-dot"
+                                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#7C3AED] rounded-full"
+                                />
+                            )}
+                        </div>
+                        <span className={`text-[9px] font-bold tracking-tight ${isActive(item.path) ? 'opacity-100' : 'opacity-60'}`}>
+                            {item.label}
+                        </span>
                     </button>
+                ))}
 
-                    <button
-                        onClick={() => setShowConfirm(true)}
-                        className="p-4 text-text-muted hover:text-red-400 transition-all active:scale-90"
-                    >
-                        <LogOut size={24} />
-                    </button>
-                </div>
+                <button
+                    onClick={() => setShowProfileMenu(true)}
+                    className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${showProfileMenu ? 'text-[#7C3AED]' : 'text-slate-400'}`}
+                >
+                    <User
+                        size={22}
+                        strokeWidth={showProfileMenu ? 2.5 : 2}
+                        fill={showProfileMenu ? "currentColor" : "none"}
+                        className={showProfileMenu ? "opacity-100" : "opacity-70"}
+                    />
+                    <span className={`text-[9px] font-bold tracking-tight ${showProfileMenu ? 'opacity-100' : 'opacity-60'}`}>
+                        Profile
+                    </span>
+                </button>
             </nav>
 
             <AnimatePresence>
-                {showConfirm && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-                    >
+                {showProfileMenu && (
+                    <div className="fixed inset-0 z-[100] flex items-end justify-center">
                         <motion.div
-                            initial={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(0, 0, 0, 0)" }}
-                            animate={{ backdropFilter: "blur(12px)", backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-                            exit={{ backdropFilter: "blur(0px)", backgroundColor: "rgba(0, 0, 0, 0)" }}
-                            className="absolute inset-0"
-                            onClick={() => setShowConfirm(false)}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+                            onClick={() => setShowProfileMenu(false)}
                         />
-
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 30 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 30 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 350 }}
-                            className="glass max-w-sm w-full p-10 rounded-[3rem] text-center relative z-10 border border-white/10 [background:var(--card-bg)]"
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            exit={{ y: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="bg-white w-full max-w-lg rounded-t-[2.5rem] p-8 pb-12 relative z-10 shadow-2xl"
                         >
-                            <div className="w-20 h-20 bg-red-400/10 rounded-3xl flex items-center justify-center mx-auto mb-6 text-red-400 shadow-inner">
-                                <LogOut size={36} />
-                            </div>
-
-                            <h2 className="text-2xl font-black text-text-main mb-2 tracking-tight">
-                                {t('confirmSignOut')}
-                            </h2>
-                            <p className="text-text-muted font-bold mb-8 text-xs uppercase tracking-widest opacity-60">
-                                {t('areYouSure')}
-                            </p>
+                            <div className="w-12 h-1 bg-slate-100 rounded-full mx-auto mb-6" />
+                            <h2 className="text-xl font-bold text-slate-800 mb-6 text-center">Settings</h2>
 
                             <div className="flex flex-col gap-3">
                                 <button
-                                    onClick={handleSignOut}
-                                    className="w-full bg-red-500 text-white py-4 rounded-2xl font-black text-lg hover:bg-red-600 transition-all shadow-xl shadow-red-500/20"
+                                    onClick={() => {
+                                        signOut();
+                                        setShowProfileMenu(false);
+                                    }}
+                                    className="flex items-center gap-4 p-4 rounded-2xl bg-red-50 text-red-500 font-bold hover:bg-red-100 transition-all border border-red-100"
                                 >
-                                    {t('yesSignOut')}
+                                    <div className="w-10 h-10 rounded-xl bg-white border border-red-200 flex items-center justify-center shadow-sm">
+                                        <LogOut size={20} />
+                                    </div>
+                                    <div className="flex flex-col items-start">
+                                        <span className="text-base">Sign Out</span>
+                                        <span className="text-red-400/80 text-[10px] font-medium tracking-tight">Log out of your account</span>
+                                    </div>
                                 </button>
+
                                 <button
-                                    onClick={() => setShowConfirm(false)}
-                                    className="w-full glass-card border-white/5 py-4 rounded-2xl font-black text-lg hover:bg-white/5 transition-all text-text-main"
+                                    onClick={() => setShowProfileMenu(false)}
+                                    className="w-full py-4 rounded-2xl font-bold text-slate-400 hover:text-slate-600 transition-all text-sm"
                                 >
-                                    {t('cancel')}
+                                    Cancel
                                 </button>
                             </div>
                         </motion.div>
-                    </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </>
@@ -119,3 +119,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

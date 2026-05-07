@@ -1,35 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Scissors, X } from 'lucide-react';
+import { Search, MapPin, Scissors, X, ChevronLeft, Bell, SlidersHorizontal, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
-
-const floatingAnimation = {
-    y: ['-10px', '10px'],
-    transition: {
-        duration: 3,
-        repeat: Infinity,
-        repeatType: 'reverse',
-        ease: 'easeInOut'
-    }
-};
-
-const floatingReverse = {
-    y: ['10px', '-10px'],
-    transition: {
-        duration: 4,
-        repeat: Infinity,
-        repeatType: 'reverse',
-        ease: 'easeInOut'
-    }
-};
 
 const Gateway = () => {
     const { t } = useTranslation();
     const { allShops, loadingShops, setShopInfo } = useStore();
     const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = React.useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState('All Service');
+
+    const categories = ['All Service', 'Barber', 'Hair Salon', 'Makeup', 'Massage'];
+
     const shops = (allShops || []).filter(s => s.status === 'Active' || !s.status);
 
     const filteredShops = shops.filter(shop =>
@@ -37,109 +21,121 @@ const Gateway = () => {
     );
 
     return (
-        <div className="flex flex-col gap-8 pb-32">
-            {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col gap-2 mt-8"
-            >
-                <h1 className="text-4xl font-black text-text-main tracking-tight">
-                    Salonlar
-                </h1>
-                <p className="text-text-muted font-medium">O'zingizga ma'qulini kashf eting</p>
-            </motion.div>
-
-            {/* Search Bar */}
-            <div className="relative group">
-                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-text-muted group-focus-within:text-primary transition-colors">
-                    <Search size={20} />
-                </div>
-                <input
-                    type="text"
-                    placeholder="Salon nomini qidiring..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full glass-card bg-white/5 border-white/5 pl-14 pr-14 py-5 rounded-2xl outline-none text-text-main font-bold placeholder:text-text-muted focus:bg-white/10 focus:border-primary/20 transition-all"
-                />
-                {searchQuery && (
+        <div className="flex flex-col gap-6 pb-32 -mt-6">
+            {/* Purple Header */}
+            <div className="bg-[#7C3AED] -mx-6 px-6 pt-10 pb-12 rounded-b-[2.5rem] relative shadow-2xl shadow-purple-500/20">
+                <div className="flex items-center justify-between mb-8 relative z-10">
                     <button
-                        onClick={() => setSearchQuery('')}
-                        className="absolute inset-y-0 right-5 flex items-center text-text-muted hover:text-primary transition-colors"
+                        onClick={() => navigate('/')}
+                        className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-90 transition-transform"
                     >
-                        <X size={18} />
+                        <ChevronLeft size={20} />
                     </button>
-                )}
+                    <h1 className="text-lg font-bold text-white tracking-tight">Appointment</h1>
+                    <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-90 transition-transform">
+                        <Bell size={20} />
+                    </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative z-10 translate-y-6">
+                    <div className="relative flex items-center">
+                        <Search className="absolute left-4 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search Salon, Specialist"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full h-12 pl-11 pr-11 rounded-2xl bg-white shadow-xl focus:outline-none text-sm font-medium transition-all"
+                        />
+                        <div className="absolute right-3 w-8 h-8 rounded-lg bg-[#7C3AED]/5 flex items-center justify-center text-[#7C3AED]">
+                            <SlidersHorizontal size={16} />
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Shops Grid */}
-            <div className="flex flex-col gap-6">
+            {/* Categories */}
+            <div className="flex gap-3 overflow-x-auto pb-2 pt-8 scrollbar-hide -mx-6 px-6">
+                {categories.map((cat) => (
+                    <button
+                        key={cat}
+                        onClick={() => setActiveCategory(cat)}
+                        className={`whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all border ${activeCategory === cat
+                                ? 'bg-[#7C3AED] text-white border-[#7C3AED] shadow-lg shadow-purple-500/20'
+                                : 'bg-white text-slate-500 border-slate-100'
+                            }`}
+                    >
+                        {cat}
+                    </button>
+                ))}
+            </div>
+
+            {/* Shops List */}
+            <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-center px-1">
+                    <h2 className="text-lg font-bold text-slate-800">Top Rated Salons</h2>
+                    <button className="text-[#7C3AED] text-xs font-bold">See All »</button>
+                </div>
+
                 {loadingShops ? (
                     <div className="flex flex-col gap-4">
-                        {[1, 2, 3].map(i => <div key={i} className="h-44 w-full skeleton" />)}
+                        {[1, 2, 3].map(i => <div key={i} className="h-64 w-full skeleton rounded-[2.5rem]" />)}
                     </div>
                 ) : filteredShops.length > 0 ? (
-                    filteredShops.map((shop, idx) => (
-                        <motion.div
-                            key={shop.id || idx}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            whileHover={{ y: -4 }}
-                            onClick={() => {
-                                const parsedServices = (shop.services || []).map(s => {
-                                    if (typeof s === 'string' && s.startsWith('{')) {
-                                        try { return JSON.parse(s); } catch (e) { return s; }
-                                    }
-                                    return s;
-                                });
-                                setShopInfo({ ...shop, services: parsedServices });
-                                navigate('/booking');
-                            }}
-                            className="glass-card overflow-hidden group cursor-pointer"
-                        >
-                            <div className="flex">
-                                <div className="w-1/3 h-44 overflow-hidden">
+                    <div className="grid grid-cols-1 gap-6">
+                        {filteredShops.map((shop, idx) => (
+                            <motion.div
+                                key={shop.id || idx}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                onClick={() => {
+                                    const parsedServices = (shop.services || []).map(s => {
+                                        if (typeof s === 'string' && s.startsWith('{')) {
+                                            try { return JSON.parse(s); } catch (e) { return s; }
+                                        }
+                                        return s;
+                                    });
+                                    setShopInfo({ ...shop, services: parsedServices });
+                                    navigate('/booking');
+                                }}
+                                className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-slate-100 group cursor-pointer"
+                            >
+                                <div className="relative h-48 overflow-hidden">
                                     <img
                                         src={shop.imageUrl || (idx % 2 === 0 ? "/barber_1.png" : "/barber_2.png")}
                                         alt={shop.name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
-                                </div>
-                                <div className="w-2/3 p-6 flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="text-xl font-bold text-text-main group-hover:text-primary transition-colors">{shop.name}</h3>
-                                            <div className="flex items-center gap-1 text-amber-400 font-black">
-                                                <span className="text-sm">4.9</span>
-                                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 text-text-muted text-xs font-bold uppercase tracking-wider mb-4">
-                                            <MapPin size={14} />
-                                            <span>Tashkent, Uzbekistan</span>
-                                        </div>
+                                    <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                                        <Heart size={18} />
                                     </div>
+                                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-1.5">
+                                        <Star size={12} fill="#7C3AED" className="text-[#7C3AED]" />
+                                        <span className="text-xs font-black text-slate-800">4.8</span>
+                                    </div>
+                                </div>
+                                <div className="p-6">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-1">{shop.name}</h3>
+                                    <p className="text-xs text-slate-400 font-medium mb-4">{shop.address || 'Tower Plaza, Sheikh Zayed Road'}</p>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-text-muted font-black uppercase mb-0.5">Ish vaqti</span>
-                                            <span className="text-xs font-bold text-text-main">{shop.workingHours?.start || '09:00'} - {shop.workingHours?.end || '18:00'}</span>
-                                        </div>
-                                        <div className="btn-primary !p-3 !rounded-xl !text-xs !bg-white/10 !text-white group-hover:!bg-primary group-hover:!text-bg transition-all">
-                                            Band qilish
+                                        <span className="text-lg font-black text-[#7C3AED]">$200</span>
+                                        <div className="w-10 h-10 rounded-full bg-[#7C3AED] flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                                            <ChevronLeft size={20} className="rotate-180" />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))
+                            </motion.div>
+                        ))}
+                    </div>
                 ) : (
                     <div className="py-20 text-center flex flex-col items-center gap-4">
-                        <div className="w-20 h-20 glass rounded-3xl flex items-center justify-center text-text-muted opacity-30">
+                        <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200">
                             <Search size={32} />
                         </div>
-                        <h3 className="text-xl font-bold text-text-main">Hech narsa topilmadi</h3>
-                        <p className="text-text-muted text-sm font-medium">Boshqa nom bilan qidirib ko'ring</p>
+                        <h3 className="text-xl font-bold text-slate-800">Hech narsa topilmadi</h3>
+                        <p className="text-slate-400 text-sm font-medium">Boshqa nom bilan qidirib ko'ring</p>
                     </div>
                 )}
             </div>
@@ -148,4 +144,5 @@ const Gateway = () => {
 };
 
 export default Gateway;
+
 
