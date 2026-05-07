@@ -125,7 +125,7 @@ const Login = ({ onLogin }) => {
         if (isLoginMode) {
             setLoading(true);
             try {
-                const { error } = await supabase.auth.signInWithPassword({
+                const { data: signInData, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
@@ -134,6 +134,27 @@ const Login = ({ onLogin }) => {
                 // Super Admin Check
                 const isAdmin = cleanPhone === '998505521107' || cleanPhone === '+998505521107' || cleanPhone === '505521107';
                 const finalRole = isAdmin ? 'owner' : role;
+
+                // If logging in as owner (non-admin), check approval status
+                if (finalRole === 'owner' && !isAdmin) {
+                    const userId = signInData?.user?.id;
+                    if (userId) {
+                        const { data: shopData } = await supabase
+                            .from('shops')
+                            .select('status')
+                            .eq('owner_id', userId)
+                            .single();
+
+                        if (shopData && shopData.status === 'Pending') {
+                            // Not approved yet — show waiting screen and sign out
+                            sessionStorage.setItem('awaitingApproval', 'true');
+                            setRegSuccess(true);
+                            await supabase.auth.signOut();
+                            setLoading(false);
+                            return;
+                        }
+                    }
+                }
 
                 localStorage.setItem('currentUserPhone', cleanPhone.startsWith('+') ? cleanPhone : `+${cleanPhone}`);
                 onLogin(finalRole);

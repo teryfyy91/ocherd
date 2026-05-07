@@ -62,7 +62,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 2000); // 2 seconds minimum splash duration
+    }, 1000); // 1 second minimum splash duration
 
     return () => clearTimeout(timer);
   }, []);

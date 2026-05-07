@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'prompt',
       injectRegister: 'auto',
       manifest: {
-        name: 'BarberOS - Navbat Tizimi',
+        name: 'BarberOS',
         short_name: 'BarberOS',
-        description: 'O\'zbekistondagi salonlar uchun onlayn navbat tizimi',
+        description: 'Onlayn navbat tizimi',
         theme_color: '#0B0F14',
         background_color: '#0B0F14',
         display: 'standalone',
