@@ -60,13 +60,31 @@ const AdminDashboard = () => {
                     }
 
                     const pending = allShops.filter(s => s.status === 'Pending');
-                    setNotifications(pending.map(s => ({
+
+                    // Fetch real notifications from DB
+                    const { data: dbNotifications } = await supabase
+                        .from('notifications')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(20);
+
+                    const mappedPending = pending.map(s => ({
                         id: s.id,
                         message: `Yangi salon: ${s.name}. Sanga sorov keldi, qabul qilasanmi?`,
                         type: 'registration',
                         created_at: s.createdAt,
                         status: 'unread'
-                    })));
+                    }));
+
+                    const dbMapped = (dbNotifications || []).map(n => ({
+                        id: n.id,
+                        message: n.message,
+                        type: 'system',
+                        created_at: n.created_at,
+                        status: n.status
+                    }));
+
+                    setNotifications([...mappedPending, ...dbMapped]);
 
                 } catch (err) {
                     console.error('Error fetching stats:', err);
@@ -89,6 +107,26 @@ const AdminDashboard = () => {
             };
         }
     }, [isSuperAdmin]);
+
+    // Live sync pending shops to notifications whenever allShops changes
+    useEffect(() => {
+        if (allShops.length > 0) {
+            const pending = allShops.filter(s => s.status === 'Pending');
+            const mappedPending = pending.map(s => ({
+                id: s.id,
+                message: `Yangi salon: ${s.name}. Sanga sorov keldi, qabul qilasanmi?`,
+                type: 'registration',
+                created_at: s.createdAt,
+                status: 'unread'
+            }));
+
+            setNotifications(prev => {
+                // Merge without duplicates based on message or ID
+                const existingSystem = prev.filter(n => n.type === 'system');
+                return [...mappedPending, ...existingSystem];
+            });
+        }
+    }, [allShops]);
 
     const handleDeleteShop = async (id) => {
         if (window.confirm("Rostdan ham ushbu salonni o'chirishni xohlaysizmi?")) {
@@ -291,14 +329,127 @@ const AdminDashboard = () => {
         <div className="min-h-screen bg-white text-slate-800 flex flex-col font-['Inter'] pb-32">
             <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 flex items-center justify-between sticky top-0 z-[50]">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                        <ShieldCheck size={24} />
+                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800 shadow-lg shadow-primary/5">
+                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-1.5" />
                     </div>
                     <h2 className="text-lg font-black text-slate-800 uppercase italic tracking-tighter leading-none">
                         BarberOS <br /> <span className="text-[8px] text-primary tracking-[0.4em] uppercase">Control Panel</span>
                     </h2>
                 </div>
                 <div className="flex items-center gap-4">
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            className={`p-3 rounded-xl transition-all relative ${showNotifications ? 'bg-primary text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                        >
+                            <Bell size={20} />
+                            {notifications.length > 0 && (
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+                            )}
+                        </button>
+
+                        <AnimatePresence>
+                            {showNotifications && (
+                                <>
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        onClick={() => setShowNotifications(false)}
+                                        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[1001]"
+                                    />
+                                    <motion.div
+                                        initial={{ x: '100%' }}
+                                        animate={{ x: 0 }}
+                                        exit={{ x: '100%' }}
+                                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                                        className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[1002] flex flex-col"
+                                    >
+                                        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                            <div className="flex flex-col gap-1">
+                                                <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter">Bildirishnomalar</h3>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{notifications.length} ta yangi xabar</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setShowNotifications(false)}
+                                                className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:rotate-90 transition-all shadow-sm"
+                                            >
+                                                <X size={24} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 scrollbar-hide">
+                                            {notifications.length > 0 ? notifications.map((n, i) => (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.1 }}
+                                                    key={n.id || i}
+                                                    className={`p-6 rounded-[2.5rem] border flex flex-col gap-6 transition-all hover:shadow-xl ${n.type === 'registration' ? 'bg-red-50/50 border-red-100 shadow-sm shadow-red-50' : 'bg-slate-50 border-slate-100'}`}
+                                                >
+                                                    <div className="flex gap-5">
+                                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${n.type === 'registration' ? 'bg-red-500 text-white shadow-red-200' : 'bg-primary text-white shadow-primary/20'}`}>
+                                                            {n.type === 'registration' ? <Building2 size={24} /> : <Bell size={24} />}
+                                                        </div>
+                                                        <div className="flex flex-col gap-2">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${n.type === 'registration' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'}`}>
+                                                                    {n.type === 'registration' ? "Yangi So'rov" : "Tizim"}
+                                                                </span>
+                                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">Hozir</span>
+                                                            </div>
+                                                            <p className="text-sm font-black text-slate-800 leading-relaxed italic">{n.message}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {n.type === 'registration' && (
+                                                        <div className="flex gap-3">
+                                                            <button
+                                                                onClick={async () => {
+                                                                    await deleteShop(n.id);
+                                                                    refreshShops();
+                                                                }}
+                                                                className="flex-1 h-12 bg-white border border-red-100 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all"
+                                                            >
+                                                                Rad etish
+                                                            </button>
+                                                            <button
+                                                                onClick={async () => {
+                                                                    await approveShop(n.id);
+                                                                    refreshShops();
+                                                                }}
+                                                                className="flex-[2] h-12 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                                                            >
+                                                                Tasdiqlash
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </motion.div>
+                                            )) : (
+                                                <div className="flex-1 flex flex-col items-center justify-center gap-6 opacity-30">
+                                                    <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
+                                                        <Bell size={48} strokeWidth={1} />
+                                                    </div>
+                                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {notifications.length > 0 && (
+                                            <div className="p-8 border-t border-slate-100 bg-slate-50/50">
+                                                <button
+                                                    onClick={() => setNotifications([])}
+                                                    className="w-full h-14 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all"
+                                                >
+                                                    Barchasini o'chirish
+                                                </button>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
                     <button onClick={signOut} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm">
                         <LogOut size={20} />
                     </button>
@@ -323,7 +474,7 @@ const AdminDashboard = () => {
                 {[
                     { id: 'gateway', icon: LayoutDashboard },
                     { id: 'salons', icon: Building2 },
-                    { id: 'super-users', icon: BarChart3 },
+                    { id: 'super-users', icon: TrendingUp },
                     { id: 'settings', icon: Settings }
                 ].map(item => (
                     <button

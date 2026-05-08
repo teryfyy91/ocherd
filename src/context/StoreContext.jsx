@@ -523,7 +523,18 @@ export const StoreProvider = ({ children }) => {
             refreshShops: fetchShops,
             refreshMyBookings: fetchMyBookings,
             theme,
-            toggleTheme
+            toggleTheme,
+            sendNotification: async (message) => {
+                try {
+                    await supabase.from('notifications').insert([{
+                        message,
+                        status: 'unread',
+                        created_at: new Date().toISOString()
+                    }]);
+                } catch (err) {
+                    console.error('Error sending notification:', err);
+                }
+            }
         }}>
 
 
