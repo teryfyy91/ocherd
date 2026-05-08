@@ -31,49 +31,24 @@ const SplashScreen = () => {
                 />
             </div>
 
-            <div className="relative z-10 flex flex-col items-center gap-16">
+            <div className="relative z-10 flex flex-col items-center">
                 <motion.div
-                    initial={{ scale: 0.4, opacity: 0, rotate: -20 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 6 }}
+                    initial={{ scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
                     transition={{
                         type: "spring",
-                        damping: 12,
+                        damping: 15,
                         stiffness: 100,
                         duration: 1.2
                     }}
-                    className="relative"
+                    className="relative px-8"
                 >
-                    <div className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full scale-150 animate-pulse" />
-                    <div className="w-36 h-36 md:w-48 md:h-48 bg-slate-900 rounded-[3.5rem] flex items-center justify-center shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] relative border-8 border-white overflow-hidden group">
-                        <motion.div
-                            animate={{ x: ['100%', '-100%'] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
-                        />
-                        <motion.img
-                            src="/logo.png"
-                            alt="Logo"
-                            className="w-full h-full object-contain p-4 relative z-10"
-                        />
-                    </div>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.8 }}
-                    className="flex flex-col items-center gap-6"
-                >
-                    <div className="flex flex-col items-center">
-                        <h2 className="text-5xl md:text-7xl font-black text-slate-800 uppercase italic tracking-tighter leading-none mb-2">
-                            Barber<span className="text-primary">OS</span>
-                        </h2>
-                        <div className="flex items-center gap-4 w-full">
-                            <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-primary/20 rounded-full" />
-                            <span className="text-primary font-black uppercase tracking-[0.8em] text-[10px] md:text-xs opacity-60">Luxury Edition</span>
-                            <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-primary/20 rounded-full" />
-                        </div>
-                    </div>
+                    <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full scale-110 animate-pulse" />
+                    <motion.img
+                        src="/logo.png"
+                        alt="Logo"
+                        className="w-[280px] md:w-[350px] object-contain relative z-10 drop-shadow-2xl"
+                    />
                 </motion.div>
             </div>
 

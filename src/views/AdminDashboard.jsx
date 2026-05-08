@@ -329,12 +329,9 @@ const AdminDashboard = () => {
         <div className="min-h-screen bg-white text-slate-800 flex flex-col font-['Inter'] pb-32">
             <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 flex items-center justify-between sticky top-0 z-[50]">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center overflow-hidden border border-slate-800 shadow-lg shadow-primary/5">
-                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-1.5" />
+                    <div className="w-16 h-auto flex items-center justify-center overflow-hidden">
+                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
-                    <h2 className="text-lg font-black text-slate-800 uppercase italic tracking-tighter leading-none">
-                        BarberOS <br /> <span className="text-[8px] text-primary tracking-[0.4em] uppercase">Control Panel</span>
-                    </h2>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="relative">

@@ -287,22 +287,14 @@ const Login = ({ onLogin }) => {
             >
                 {!role ? (
                     <div className="flex flex-col items-center gap-10 w-full animate-fade-in">
-                        <div className="flex flex-col items-center gap-10">
+                        <div className="flex flex-col items-center gap-6">
                             <motion.div
-                                whileHover={{ rotate: 5, scale: 1.05 }}
-                                className="w-32 h-32 bg-slate-900 rounded-[3rem] flex items-center justify-center p-6 border border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative group overflow-hidden"
+                                whileHover={{ scale: 1.05 }}
+                                className="relative group w-64 h-auto flex items-center justify-center p-2 mb-4"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="absolute -inset-[50%] bg-primary/10 blur-[60px] rounded-full animate-pulse-slow opacity-50" />
-                                <img src="/logo.png" alt="BarberOS Logo" className="w-full h-full object-contain relative z-10 filter drop-shadow-2xl brightness-110" />
+                                <div className="absolute -inset-[30%] bg-primary/10 blur-[80px] rounded-full animate-pulse-slow opacity-60" />
+                                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)]" />
                             </motion.div>
-
-                            <div className="text-center">
-                                <h2 className="text-5xl font-black text-slate-800 uppercase italic tracking-tighter leading-none mb-2">
-                                    Barber<span className="text-gradient">OS</span>
-                                </h2>
-                                <p className="text-slate-400 font-black text-[9px] uppercase tracking-[0.5em] opacity-60">Sizning go'zallik hamkoringiz</p>
-                            </div>
                         </div>
 
                         <div className="flex flex-col gap-5 w-full">

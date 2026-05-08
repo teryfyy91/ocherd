@@ -254,8 +254,8 @@ const Dashboard = () => {
                         animate={{ opacity: 1 }}
                         className="py-24 text-center flex flex-col items-center gap-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[3rem]"
                     >
-                        <div className="w-20 h-20 bg-slate-900 rounded-[1.5rem] flex items-center justify-center overflow-hidden border border-slate-800 shadow-xl">
-                            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-3" />
+                        <div className="w-24 h-auto flex items-center justify-center overflow-hidden">
+                            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col gap-2">
                             <h3 className="text-xl font-black text-slate-800 uppercase italic">Salonlar topilmadi</h3>

@@ -43,7 +43,7 @@ const Landing = () => {
             <div className="px-6 pt-12 pb-6 flex flex-col gap-8">
                 <header className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center p-2.5 shadow-lg shadow-slate-200 overflow-hidden border border-slate-800">
+                        <div className="w-16 h-auto flex items-center justify-center overflow-hidden">
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex flex-col gap-1">
