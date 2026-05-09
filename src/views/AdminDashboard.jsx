@@ -21,8 +21,8 @@ const AdminDashboard = () => {
         deleteShop, approveShop, refreshShops, signOut
     } = useStore();
 
-    const userPhone = localStorage.getItem('currentUserPhone');
-    const isSuperAdmin = userPhone === '+998505521107';
+    const userPhone = localStorage.getItem('currentUserPhone') || '';
+    const isSuperAdmin = userPhone.replace(/\D/g, '').includes('505521107');
 
     const [activeTab, setActiveTab] = useState(isSuperAdmin ? 'gateway' : 'overview');
     const [searchQuery, setSearchQuery] = useState('');
@@ -31,6 +31,7 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [newNotificationToast, setNewNotificationToast] = useState(null);
 
     useEffect(() => {
         if (isSuperAdmin) {
@@ -68,23 +69,40 @@ const AdminDashboard = () => {
                         .order('created_at', { ascending: false })
                         .limit(20);
 
-                    const mappedPending = pending.map(s => ({
-                        id: s.id,
-                        message: `Yangi salon: ${s.name}. Sanga sorov keldi, qabul qilasanmi?`,
-                        type: 'registration',
-                        created_at: s.createdAt,
-                        status: 'unread'
+                    const dbMapped = await Promise.all((dbNotifications || []).map(async n => {
+                        let msg = n.message;
+                        let type = 'system';
+                        let salonDetails = null;
+
+                        if (msg && msg.startsWith('NEW_SALON_REGISTRATION|||')) {
+                            type = 'new_salon_registration';
+                            const pendingId = msg.split('|||')[1];
+                            if (pendingId && pendingId !== 'null') {
+                                // Fetch details from pending_salons
+                                const { data: salonData } = await supabase
+                                    .from('pending_salons')
+                                    .select('*')
+                                    .eq('id', pendingId)
+                                    .single();
+
+                                if (salonData) {
+                                    salonDetails = salonData;
+                                    msg = "Yangi salon tasdiqlash kutmoqda";
+                                }
+                            }
+                        }
+
+                        return {
+                            id: n.id,
+                            message: msg,
+                            type: type,
+                            salonDetails: salonDetails,
+                            created_at: n.created_at,
+                            status: n.status
+                        }
                     }));
 
-                    const dbMapped = (dbNotifications || []).map(n => ({
-                        id: n.id,
-                        message: n.message,
-                        type: 'system',
-                        created_at: n.created_at,
-                        status: n.status
-                    }));
-
-                    setNotifications([...mappedPending, ...dbMapped]);
+                    setNotifications(dbMapped);
 
                 } catch (err) {
                     console.error('Error fetching stats:', err);
@@ -93,39 +111,55 @@ const AdminDashboard = () => {
             };
             fetchAllData();
 
-            const channel = supabase
-                .channel('admin-shops-sync')
-                .on('postgres_changes', { event: 'INSERT', table: 'shops' }, payload => {
-                    if (payload.new.status === 'Pending') {
-                        refreshShops();
+            const notificationChannel = supabase
+                .channel('admin-notifications-sync')
+                .on('postgres_changes', { event: '*', table: 'notifications' }, async payload => {
+                    if (payload.eventType === 'INSERT') {
+                        let msg = payload.new.message;
+                        let type = 'system';
+                        let salonDetails = null;
+
+                        if (msg && msg.startsWith('NEW_SALON_REGISTRATION|||')) {
+                            type = 'new_salon_registration';
+                            const pendingId = msg.split('|||')[1];
+                            if (pendingId && pendingId !== 'null') {
+                                const { data: salonData } = await supabase
+                                    .from('pending_salons')
+                                    .select('*')
+                                    .eq('id', pendingId)
+                                    .single();
+
+                                if (salonData) {
+                                    salonDetails = salonData;
+                                    msg = "Yangi salon tasdiqlash kutmoqda";
+                                }
+                            }
+                        }
+
+                        const newNotif = {
+                            id: payload.new.id,
+                            message: msg,
+                            type: type,
+                            salonDetails: salonDetails,
+                            created_at: payload.new.created_at,
+                            status: payload.new.status
+                        };
+                        setNotifications(prev => [newNotif, ...prev]);
+                        setNewNotificationToast(msg);
+                        setTimeout(() => setNewNotificationToast(null), 8000);
                     }
                 })
                 .subscribe();
 
             return () => {
-                supabase.removeChannel(channel);
+                supabase.removeChannel(notificationChannel);
             };
         }
     }, [isSuperAdmin]);
 
-    // Live sync pending shops to notifications whenever allShops changes
+    // Live sync pending shops to notifications is now handled by DB fetch
     useEffect(() => {
-        if (allShops.length > 0) {
-            const pending = allShops.filter(s => s.status === 'Pending');
-            const mappedPending = pending.map(s => ({
-                id: s.id,
-                message: `Yangi salon: ${s.name}. Sanga sorov keldi, qabul qilasanmi?`,
-                type: 'registration',
-                created_at: s.createdAt,
-                status: 'unread'
-            }));
-
-            setNotifications(prev => {
-                // Merge without duplicates based on message or ID
-                const existingSystem = prev.filter(n => n.type === 'system');
-                return [...mappedPending, ...existingSystem];
-            });
-        }
+        // No need for client-side mapping of allShops to notifications anymore
     }, [allShops]);
 
     const handleDeleteShop = async (id) => {
@@ -136,6 +170,48 @@ const AdminDashboard = () => {
 
     const handleApproveShop = async (id) => {
         await approveShop(id);
+    };
+
+    const handleApproveNewRegistration = async (notif) => {
+        if (!notif.salonDetails) return;
+        try {
+            const { error: shopError } = await supabase.from('shops').insert([{
+                owner_id: notif.salonDetails.owner_id,
+                name: notif.salonDetails.name,
+                image_url: notif.salonDetails.image_url,
+                services: notif.salonDetails.services,
+                working_hours: notif.salonDetails.working_hours,
+                status: 'Active'
+            }]);
+
+            if (shopError) {
+                console.error('Error adding shop:', shopError);
+                return;
+            }
+
+            // Update pending status
+            await supabase.from('pending_salons').update({ status: 'approved' }).eq('id', notif.salonDetails.id);
+
+            // Delete notification
+            await supabase.from('notifications').delete().eq('id', notif.id);
+
+            setNotifications(prev => prev.filter(n => n.id !== notif.id));
+            refreshShops();
+        } catch (err) {
+            console.error('Error approving new registration:', err);
+        }
+    };
+
+    const handleRejectNewRegistration = async (notif) => {
+        try {
+            if (notif.salonDetails) {
+                await supabase.from('pending_salons').update({ status: 'rejected' }).eq('id', notif.salonDetails.id);
+            }
+            await supabase.from('notifications').delete().eq('id', notif.id);
+            setNotifications(prev => prev.filter(n => n.id !== notif.id));
+        } catch (err) {
+            console.error('Error rejecting new registration:', err);
+        }
     };
 
     const SuperGatewayTab = () => (
@@ -181,7 +257,16 @@ const AdminDashboard = () => {
     );
 
     const SuperSalonsTab = () => {
-        const pendingShops = allShops.filter(s => s.status === 'Pending');
+        const pendingShops = [
+            ...allShops.filter(s => s.status === 'Pending'),
+            ...notifications.filter(n => n.type === 'new_registration').map(n => ({
+                id: n.id, // using notif id as temp key
+                name: n.shopData?.name || 'Kutilmoqda',
+                status: 'Pending',
+                isNewReg: true,
+                notifData: n
+            }))
+        ];
         const activeShops = allShops.filter(s => s.status !== 'Pending');
         const filteredActive = activeShops.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -225,8 +310,20 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex gap-3">
-                                            <button onClick={() => handleDeleteShop(s.id)} className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all">Bekor qilish</button>
-                                            <button onClick={() => handleApproveShop(s.id)} className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Tasdiqlash</button>
+                                            <button onClick={() => {
+                                                if (s.isNewReg) {
+                                                    handleRejectNewRegistration(s.notifData);
+                                                } else {
+                                                    handleDeleteShop(s.id);
+                                                }
+                                            }} className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all">Bekor qilish</button>
+                                            <button onClick={() => {
+                                                if (s.isNewReg) {
+                                                    handleApproveNewRegistration(s.notifData);
+                                                } else {
+                                                    handleApproveShop(s.id);
+                                                }
+                                            }} className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Tasdiqlash</button>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -355,94 +452,126 @@ const AdminDashboard = () => {
                                         onClick={() => setShowNotifications(false)}
                                         className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[1001]"
                                     />
-                                    <motion.div
-                                        initial={{ x: '100%' }}
-                                        animate={{ x: 0 }}
-                                        exit={{ x: '100%' }}
-                                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                                        className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[1002] flex flex-col"
-                                    >
-                                        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                                            <div className="flex flex-col gap-1">
-                                                <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter">Bildirishnomalar</h3>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{notifications.length} ta yangi xabar</p>
-                                            </div>
+                                    <div className="fixed inset-0 z-[1002] flex items-center justify-center p-4 md:p-8 pointer-events-none">
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.95, y: 30 }}
+                                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                            className="w-full max-w-4xl h-[85vh] flex flex-col bg-white shadow-[0_40px_100px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-slate-100 pointer-events-auto"
+                                        >
+                                            {/* Absolute Close Button (X) */}
                                             <button
                                                 onClick={() => setShowNotifications(false)}
-                                                className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:rotate-90 transition-all shadow-sm"
+                                                className="absolute top-6 right-6 w-14 h-14 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-red-500 hover:border-red-500 transition-all duration-300 shadow-xl z-50 group"
                                             >
-                                                <X size={24} />
+                                                <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
                                             </button>
-                                        </div>
 
-                                        <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 scrollbar-hide">
-                                            {notifications.length > 0 ? notifications.map((n, i) => (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.1 }}
-                                                    key={n.id || i}
-                                                    className={`p-6 rounded-[2.5rem] border flex flex-col gap-6 transition-all hover:shadow-xl ${n.type === 'registration' ? 'bg-red-50/50 border-red-100 shadow-sm shadow-red-50' : 'bg-slate-50 border-slate-100'}`}
-                                                >
-                                                    <div className="flex gap-5">
-                                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${n.type === 'registration' ? 'bg-red-500 text-white shadow-red-200' : 'bg-primary text-white shadow-primary/20'}`}>
-                                                            {n.type === 'registration' ? <Building2 size={24} /> : <Bell size={24} />}
-                                                        </div>
-                                                        <div className="flex flex-col gap-2">
-                                                            <div className="flex items-center justify-between">
-                                                                <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${n.type === 'registration' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'}`}>
-                                                                    {n.type === 'registration' ? "Yangi So'rov" : "Tizim"}
-                                                                </span>
-                                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">Hozir</span>
+                                            <div className="p-8 md:p-10 border-b border-slate-100 flex flex-col justify-center bg-slate-50/50 shrink-0 relative z-40">
+                                                <div className="flex flex-col gap-1 pr-16">
+                                                    <h3 className="text-2xl md:text-3xl font-black text-slate-800 uppercase italic tracking-tighter">Bildirishnomalar</h3>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{notifications.length} ta yangi xabar</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 scrollbar-hide">
+                                                {notifications.length > 0 ? notifications.map((n, i) => (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 20 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: i * 0.1 }}
+                                                        key={n.id || i}
+                                                        className={`p-6 rounded-[2.5rem] border flex flex-col gap-6 transition-all hover:shadow-xl ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-50/50 border-indigo-100 shadow-sm shadow-indigo-50' : 'bg-slate-50 border-slate-100'}`}
+                                                    >
+                                                        <div className="flex gap-5">
+                                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-500 text-white shadow-indigo-200' : 'bg-primary text-white shadow-primary/20'}`}>
+                                                                {(n.type === 'new_salon_registration' || n.type === 'registration') ? <Building2 size={24} /> : <Bell size={24} />}
                                                             </div>
-                                                            <p className="text-sm font-black text-slate-800 leading-relaxed italic">{n.message}</p>
-                                                        </div>
-                                                    </div>
+                                                            <div className="flex-1 flex flex-col gap-3">
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-100 text-indigo-600' : 'bg-primary/10 text-primary'}`}>
+                                                                        {(n.type === 'new_salon_registration' || n.type === 'registration') ? "Yangi Salon Tasdiqlash" : "Tizim"}
+                                                                    </span>
+                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">
+                                                                        {new Date(n.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-sm font-black text-slate-800 leading-relaxed italic">{n.message}</p>
 
-                                                    {n.type === 'registration' && (
-                                                        <div className="flex gap-3">
-                                                            <button
-                                                                onClick={async () => {
-                                                                    await deleteShop(n.id);
-                                                                    refreshShops();
-                                                                }}
-                                                                className="flex-1 h-12 bg-white border border-red-100 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all"
-                                                            >
-                                                                Rad etish
-                                                            </button>
-                                                            <button
-                                                                onClick={async () => {
-                                                                    await approveShop(n.id);
-                                                                    refreshShops();
-                                                                }}
-                                                                className="flex-[2] h-12 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all"
-                                                            >
-                                                                Tasdiqlash
-                                                            </button>
+                                                                {n.salonDetails && (
+                                                                    <div className="bg-white/50 backdrop-blur-sm border border-indigo-100/50 rounded-2xl p-4 flex flex-col gap-3">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <User size={14} className="text-indigo-400" />
+                                                                            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.1em]">{n.salonDetails.owner_name}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-3">
+                                                                            <Phone size={14} className="text-indigo-400" />
+                                                                            <span className="text-[10px] font-bold text-slate-600 tracking-wider ">{n.salonDetails.owner_phone}</span>
+                                                                        </div>
+                                                                        {n.salonDetails.description && (
+                                                                            <p className="text-[9px] text-slate-400 font-medium italic line-clamp-2 mt-1">
+                                                                                "{n.salonDetails.description}"
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    )}
-                                                </motion.div>
-                                            )) : (
-                                                <div className="flex-1 flex flex-col items-center justify-center gap-6 opacity-30">
-                                                    <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
-                                                        <Bell size={48} strokeWidth={1} />
+
+                                                        {(n.type === 'new_salon_registration' || n.type === 'registration') && (
+                                                            <div className="flex gap-3">
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        if (n.type === 'new_salon_registration') {
+                                                                            await handleRejectNewRegistration(n);
+                                                                        } else {
+                                                                            await deleteShop(n.id);
+                                                                            refreshShops();
+                                                                        }
+                                                                    }}
+                                                                    className="flex-1 h-12 bg-white border border-red-100 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm active:scale-95"
+                                                                >
+                                                                    Rad etish
+                                                                </button>
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        if (n.type === 'new_salon_registration') {
+                                                                            await handleApproveNewRegistration(n);
+                                                                        } else {
+                                                                            await approveShop(n.id);
+                                                                            refreshShops();
+                                                                        }
+                                                                    }}
+                                                                    className="flex-[2] h-12 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
+                                                                >
+                                                                    Tasdiqlash
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </motion.div>
+                                                )) : (
+                                                    <div className="flex-1 flex flex-col items-center justify-center gap-6 opacity-30">
+                                                        <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
+                                                            <Bell size={48} strokeWidth={1} />
+                                                        </div>
+                                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
                                                     </div>
-                                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
+                                                )}
+                                            </div>
+
+                                            {notifications.length > 0 && (
+                                                <div className="p-8 border-t border-slate-100 bg-slate-50/50 shrink-0">
+                                                    <button
+                                                        onClick={() => setNotifications([])}
+                                                        className="w-full h-14 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all"
+                                                    >
+                                                        Barchasini o'chirish
+                                                    </button>
                                                 </div>
                                             )}
-                                        </div>
-
-                                        {notifications.length > 0 && (
-                                            <div className="p-8 border-t border-slate-100 bg-slate-50/50">
-                                                <button
-                                                    onClick={() => setNotifications([])}
-                                                    className="w-full h-14 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all"
-                                                >
-                                                    Barchasini o'chirish
-                                                </button>
-                                            </div>
-                                        )}
-                                    </motion.div>
+                                        </motion.div>
+                                    </div>
                                 </>
                             )}
                         </AnimatePresence>
@@ -455,6 +584,28 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </header>
+
+            <AnimatePresence>
+                {newNotificationToast && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 100, scale: 0.9 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                        className="fixed top-24 right-6 z-[2000] w-80 bg-slate-900 text-white p-6 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 flex items-start gap-4 backdrop-blur-xl"
+                    >
+                        <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                            <Bell size={20} className="animate-bounce" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">Yangi Xabar</span>
+                            <p className="text-xs font-bold leading-relaxed">{newNotificationToast}</p>
+                        </div>
+                        <button onClick={() => setNewNotificationToast(null)} className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors">
+                            <X size={14} />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <main className="flex-1 flex flex-col px-6">
                 <AnimatePresence mode="wait">

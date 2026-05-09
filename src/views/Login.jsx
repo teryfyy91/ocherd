@@ -113,11 +113,14 @@ const Login = ({ onLogin }) => {
     const [successMsg, setSuccessMsg] = useState('');
     const [regStep, setRegStep] = useState(0);
     const [salonName, setSalonName] = useState('');
+    const [salonImage, setSalonImage] = useState('');
+    const [salonDescription, setSalonDescription] = useState('');
     const [workingHours, setWorkingHours] = useState({ start: '09:00', end: '18:00' });
     const [services, setServices] = useState([]);
     const [serviceInput, setServiceInput] = useState('');
     const [servicePrice, setServicePrice] = useState('');
     const [regSuccess, setRegSuccess] = useState(false);
+    const [pendingSalonId, setPendingSalonId] = useState(null);
 
     const addService = () => {
         if (serviceInput.trim() && servicePrice.trim()) {
@@ -159,15 +162,31 @@ const Login = ({ onLogin }) => {
                 if (finalRole === 'owner' && !isAdmin) {
                     const userId = signInData?.user?.id;
                     if (userId) {
+                        // Check in shops
                         const { data: shopData } = await supabase
                             .from('shops')
                             .select('status')
                             .eq('owner_id', userId)
                             .single();
 
-                        if (shopData && shopData.status === 'Pending') {
+                        // Also check in pending_salons
+                        const { data: pendingData } = await supabase
+                            .from('pending_salons')
+                            .select('status')
+                            .eq('owner_id', userId)
+                            .order('created_at', { ascending: false })
+                            .limit(1);
+
+                        if ((shopData && shopData.status === 'Pending') || (pendingData && pendingData[0]?.status === 'pending')) {
                             sessionStorage.setItem('awaitingApproval', 'true');
                             setRegSuccess(true);
+                            await supabase.auth.signOut();
+                            setLoading(false);
+                            return;
+                        }
+
+                        if ((shopData && shopData.status === 'Rejected') || (pendingData && pendingData[0]?.status === 'rejected')) {
+                            setErrorMsg("Sizning so'rovingiz rad etilgan. Batafsil ma'lumot uchun admin bilan bog'laning.");
                             await supabase.auth.signOut();
                             setLoading(false);
                             return;
@@ -187,7 +206,7 @@ const Login = ({ onLogin }) => {
 
         setLoading(true);
         try {
-            let { data, error } = await supabase.auth.signUp({
+            let { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email: email,
                 password: password,
                 options: {
@@ -199,35 +218,39 @@ const Login = ({ onLogin }) => {
                 }
             });
 
-            if (error && error.message.includes('User already registered')) {
+            if (signUpError && signUpError.message.includes('User already registered')) {
                 setErrorMsg("Ushbu raqam allaqachon ro'yxatdan o'tgan.");
                 setLoading(false);
                 return;
             }
 
-            if (error) throw error;
+            if (signUpError) throw signUpError;
 
-            if (data?.user) {
-                if (data.session && role === 'owner') {
-                    const { error: shopError } = await supabase
-                        .from('shops')
+            if (signUpData?.user) {
+                if (signUpData.session && role === 'owner') {
+                    // Save to pending_salons table
+                    const { data: pendingResult, error: pendingError } = await supabase
+                        .from('pending_salons')
                         .insert([{
-                            owner_id: data.user.id,
+                            owner_id: signUpData.user.id,
+                            owner_name: name,
+                            owner_phone: phone,
                             name: salonName,
+                            image_url: salonImage,
+                            description: salonDescription,
                             services: services,
                             working_hours: workingHours,
-                            status: 'Pending'
-                        }]);
-                    if (shopError) console.error(shopError);
+                            status: 'pending'
+                        }])
+                        .select();
 
-                    // Send notification to admin
-                    if (sendNotification) {
-                        await sendNotification(`Yangi salon ro'yxatdan o'tdi: ${salonName}. Tekshirib tasdiqlang!`);
+                    if (pendingResult && pendingResult[0]) {
+                        setPendingSalonId(pendingResult[0].id);
                     }
 
                     sessionStorage.setItem('awaitingApproval', 'true');
                     setRegSuccess(true);
-                } else if (!data.session) {
+                } else if (!signUpData.session) {
                     setSuccessMsg('Tayyor! Endi tizimga kiring.');
                     setIsLoginMode(true);
                     setRegStep(0);
@@ -244,32 +267,40 @@ const Login = ({ onLogin }) => {
 
     if (regSuccess) {
         return (
-            <div className="fixed inset-0 z-[2000] bg-white flex flex-col items-center justify-center p-8 text-center overscroll-none">
+            <div className="fixed inset-0 z-[2000] bg-white/20 backdrop-blur-3xl flex flex-col items-center justify-center p-8 text-center overscroll-none">
                 <div className="absolute inset-0 bg-primary/5 opacity-40 blur-[120px] rounded-full" />
-                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative z-10 w-full max-w-sm flex flex-col items-center gap-10">
-                    <div className="w-24 h-24 bg-primary text-white rounded-[2rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-6">
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    className="relative z-10 w-full max-w-sm flex flex-col items-center gap-10 bg-white/40 backdrop-blur-md p-10 rounded-[3rem] border border-white shadow-2xl"
+                >
+                    <div className="w-24 h-24 bg-primary text-white rounded-[2rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-6 translate-y-[-20%]">
                         <Clock size={48} strokeWidth={2.5} />
                     </div>
                     <div className="flex flex-col gap-4">
-                        <h2 className="text-4xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Kutilmoqda</h2>
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] leading-loose max-w-[280px] mx-auto">
-                            Sizning so'rovnomangiz yuborildi. Admin tasdiqlashini kuting.
+                        <h2 className="text-4xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Yuborildi</h2>
+                        <p className="text-slate-500 font-bold text-[10px] uppercase tracking-[0.3em] leading-loose max-w-[280px] mx-auto">
+                            So‘rovingiz yuborildi. Admin tasdiqlashini kuting.
                         </p>
                     </div>
                     <button
                         onClick={async () => {
+                            if (sendNotification) {
+                                await sendNotification(`NEW_SALON_REGISTRATION|||${pendingSalonId || 'null'}`);
+                            }
                             sessionStorage.removeItem('awaitingApproval');
                             await supabase.auth.signOut();
                             window.location.reload();
                         }}
                         className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-200 active:scale-95 transition-all"
                     >
-                        Tushunarli
+                        TUSUNARLI
                     </button>
                 </motion.div>
             </div>
         );
     }
+
 
     return (
         <div className="min-h-screen mesh-gradient flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -277,8 +308,8 @@ const Login = ({ onLogin }) => {
             <div className="absolute inset-0 bg-dot-pattern opacity-30 pointer-events-none" />
 
             {/* Dynamic Background Lights */}
-            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse-slow" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse-slow" />
+            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -289,11 +320,34 @@ const Login = ({ onLogin }) => {
                     <div className="flex flex-col items-center gap-10 w-full animate-fade-in">
                         <div className="flex flex-col items-center gap-6">
                             <motion.div
-                                whileHover={{ scale: 1.05 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                                 className="relative group w-64 h-auto flex items-center justify-center p-2 mb-4"
                             >
-                                <div className="absolute -inset-[30%] bg-primary/10 blur-[80px] rounded-full animate-pulse-slow opacity-60" />
-                                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)]" />
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.8, rotate: -15 }}
+                                    animate={{ opacity: 0.5, scale: 1, rotate: 0 }}
+                                    transition={{ duration: 1.5, ease: "easeOut" }}
+                                    className="absolute -inset-[30%] bg-primary/20 blur-[80px] rounded-full opacity-60"
+                                />
+                                <div className="relative rounded-[30px] overflow-hidden p-2">
+                                    <motion.img
+                                        src="/logo.png"
+                                        alt="Logo"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ duration: 1, ease: "easeOut" }}
+                                        className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                                    />
+                                    {/* Sweeping Light Shimmer Effect */}
+                                    <motion.div
+                                        initial={{ left: "-150%" }}
+                                        animate={{ left: "150%" }}
+                                        transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.5 }}
+                                        className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-25deg] z-20 pointer-events-none blur-[2px]"
+                                    />
+                                </div>
                             </motion.div>
                         </div>
 
@@ -382,6 +436,15 @@ const Login = ({ onLogin }) => {
                                             onChange={(e) => setSalonName(e.target.value)}
                                             placeholder="Salon nomi"
                                             required
+                                        />
+
+                                        <FloatingInput
+                                            icon={User}
+                                            label="Tavsif"
+                                            type="text"
+                                            value={salonDescription}
+                                            onChange={(e) => setSalonDescription(e.target.value)}
+                                            placeholder="Salon haqida qisqacha"
                                         />
 
                                         <div className="flex flex-col gap-4">

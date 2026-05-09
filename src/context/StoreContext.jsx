@@ -383,7 +383,8 @@ export const StoreProvider = ({ children }) => {
                 name: info.name,
                 image_url: info.imageUrl,
                 services: normalizedServices,
-                working_hours: info.workingHours
+                working_hours: info.workingHours,
+                status: 'Pending'
             };
 
             let result;

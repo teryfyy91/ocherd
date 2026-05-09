@@ -89,7 +89,7 @@ const Dashboard = () => {
         shopInfo, setShopInfo, updateShopInfo,
         queue, updateBookingStatus, deleteBooking,
         myShops, loadingShops, deleteShop,
-        reviews
+        reviews, sendNotification
     } = useStore();
 
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'manage'
@@ -158,7 +158,10 @@ const Dashboard = () => {
             showToast("Muvaffaqiyatli saqlandi!");
             setIsEditing(false);
             setSalonImageFile(null);
-            if (firstTime) navigate('/success');
+            if (firstTime) {
+                await sendNotification("Yangi salon qabul qilasizmi?");
+                navigate('/success');
+            }
         }
     };
 

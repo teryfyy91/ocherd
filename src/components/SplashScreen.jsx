@@ -33,22 +33,37 @@ const SplashScreen = () => {
 
             <div className="relative z-10 flex flex-col items-center">
                 <motion.div
-                    initial={{ scale: 0.4, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{
-                        type: "spring",
-                        damping: 15,
-                        stiffness: 100,
-                        duration: 1.2
+                        duration: 1,
+                        ease: "easeOut"
                     }}
-                    className="relative px-8"
+                    className="relative px-8 group"
                 >
-                    <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full scale-110 animate-pulse" />
-                    <motion.img
-                        src="/logo.png"
-                        alt="Logo"
-                        className="w-[280px] md:w-[350px] object-contain relative z-10 drop-shadow-2xl"
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8, rotate: -15 }}
+                        animate={{ opacity: 0.5, scale: 1, rotate: 0 }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full"
                     />
+                    <div className="relative rounded-[40px] overflow-hidden p-2">
+                        <motion.img
+                            src="/logo.png"
+                            alt="Logo"
+                            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                            className="w-[280px] md:w-[350px] object-contain relative z-10 drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                        />
+                        {/* Premium Light Sweep Shimmer Effect */}
+                        <motion.div
+                            initial={{ left: "-150%" }}
+                            animate={{ left: "150%" }}
+                            transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.5 }}
+                            className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-25deg] z-20 pointer-events-none blur-[2px]"
+                        />
+                    </div>
                 </motion.div>
             </div>
 
