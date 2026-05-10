@@ -6,7 +6,7 @@ import {
     MonitorPlay, Users, Phone, Scissors,
     ChevronLeft, Plus, LayoutGrid, Store,
     ArrowRight, MapPin, MoreVertical, AlertTriangle, Check,
-    BarChart3, TrendingUp, Star, MessageSquare, X, Camera
+    BarChart3, TrendingUp, Star, MessageSquare, X, Camera, LogOut
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
@@ -89,7 +89,7 @@ const Dashboard = () => {
         shopInfo, setShopInfo, updateShopInfo,
         queue, updateBookingStatus, deleteBooking,
         myShops, loadingShops, deleteShop,
-        reviews, sendNotification
+        reviews, sendNotification, signOut
     } = useStore();
 
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'manage'
@@ -241,9 +241,14 @@ const Dashboard = () => {
                             <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase italic italic leading-none">Meniki</h1>
                             <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px]">Salonlar boshqaruvi</p>
                         </div>
-                        <button onClick={handleAddNew} className="bg-slate-900 text-white rounded-2xl p-4 shadow-xl hover:scale-105 active:scale-95 transition-all">
-                            <Plus size={24} />
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button onClick={signOut} className="bg-red-50 text-red-500 rounded-2xl p-4 shadow-sm hover:bg-red-500 hover:text-white transition-all">
+                                <LogOut size={24} />
+                            </button>
+                            <button onClick={handleAddNew} className="bg-slate-900 text-white rounded-2xl p-4 shadow-xl hover:scale-105 active:scale-95 transition-all">
+                                <Plus size={24} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 

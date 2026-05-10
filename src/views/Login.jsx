@@ -166,9 +166,9 @@ const Login = ({ onLogin }) => {
                         // Check in shops
                         const { data: shopData } = await supabase
                             .from('shops')
-                            .select('status')
+                            .select('id')
                             .eq('owner_id', userId)
-                            .single();
+                            .limit(1);
 
                         // Also check in pending_salons
                         const { data: pendingData } = await supabase
@@ -178,9 +178,9 @@ const Login = ({ onLogin }) => {
                             .order('created_at', { ascending: false })
                             .limit(1);
 
-                        const isApproved = shopData && shopData.status === 'Active';
-                        const isPending = (shopData && shopData.status === 'Pending') || (pendingData && pendingData[0]?.status === 'pending');
-                        const isRejected = (shopData && shopData.status === 'Rejected') || (pendingData && pendingData[0]?.status === 'rejected');
+                        const isApproved = shopData && shopData.length > 0;
+                        const isPending = !isApproved && (pendingData && pendingData[0]?.status === 'pending');
+                        const isRejected = !isApproved && (pendingData && pendingData[0]?.status === 'rejected');
 
                         if (isPending || (!isApproved && !isRejected)) {
                             sessionStorage.setItem('awaitingApproval', 'true');

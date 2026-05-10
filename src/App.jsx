@@ -40,7 +40,7 @@ function App() {
   }, []);
 
   const [isChecking, setIsChecking] = useState(true);
-  const [isPendingApproval, setIsPendingApproval] = useState(false);
+  const [pendingLoginError, setPendingLoginError] = useState(false);
 
   // Synchronize local login state with current user from Supabase
   useEffect(() => {
@@ -57,21 +57,14 @@ function App() {
           if (isOwner && !isAdmin) {
             const { data: shopData } = await supabase
               .from('shops')
-              .select('status')
+              .select('id')
               .eq('owner_id', currentUser.id)
-              .maybeSingle();
+              .limit(1);
 
-            const { data: pendingData } = await supabase
-              .from('pending_salons')
-              .select('status')
-              .eq('owner_id', currentUser.id)
-              .maybeSingle();
+            const isApproved = shopData && shopData.length > 0;
 
-            const isApproved = shopData && shopData.status === 'Active';
-            const isPending = (shopData && shopData.status === 'Pending') || (pendingData && pendingData.status === 'pending');
-
-            if (!isApproved || isPending) {
-              alert("Xurmatli mijoz, sizning saloningiz hali tasdiqlanmagan. Iltimos admin tasdiqlashini kuting!");
+            if (!isApproved) {
+              setPendingLoginError(true);
               await supabase.auth.signOut();
               localStorage.removeItem('isLoggedIn');
               setIsLoggedIn(false);
@@ -90,12 +83,7 @@ function App() {
     checkAndSync();
   }, [currentUser, loadingUser]);
 
-  const handlePendingConfirm = async () => {
-    await supabase.auth.signOut();
-    localStorage.removeItem('isLoggedIn');
-    setIsLoggedIn(false);
-    setIsPendingApproval(false);
-  };
+
 
   if (showSplash || loadingUser || isChecking) {
     return (
@@ -108,6 +96,25 @@ function App() {
   return (
     <>
       <AnimatePresence mode="wait">
+        {pendingLoginError && (
+          <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white p-10 rounded-[3rem] text-center max-w-sm flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full" />
+              <div className="w-20 h-20 bg-primary/10 text-primary border border-primary/20 rounded-[2rem] flex items-center justify-center rotate-6">
+                <Clock size={40} />
+              </div>
+              <div className="relative z-10 w-full">
+                <h3 className="text-2xl font-black text-slate-800 uppercase italic">Kutilmoqda</h3>
+                <p className="text-[11px] text-slate-500 font-bold mt-3 uppercase tracking-widest leading-loose">
+                  Xurmatli mijoz, saloningiz hali admin tomonidan tasdiqlanmagan. Iltimos kuting.
+                </p>
+              </div>
+              <button onClick={() => setPendingLoginError(false)} className="w-full h-14 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest mt-2 active:scale-95 transition-all outline-none">
+                Tushunarli
+              </button>
+            </motion.div>
+          </div>
+        )}
         {!isLoggedIn ? (
           <Login key="login" onLogin={handleLogin} />
         ) : (
@@ -125,8 +132,11 @@ function App() {
                 <Route path="my-bookings" element={<MyBookings />} />
               </Route>
 
-              {/* Admin Dashboard has its own sidebar layout */}
-              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="dashboard" element={
+                localStorage.getItem('currentUserPhone')?.replace(/\D/g, '').includes('505521107')
+                  ? <AdminDashboard />
+                  : <Dashboard />
+              } />
 
               {/* Display doesn't use the main Layout with Navbar */}
               <Route path="/display" element={<QueueDisplay />} />
