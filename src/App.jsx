@@ -12,6 +12,7 @@ import Login from './views/Login';
 import Success from './views/Success';
 import MyBookings from './views/MyBookings';
 import SplashScreen from './components/SplashScreen';
+import PendingApproval from './components/PendingApproval';
 import PwaInstallPopup from './components/PwaInstallPopup';
 import PwaUpdatePopup from './components/PwaUpdatePopup';
 import { AnimatePresence } from 'framer-motion';
@@ -31,12 +32,21 @@ function App() {
     setUserRole(role);
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
+  const [isChecking, setIsChecking] = useState(true);
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
 
   // Synchronize local login state with current user from Supabase
   useEffect(() => {
     const checkAndSync = async () => {
       if (!loadingUser) {
+        setIsChecking(true);
         if (currentUser) {
           const userMeta = currentUser.user_metadata || {};
           const userPhone = userMeta.phone || '';
@@ -49,11 +59,23 @@ function App() {
               .from('shops')
               .select('status')
               .eq('owner_id', currentUser.id)
-              .single();
+              .maybeSingle();
 
-            if (shopData && shopData.status === 'Pending') {
-              // Sign out if still pending
+            const { data: pendingData } = await supabase
+              .from('pending_salons')
+              .select('status')
+              .eq('owner_id', currentUser.id)
+              .maybeSingle();
+
+            const isApproved = shopData && shopData.status === 'Active';
+            const isPending = (shopData && shopData.status === 'Pending') || (pendingData && pendingData.status === 'pending');
+
+            if (!isApproved || isPending) {
+              alert("Xurmatli mijoz, sizning saloningiz hali tasdiqlanmagan. Iltimos admin tasdiqlashini kuting!");
               await supabase.auth.signOut();
+              localStorage.removeItem('isLoggedIn');
+              setIsLoggedIn(false);
+              setIsChecking(false);
               return;
             }
           }
@@ -62,15 +84,23 @@ function App() {
           setIsLoggedIn(false);
           localStorage.removeItem('isLoggedIn');
         }
+        setIsChecking(false);
       }
     };
     checkAndSync();
   }, [currentUser, loadingUser]);
 
-  if (showSplash || loadingUser) {
+  const handlePendingConfirm = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem('isLoggedIn');
+    setIsLoggedIn(false);
+    setIsPendingApproval(false);
+  };
+
+  if (showSplash || loadingUser || isChecking) {
     return (
       <AnimatePresence>
-        {(showSplash || loadingUser) && <SplashScreen key="splash" />}
+        {(showSplash || loadingUser || isChecking) && <SplashScreen key="splash" />}
       </AnimatePresence>
     );
   }

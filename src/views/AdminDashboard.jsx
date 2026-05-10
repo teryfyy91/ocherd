@@ -8,7 +8,8 @@ import {
     TrendingUp, ArrowUpRight, ArrowDownRight,
     Search as SearchIcon, Filter, Calendar,
     UserPlus, ChevronRight, User, Phone,
-    Building2, Star, MessageSquare, ShieldCheck
+    Building2, Star, MessageSquare, ShieldCheck,
+    Loader2
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../utils/supabase';
@@ -18,7 +19,7 @@ const AdminDashboard = () => {
     const {
         shopInfo, queue, updateBookingStatus,
         deleteBooking, reviews, currentUser, allShops: contextShops,
-        deleteShop, approveShop, refreshShops, signOut
+        deleteShop, approveShop, refreshShops, signOut, setAllShops
     } = useStore();
 
     const userPhone = localStorage.getItem('currentUserPhone') || '';
@@ -70,42 +71,46 @@ const AdminDashboard = () => {
                         .limit(20);
 
                     const dbMapped = await Promise.all((dbNotifications || []).map(async n => {
-                        let msg = n.message;
-                        let type = 'system';
-                        let salonDetails = null;
+                        try {
+                            let msg = n.message || '';
+                            let type = 'system';
+                            let salonDetails = null;
 
-                        if (msg && msg.startsWith('NEW_SALON_REGISTRATION|||')) {
-                            type = 'new_salon_registration';
-                            const pendingId = msg.split('|||')[1];
-                            if (pendingId && pendingId !== 'null') {
-                                // Fetch details from pending_salons
-                                const { data: salonData } = await supabase
-                                    .from('pending_salons')
-                                    .select('*')
-                                    .eq('id', pendingId)
-                                    .single();
+                            if (msg.startsWith('NEW_SALON_REGISTRATION|||')) {
+                                type = 'new_salon_registration';
+                                const pendingId = msg.split('|||')[1];
+                                if (pendingId && pendingId !== 'null') {
+                                    const { data: salonData } = await supabase
+                                        .from('pending_salons')
+                                        .select('*')
+                                        .eq('id', pendingId)
+                                        .maybeSingle();
 
-                                if (salonData) {
-                                    salonDetails = salonData;
-                                    msg = "Yangi salon tasdiqlash kutmoqda";
+                                    if (salonData) {
+                                        salonDetails = salonData;
+                                        msg = "Yangi salon so'rovi bor, qabul qilasizmi?";
+                                    }
                                 }
                             }
-                        }
 
-                        return {
-                            id: n.id,
-                            message: msg,
-                            type: type,
-                            salonDetails: salonDetails,
-                            created_at: n.created_at,
-                            status: n.status
+                            return {
+                                id: n.id,
+                                message: msg,
+                                type: type,
+                                salonDetails: salonDetails,
+                                created_at: n.created_at,
+                                status: n.status
+                            };
+                        } catch (err) {
+                            console.error('Error mapping notification:', err);
+                            return { id: n.id, message: n.message, type: 'system', created_at: n.created_at };
                         }
                     }));
 
                     setNotifications(dbMapped);
 
                 } catch (err) {
-                    console.error('Error fetching stats:', err);
+                    console.error('Error fetching admin data:', err);
                 }
                 setLoading(false);
             };
@@ -113,13 +118,13 @@ const AdminDashboard = () => {
 
             const notificationChannel = supabase
                 .channel('admin-notifications-sync')
-                .on('postgres_changes', { event: '*', table: 'notifications' }, async payload => {
-                    if (payload.eventType === 'INSERT') {
-                        let msg = payload.new.message;
+                .on('postgres_changes', { event: 'INSERT', table: 'notifications' }, async payload => {
+                    try {
+                        let msg = payload.new.message || '';
                         let type = 'system';
                         let salonDetails = null;
 
-                        if (msg && msg.startsWith('NEW_SALON_REGISTRATION|||')) {
+                        if (msg.startsWith('NEW_SALON_REGISTRATION|||')) {
                             type = 'new_salon_registration';
                             const pendingId = msg.split('|||')[1];
                             if (pendingId && pendingId !== 'null') {
@@ -127,11 +132,11 @@ const AdminDashboard = () => {
                                     .from('pending_salons')
                                     .select('*')
                                     .eq('id', pendingId)
-                                    .single();
+                                    .maybeSingle();
 
                                 if (salonData) {
                                     salonDetails = salonData;
-                                    msg = "Yangi salon tasdiqlash kutmoqda";
+                                    msg = "Yangi salon so'rovi bor, qabul qilasizmi?";
                                 }
                             }
                         }
@@ -147,6 +152,8 @@ const AdminDashboard = () => {
                         setNotifications(prev => [newNotif, ...prev]);
                         setNewNotificationToast(msg);
                         setTimeout(() => setNewNotificationToast(null), 8000);
+                    } catch (err) {
+                        console.error('Real-time notification error:', err);
                     }
                 })
                 .subscribe();
@@ -162,47 +169,95 @@ const AdminDashboard = () => {
         // No need for client-side mapping of allShops to notifications anymore
     }, [allShops]);
 
-    const handleDeleteShop = async (id) => {
-        if (window.confirm("Rostdan ham ushbu salonni o'chirishni xohlaysizmi?")) {
-            await deleteShop(id);
-        }
-    };
-
-    const handleApproveShop = async (id) => {
-        await approveShop(id);
-    };
-
     const handleApproveNewRegistration = async (notif) => {
-        if (!notif.salonDetails) return;
+        if (!notif || !notif.salonDetails) {
+            console.error('notif yoki salonDetails topilmadi');
+            return;
+        }
+        setLoading(true);
         try {
-            const { error: shopError } = await supabase.from('shops').insert([{
-                owner_id: notif.salonDetails.owner_id,
-                name: notif.salonDetails.name,
-                image_url: notif.salonDetails.image_url,
-                services: notif.salonDetails.services,
-                working_hours: notif.salonDetails.working_hours,
-                status: 'Active'
-            }]);
+            const d = notif.salonDetails;
 
-            if (shopError) {
-                console.error('Error adding shop:', shopError);
+            // 1. Build insert payload
+            let insertPayload = {
+                owner_id: d.owner_id,
+                name: d.name || 'Nomsiz Salon',
+                status: 'Active',
+                image_url: d.image_url || ''
+            };
+            if (d.services) insertPayload.services = d.services;
+            if (d.working_hours) insertPayload.working_hours = d.working_hours;
+
+            let insertError = null;
+            let success = false;
+
+            // Auto-retry loop to strip missing columns
+            let attempts = 0;
+            while (!success && attempts < 5) {
+                attempts++;
+                const { error } = await supabase.from('shops').insert([insertPayload]);
+
+                if (error) {
+                    if (error.code === '23505') {
+                        // Duplicate owner - already exists in shops, so it's already active!
+                        success = true;
+                        break;
+                    }
+                    if (error.message && error.message.includes("Could not find the") && error.message.includes("column")) {
+                        const match = error.message.match(/'([^']+)'/);
+                        if (match && match[1] && insertPayload[match[1]] !== undefined) {
+                            console.warn(`Ustun topilmadi: ${match[1]}, olib tashlab qayta urinamiz...`);
+                            delete insertPayload[match[1]];
+                            continue;
+                        }
+                    }
+                    insertError = error;
+                    break;
+                } else {
+                    success = true;
+                }
+            }
+
+            if (insertError) {
+                console.error('Insert error:', insertError);
+                alert('Bazada xatolik: ' + insertError.message);
                 return;
             }
 
-            // Update pending status
-            await supabase.from('pending_salons').update({ status: 'approved' }).eq('id', notif.salonDetails.id);
+            // 2. Mark pending_salon as approved
+            await supabase.from('pending_salons').update({ status: 'approved' }).eq('id', d.id);
 
-            // Delete notification
+            // 3. Remove notification from DB
             await supabase.from('notifications').delete().eq('id', notif.id);
 
+            // 4. Immediately remove notification from local state
             setNotifications(prev => prev.filter(n => n.id !== notif.id));
-            refreshShops();
+
+            // 5. Optimistic update: add the new shop immediately to local state
+            const newShop = {
+                id: 'temp-' + Date.now(),
+                ownerId: d.owner_id,
+                name: d.name || 'Nomsiz Salon',
+                imageUrl: d.image_url || '',
+                services: d.services || [],
+                workingHours: d.working_hours || { start: '09:00', end: '18:00' },
+                status: 'Active',
+                createdAt: new Date().toISOString()
+            };
+            setAllShops(prev => [newShop, ...prev]);
+
+            // 6. Then refresh from server to get real ID
+            await refreshShops();
         } catch (err) {
-            console.error('Error approving new registration:', err);
+            console.error('Tasdiqlashda xatolik:', err);
+            alert('Tasdiqlashda kutilmagan xatolik yuz berdi.');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleRejectNewRegistration = async (notif) => {
+        setLoading(true);
         try {
             if (notif.salonDetails) {
                 await supabase.from('pending_salons').update({ status: 'rejected' }).eq('id', notif.salonDetails.id);
@@ -211,6 +266,34 @@ const AdminDashboard = () => {
             setNotifications(prev => prev.filter(n => n.id !== notif.id));
         } catch (err) {
             console.error('Error rejecting new registration:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleApproveShop = async (id) => {
+        setLoading(true);
+        try {
+            await approveShop(id);
+            await refreshShops();
+        } catch (err) {
+            console.error('Error approving shop:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteShop = async (id) => {
+        if (window.confirm("Rostdan ham ushbu salonni o'chirishni xohlaysizmi?")) {
+            setLoading(true);
+            try {
+                await deleteShop(id);
+                await refreshShops();
+            } catch (err) {
+                console.error('Error deleting shop:', err);
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -259,9 +342,9 @@ const AdminDashboard = () => {
     const SuperSalonsTab = () => {
         const pendingShops = [
             ...allShops.filter(s => s.status === 'Pending'),
-            ...notifications.filter(n => n.type === 'new_registration').map(n => ({
-                id: n.id, // using notif id as temp key
-                name: n.shopData?.name || 'Kutilmoqda',
+            ...notifications.filter(n => n.type === 'new_salon_registration').map(n => ({
+                id: n.id,
+                name: n.salonDetails?.name || 'Kutilmoqda',
                 status: 'Pending',
                 isNewReg: true,
                 notifData: n
@@ -310,20 +393,32 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex gap-3">
-                                            <button onClick={() => {
-                                                if (s.isNewReg) {
-                                                    handleRejectNewRegistration(s.notifData);
-                                                } else {
-                                                    handleDeleteShop(s.id);
-                                                }
-                                            }} className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all">Bekor qilish</button>
-                                            <button onClick={() => {
-                                                if (s.isNewReg) {
-                                                    handleApproveNewRegistration(s.notifData);
-                                                } else {
-                                                    handleApproveShop(s.id);
-                                                }
-                                            }} className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Tasdiqlash</button>
+                                            <button
+                                                disabled={loading}
+                                                onClick={() => {
+                                                    if (s.isNewReg) {
+                                                        handleRejectNewRegistration(s.notifData);
+                                                    } else {
+                                                        handleDeleteShop(s.id);
+                                                    }
+                                                }}
+                                                className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all disabled:opacity-50"
+                                            >
+                                                {loading ? '...' : 'Bekor qilish'}
+                                            </button>
+                                            <button
+                                                disabled={loading}
+                                                onClick={() => {
+                                                    if (s.isNewReg) {
+                                                        handleApproveNewRegistration(s.notifData);
+                                                    } else {
+                                                        handleApproveShop(s.id);
+                                                    }
+                                                }}
+                                                className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                            >
+                                                {loading ? <Loader2 className="animate-spin size-4" /> : 'Tasdiqlash'}
+                                            </button>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -454,11 +549,11 @@ const AdminDashboard = () => {
                                     />
                                     <div className="fixed inset-0 z-[1002] flex items-center justify-center p-4 md:p-8 pointer-events-none">
                                         <motion.div
-                                            initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                                            initial={{ opacity: 0, scale: 0.95, y: 50 }}
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                                            className="w-full max-w-4xl h-[85vh] flex flex-col bg-white shadow-[0_40px_100px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-slate-100 pointer-events-auto"
+                                            exit={{ opacity: 0, scale: 0.95, y: 50 }}
+                                            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                                            className="w-full max-w-4xl max-h-[85vh] h-auto flex flex-col bg-white shadow-[0_50px_100px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-slate-100 pointer-events-auto"
                                         >
                                             {/* Absolute Close Button (X) */}
                                             <button
@@ -470,47 +565,47 @@ const AdminDashboard = () => {
 
                                             <div className="p-8 md:p-10 border-b border-slate-100 flex flex-col justify-center bg-slate-50/50 shrink-0 relative z-40">
                                                 <div className="flex flex-col gap-1 pr-16">
-                                                    <h3 className="text-2xl md:text-3xl font-black text-slate-800 uppercase italic tracking-tighter">Bildirishnomalar</h3>
+                                                    <h3 className="text-2xl md:text-3xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Bildirishnomalar</h3>
                                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{notifications.length} ta yangi xabar</p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 scrollbar-hide">
+                                            <div className="flex-1 overflow-y-auto p-8 md:p-10 flex flex-col gap-8 scrollbar-hide pt-12 md:pt-16">
                                                 {notifications.length > 0 ? notifications.map((n, i) => (
                                                     <motion.div
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: i * 0.1 }}
                                                         key={n.id || i}
-                                                        className={`p-6 rounded-[2.5rem] border flex flex-col gap-6 transition-all hover:shadow-xl ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-50/50 border-indigo-100 shadow-sm shadow-indigo-50' : 'bg-slate-50 border-slate-100'}`}
+                                                        className={`p-8 rounded-[2.5rem] border flex flex-col gap-8 transition-all hover:shadow-xl ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-50/50 border-indigo-100 shadow-sm shadow-indigo-100/10' : 'bg-slate-50 border-slate-100'}`}
                                                     >
-                                                        <div className="flex gap-5">
-                                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-500 text-white shadow-indigo-200' : 'bg-primary text-white shadow-primary/20'}`}>
-                                                                {(n.type === 'new_salon_registration' || n.type === 'registration') ? <Building2 size={24} /> : <Bell size={24} />}
+                                                        <div className="flex gap-6">
+                                                            <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center shrink-0 shadow-lg ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-500 text-white shadow-indigo-200' : 'bg-primary text-white shadow-primary/20'}`}>
+                                                                {(n.type === 'new_salon_registration' || n.type === 'registration') ? <Building2 size={28} /> : <Bell size={28} />}
                                                             </div>
-                                                            <div className="flex-1 flex flex-col gap-3">
+                                                            <div className="flex-1 flex flex-col gap-4">
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-100 text-indigo-600' : 'bg-primary/10 text-primary'}`}>
-                                                                        {(n.type === 'new_salon_registration' || n.type === 'registration') ? "Yangi Salon Tasdiqlash" : "Tizim"}
+                                                                    <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-100 text-indigo-600' : 'bg-primary/10 text-primary'}`}>
+                                                                        {(n.type === 'new_salon_registration' || n.type === 'registration') ? "Yangi Salon Tasdiqlash" : "Xabar"}
                                                                     </span>
-                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">
+                                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">
                                                                         {new Date(n.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}
                                                                     </span>
                                                                 </div>
-                                                                <p className="text-sm font-black text-slate-800 leading-relaxed italic">{n.message}</p>
+                                                                <p className="text-lg md:text-xl font-black text-slate-800 leading-tight italic tracking-tight">{n.message}</p>
 
                                                                 {n.salonDetails && (
-                                                                    <div className="bg-white/50 backdrop-blur-sm border border-indigo-100/50 rounded-2xl p-4 flex flex-col gap-3">
-                                                                        <div className="flex items-center gap-3">
-                                                                            <User size={14} className="text-indigo-400" />
-                                                                            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.1em]">{n.salonDetails.owner_name}</span>
+                                                                    <div className="bg-white/80 backdrop-blur-xl border border-indigo-100/50 rounded-[2rem] p-6 flex flex-col gap-4 mt-2 shadow-sm">
+                                                                        <div className="flex items-center gap-4">
+                                                                            <User size={18} className="text-indigo-400" />
+                                                                            <span className="text-xs font-black text-slate-700 uppercase tracking-wider">{n.salonDetails.owner_name}</span>
                                                                         </div>
-                                                                        <div className="flex items-center gap-3">
-                                                                            <Phone size={14} className="text-indigo-400" />
-                                                                            <span className="text-[10px] font-bold text-slate-600 tracking-wider ">{n.salonDetails.owner_phone}</span>
+                                                                        <div className="flex items-center gap-4">
+                                                                            <Phone size={18} className="text-indigo-400" />
+                                                                            <span className="text-xs font-black text-slate-700 tracking-widest">{n.salonDetails.owner_phone}</span>
                                                                         </div>
                                                                         {n.salonDetails.description && (
-                                                                            <p className="text-[9px] text-slate-400 font-medium italic line-clamp-2 mt-1">
+                                                                            <p className="text-[10px] text-slate-500 font-bold italic line-clamp-2 mt-1 leading-relaxed border-t border-slate-100 pt-3">
                                                                                 "{n.salonDetails.description}"
                                                                             </p>
                                                                         )}
@@ -520,7 +615,7 @@ const AdminDashboard = () => {
                                                         </div>
 
                                                         {(n.type === 'new_salon_registration' || n.type === 'registration') && (
-                                                            <div className="flex gap-3">
+                                                            <div className="flex gap-4">
                                                                 <button
                                                                     onClick={async () => {
                                                                         if (n.type === 'new_salon_registration') {
@@ -530,7 +625,7 @@ const AdminDashboard = () => {
                                                                             refreshShops();
                                                                         }
                                                                     }}
-                                                                    className="flex-1 h-12 bg-white border border-red-100 text-red-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm active:scale-95"
+                                                                    className="flex-1 h-14 bg-white border border-red-100 text-red-500 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm active:scale-95"
                                                                 >
                                                                     Rad etish
                                                                 </button>
@@ -543,7 +638,7 @@ const AdminDashboard = () => {
                                                                             refreshShops();
                                                                         }
                                                                     }}
-                                                                    className="flex-[2] h-12 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
+                                                                    className="flex-[2] h-14 bg-emerald-500 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
                                                                 >
                                                                     Tasdiqlash
                                                                 </button>
@@ -551,22 +646,22 @@ const AdminDashboard = () => {
                                                         )}
                                                     </motion.div>
                                                 )) : (
-                                                    <div className="flex-1 flex flex-col items-center justify-center gap-6 opacity-30">
+                                                    <div className="flex-1 flex flex-col items-center justify-center gap-6 opacity-30 py-20">
                                                         <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
                                                             <Bell size={48} strokeWidth={1} />
                                                         </div>
-                                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
+                                                        <p className="text-[11px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
                                                     </div>
                                                 )}
                                             </div>
 
                                             {notifications.length > 0 && (
-                                                <div className="p-8 border-t border-slate-100 bg-slate-50/50 shrink-0">
+                                                <div className="p-8 md:p-10 border-t border-slate-100 bg-slate-50/50 shrink-0">
                                                     <button
                                                         onClick={() => setNotifications([])}
-                                                        className="w-full h-14 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all"
+                                                        className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.4em] shadow-xl active:scale-95 transition-all"
                                                     >
-                                                        Barchasini o'chirish
+                                                        Barchasini tozalash
                                                     </button>
                                                 </div>
                                             )}
@@ -588,21 +683,40 @@ const AdminDashboard = () => {
             <AnimatePresence>
                 {newNotificationToast && (
                     <motion.div
-                        initial={{ opacity: 0, x: 100, scale: 0.9 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9, x: 20 }}
-                        className="fixed top-24 right-6 z-[2000] w-80 bg-slate-900 text-white p-6 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 flex items-start gap-4 backdrop-blur-xl"
+                        initial={{ opacity: 0, y: 100, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 50 }}
+                        className="fixed bottom-32 left-4 right-4 md:left-auto md:right-8 md:w-[400px] z-[9999] bg-slate-900/95 backdrop-blur-2xl text-white p-6 rounded-[2.5rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-white/10 flex items-center gap-6 overflow-hidden"
                     >
-                        <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
-                            <Bell size={20} className="animate-bounce" />
+                        {/* Decorative background glow */}
+                        <div className="absolute -right-20 -top-20 w-40 h-40 bg-emerald-500/20 blur-[60px] rounded-full pointer-events-none" />
+
+                        <div className="w-16 h-16 bg-emerald-500 rounded-[1.5rem] flex items-center justify-center shrink-0 shadow-2xl shadow-emerald-500/40 relative z-10">
+                            <Bell size={28} className="animate-bounce" />
                         </div>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">Yangi Xabar</span>
-                            <p className="text-xs font-bold leading-relaxed">{newNotificationToast}</p>
+
+                        <div className="flex flex-col gap-1.5 flex-1 relative z-10">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Yangi Bildirishnoma</span>
+                            </div>
+                            <p className="text-base font-black italic tracking-tight leading-tight">{newNotificationToast}</p>
                         </div>
-                        <button onClick={() => setNewNotificationToast(null)} className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors">
-                            <X size={14} />
+
+                        <button
+                            onClick={() => setNewNotificationToast(null)}
+                            className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:bg-white/10 hover:text-white transition-all relative z-10"
+                        >
+                            <X size={20} />
                         </button>
+
+                        {/* Progress bar at the bottom */}
+                        <motion.div
+                            initial={{ width: "100%" }}
+                            animate={{ width: "0%" }}
+                            transition={{ duration: 8, ease: "linear" }}
+                            className="absolute bottom-0 left-0 h-1.5 bg-emerald-500/50"
+                        />
                     </motion.div>
                 )}
             </AnimatePresence>

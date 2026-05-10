@@ -6,7 +6,7 @@ const SplashScreen = () => {
         <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
             className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white overflow-hidden select-none"
         >
             {/* Dynamic Mesh Decorative Orbs */}
@@ -53,14 +53,14 @@ const SplashScreen = () => {
                             alt="Logo"
                             initial={{ opacity: 0, y: 30, scale: 0.9 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                             className="w-[280px] md:w-[350px] object-contain relative z-10 drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
                         />
                         {/* Premium Light Sweep Shimmer Effect */}
                         <motion.div
                             initial={{ left: "-150%" }}
                             animate={{ left: "150%" }}
-                            transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatDelay: 1.5 }}
+                            transition={{ duration: 2, ease: "easeInOut", repeat: Infinity, repeatDelay: 1 }}
                             className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-25deg] z-20 pointer-events-none blur-[2px]"
                         />
                     </div>

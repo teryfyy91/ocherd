@@ -35,7 +35,8 @@ const Landing = () => {
         { id: 4, name: 'Parvarish', icon: <Sparkles size={20} />, color: 'bg-pink-100 text-pink-600', delay: 0.4 },
     ];
 
-    const topShops = allShops.slice(0, 5);
+    const activeShops = (allShops || []).filter(s => s.status === 'Active' || !s.status);
+    const topShops = activeShops.slice(0, 5);
 
     return (
         <div className="flex flex-col gap-0 pb-32 bg-white min-h-screen overflow-x-hidden select-none">
@@ -131,7 +132,7 @@ const Landing = () => {
                         <button className="text-[10px] font-black text-primary uppercase tracking-[0.2em] opacity-80" onClick={() => navigate('/discovery')}>Xaritada</button>
                     </div>
                     <div className="flex flex-col gap-6 px-6">
-                        {allShops.map((shop, idx) => (
+                        {activeShops.map((shop, idx) => (
                             <motion.div
                                 key={shop.id || idx}
                                 initial={{ opacity: 0, y: 30 }}

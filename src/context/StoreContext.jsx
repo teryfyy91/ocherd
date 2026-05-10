@@ -516,6 +516,7 @@ export const StoreProvider = ({ children }) => {
             approveShop,
             getAllShops,
             allShops,
+            setAllShops,
             currentUser,
             loadingUser,
             signOut,
