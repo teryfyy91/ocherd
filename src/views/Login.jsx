@@ -103,7 +103,11 @@ const FloatingInput = ({ icon: Icon, label, type, value, onChange, placeholder, 
 
 const Login = ({ onLogin }) => {
     const { t } = useTranslation();
-    const { sendNotification } = useStore();
+    const {
+        sendNotification,
+        allShops,
+        refreshShops
+    } = useStore();
     const [role, setRole] = useState(null);
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [name, setName] = useState('');
@@ -112,7 +116,7 @@ const Login = ({ onLogin }) => {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
-    const [regStep, setRegStep] = useState(0);
+    const [regStep, setRegStep] = useState(0); // 0: initial/select, 1: next step
     const [salonName, setSalonName] = useState('');
     const [salonImage, setSalonImage] = useState('');
     const [salonDescription, setSalonDescription] = useState('');
@@ -122,6 +126,14 @@ const Login = ({ onLogin }) => {
     const [servicePrice, setServicePrice] = useState('');
     const [regSuccess, setRegSuccess] = useState(false);
     const [pendingSalonId, setPendingSalonId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedShopId, setSelectedShopId] = useState(null);
+
+    useEffect(() => {
+        if (allShops.length === 0) {
+            refreshShops();
+        }
+    }, []);
 
     const addService = () => {
         if (serviceInput.trim() && servicePrice.trim()) {
@@ -144,6 +156,15 @@ const Login = ({ onLogin }) => {
         const email = `${cleanPhone}@ocherd.app`;
 
         if (!isLoginMode && role === 'owner' && regStep === 0) {
+            setRegStep(1);
+            return;
+        }
+
+        if (!isLoginMode && role === 'user' && regStep === 0) {
+            if (!selectedShopId) {
+                setErrorMsg("Iltimos, avval sartaroshingizni (salonni) tanlang.");
+                return;
+            }
             setRegStep(1);
             return;
         }
@@ -377,7 +398,15 @@ const Login = ({ onLogin }) => {
                             <motion.button
                                 whileHover={{ x: -2 }}
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => regStep === 1 ? setRegStep(0) : setRole(null)}
+                                onClick={() => {
+                                    if (regStep === 1) {
+                                        setRegStep(0);
+                                    } else {
+                                        setRole(null);
+                                        setRegStep(0);
+                                        setIsLoginMode(true);
+                                    }
+                                }}
                                 className="w-10 h-10 glass-card flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
                             >
                                 <ChevronLeft size={20} />
@@ -413,78 +442,78 @@ const Login = ({ onLogin }) => {
                         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
                             <div className="glass-card p-8 flex flex-col gap-8 pt-10">
                                 {regStep === 1 ? (
-                                    <div className="flex flex-col gap-8">
-                                        <FloatingInput
-                                            icon={Building2}
-                                            label="Salon Nomi"
-                                            type="text"
-                                            value={salonName}
-                                            onChange={(e) => setSalonName(e.target.value)}
-                                            placeholder="Salon nomi"
-                                            required
-                                        />
+                                    role === 'owner' ? (
+                                        <div className="flex flex-col gap-8">
+                                            <FloatingInput
+                                                icon={Building2}
+                                                label="Salon Nomi"
+                                                type="text"
+                                                value={salonName}
+                                                onChange={(e) => setSalonName(e.target.value)}
+                                                placeholder="Salon nomi"
+                                                required
+                                            />
 
-                                        <FloatingInput
-                                            icon={User}
-                                            label="Tavsif"
-                                            type="text"
-                                            value={salonDescription}
-                                            onChange={(e) => setSalonDescription(e.target.value)}
-                                            placeholder="Salon haqida qisqacha"
-                                        />
+                                            <FloatingInput
+                                                icon={User}
+                                                label="Tavsif"
+                                                type="text"
+                                                value={salonDescription}
+                                                onChange={(e) => setSalonDescription(e.target.value)}
+                                                placeholder="Salon haqida qisqacha"
+                                            />
 
-                                        <div className="flex flex-col gap-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Clock size={14} className="text-primary" />
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Ish tartibi</span>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <CustomTimePicker label="Ochilish" value={workingHours.start} onChange={val => setWorkingHours(prev => ({ ...prev, start: val }))} />
-                                                <CustomTimePicker label="Yopilish" value={workingHours.end} onChange={val => setWorkingHours(prev => ({ ...prev, end: val }))} />
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-4 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Xizmatlar</span>
-                                                <span className="text-[8px] font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">{services.length} ta</span>
-                                            </div>
-                                            <div className="flex flex-col gap-3">
-                                                <input type="text" value={serviceInput} onChange={e => setServiceInput(e.target.value)} className="w-full h-12 px-5 glass-input rounded-xl text-sm font-bold" placeholder="Xizmat nomi" />
-                                                <div className="flex gap-3">
-                                                    <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)} className="flex-1 h-12 px-5 glass-input rounded-xl text-sm font-bold" placeholder="Narxi" />
-                                                    <button type="button" onClick={addService} className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"><Plus size={20} /></button>
+                                            <div className="flex flex-col gap-4">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Clock size={14} className="text-primary" />
+                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Ish tartibi</span>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <CustomTimePicker label="Ochilish" value={workingHours.start} onChange={val => setWorkingHours(prev => ({ ...prev, start: val }))} />
+                                                    <CustomTimePicker label="Yopilish" value={workingHours.end} onChange={val => setWorkingHours(prev => ({ ...prev, end: val }))} />
                                                 </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-2 mt-2">
-                                                {services.map((s, idx) => (
-                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} key={idx} className="bg-white pl-4 pr-2 py-2 rounded-xl border border-slate-100 flex items-center gap-3 shadow-sm">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[10px] font-black text-slate-700 uppercase italic">{s.name}</span>
-                                                            <span className="text-[8px] font-bold text-primary opacity-60">{s.price.toLocaleString()}</span>
-                                                        </div>
-                                                        <button type="button" onClick={() => removeService(s.name)} className="w-6 h-6 rounded-lg hover:bg-red-50 text-red-400 transition-colors flex items-center justify-center"><X size={12} /></button>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        </div>
 
-                                        <button
-                                            type="submit"
-                                            disabled={loading}
-                                            className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.5em] shadow-2xl shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-4 group"
-                                        >
-                                            {loading ? <Loader2 className="animate-spin size-6" /> : (
-                                                <>
-                                                    TAYYOR
-                                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-10">
-                                        {!isLoginMode && (
+                                            <div className="flex flex-col gap-4 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Xizmatlar</span>
+                                                    <span className="text-[8px] font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">{services.length} ta</span>
+                                                </div>
+                                                <div className="flex flex-col gap-3">
+                                                    <input type="text" value={serviceInput} onChange={e => setServiceInput(e.target.value)} className="w-full h-12 px-5 glass-input rounded-xl text-sm font-bold" placeholder="Xizmat nomi" />
+                                                    <div className="flex gap-3">
+                                                        <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)} className="flex-1 h-12 px-5 glass-input rounded-xl text-sm font-bold" placeholder="Narxi" />
+                                                        <button type="button" onClick={addService} className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"><Plus size={20} /></button>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {services.map((s, idx) => (
+                                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} key={idx} className="bg-white pl-4 pr-2 py-2 rounded-xl border border-slate-100 flex items-center gap-3 shadow-sm">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[10px] font-black text-slate-700 uppercase italic">{s.name}</span>
+                                                                <span className="text-[8px] font-bold text-primary opacity-60">{s.price.toLocaleString()}</span>
+                                                            </div>
+                                                            <button type="button" onClick={() => removeService(s.name)} className="w-6 h-6 rounded-lg hover:bg-red-50 text-red-400 transition-colors flex items-center justify-center"><X size={12} /></button>
+                                                        </motion.div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                disabled={loading}
+                                                className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.5em] shadow-2xl shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-4 group"
+                                            >
+                                                {loading ? <Loader2 className="animate-spin size-6" /> : (
+                                                    <>
+                                                        TAYYOR
+                                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col gap-10">
                                             <FloatingInput
                                                 icon={User}
                                                 label="F.I.SH"
@@ -494,7 +523,37 @@ const Login = ({ onLogin }) => {
                                                 placeholder="Ism familiya"
                                                 required
                                             />
-                                        )}
+                                            <FloatingInput
+                                                icon={Phone}
+                                                label="Telefon"
+                                                type="tel"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                placeholder="Telefon raqam"
+                                                required
+                                            />
+                                            <FloatingInput
+                                                icon={Lock}
+                                                label="Maxfiy Parol"
+                                                type="password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                placeholder="Parol"
+                                                required
+                                            />
+
+                                            <button
+                                                type="submit"
+                                                disabled={loading}
+                                                className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group relative overflow-hidden"
+                                            >
+                                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                                {loading ? <Loader2 className="animate-spin size-6" /> : 'DAVOM ETISH'}
+                                            </button>
+                                        </div>
+                                    )
+                                ) : isLoginMode ? (
+                                    <div className="flex flex-col gap-10">
                                         <FloatingInput
                                             icon={Phone}
                                             label="Telefon"
@@ -520,7 +579,109 @@ const Login = ({ onLogin }) => {
                                             className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group relative overflow-hidden"
                                         >
                                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                                            {loading ? <Loader2 className="animate-spin size-6" /> : (isLoginMode ? 'KIRISH' : 'DAVOM ETISH')}
+                                            {loading ? <Loader2 className="animate-spin size-6" /> : 'KIRISH'}
+                                        </button>
+                                    </div>
+                                ) : role === 'user' ? (
+                                    <div className="flex flex-col gap-6">
+                                        <div className="relative group">
+                                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" size={18} />
+                                            <input
+                                                type="text"
+                                                placeholder="Sartaroshni qidiring..."
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                className="w-full h-14 pl-14 pr-6 glass-input rounded-2xl outline-none text-slate-800 font-bold placeholder:text-slate-300 focus:ring-4 focus:ring-primary/5 transition-all text-sm"
+                                            />
+                                        </div>
+
+                                        <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {allShops.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())).map(shop => (
+                                                <button
+                                                    key={shop.id}
+                                                    type="button"
+                                                    onClick={() => setSelectedShopId(shop.id)}
+                                                    className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center gap-4 text-left ${selectedShopId === shop.id ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10' : 'border-slate-50 bg-white hover:border-slate-200'}`}
+                                                >
+                                                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                                                        {shop.imageUrl ? (
+                                                            <img src={shop.imageUrl} alt={shop.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-300"><Building2 size={24} /></div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-black text-slate-800 text-sm uppercase italic truncate">{shop.name}</h4>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{shop.workingHours?.start} - {shop.workingHours?.end}</span>
+                                                        </div>
+                                                    </div>
+                                                    {selectedShopId === shop.id && (
+                                                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"><CheckCircle2 size={14} /></div>
+                                                    )}
+                                                </button>
+                                            ))}
+                                            {allShops.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                                                <div className="py-10 text-center opacity-40">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Salon topilmadi</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (!selectedShopId) {
+                                                    setErrorMsg("Iltimos, avval sartaroshingizni (salonni) tanlang.");
+                                                    setTimeout(() => setErrorMsg(''), 3000);
+                                                    return;
+                                                }
+                                                setRegStep(1);
+                                            }}
+                                            className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group"
+                                        >
+                                            DAVOM ETISH
+                                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-10">
+                                        <FloatingInput
+                                            icon={User}
+                                            label="F.I.SH"
+                                            type="text"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            placeholder="Ism familiya"
+                                            required
+                                        />
+                                        <FloatingInput
+                                            icon={Phone}
+                                            label="Telefon"
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            placeholder="Telefon raqam"
+                                            required
+                                        />
+                                        <FloatingInput
+                                            icon={Lock}
+                                            label="Maxfiy Parol"
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="Parol"
+                                            required
+                                        />
+
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group relative overflow-hidden"
+                                        >
+                                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                            {loading ? <Loader2 className="animate-spin size-6" /> : 'DAVOM ETISH'}
                                         </button>
                                     </div>
                                 )}
