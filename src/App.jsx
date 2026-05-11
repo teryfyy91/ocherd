@@ -133,9 +133,9 @@ function App() {
               </Route>
 
               <Route path="dashboard" element={
-                localStorage.getItem('currentUserPhone')?.replace(/\D/g, '').includes('505521107')
+                (localStorage.getItem('currentUserPhone')?.replace(/\D/g, '').includes('505521107'))
                   ? <AdminDashboard />
-                  : <Dashboard />
+                  : (localStorage.getItem('userRole') === 'owner' ? <Dashboard /> : <Navigate to="/" replace />)
               } />
 
               {/* Display doesn't use the main Layout with Navbar */}

@@ -255,6 +255,8 @@ export const StoreProvider = ({ children }) => {
                     imageUrl: s.image_url,
                     services: parseServices(s.services),
                     workingHours: s.working_hours,
+                    phone: s.phone || '',
+                    gallery: s.gallery || [],
                     status: s.status || 'Active', // Default to Active for older entries
                     createdAt: s.created_at
                 }));
@@ -367,10 +369,10 @@ export const StoreProvider = ({ children }) => {
             const user = currentUser;
             if (!user) {
                 alert("Please log in first");
-                return;
+                return { success: false, error: "Not logged in" };
             }
 
-            // Normalize services: always save as array of {name, price} objects
+            // Normalize services
             const normalizedServices = (info.services || []).map(s => {
                 if (typeof s === 'string' && s.startsWith('{')) {
                     try { return JSON.parse(s); } catch (e) { return { name: s, price: 50000 }; }
@@ -378,27 +380,42 @@ export const StoreProvider = ({ children }) => {
                 return typeof s === 'string' ? { name: s, price: 50000 } : s;
             });
 
-            const payload = {
+            let payload = {
                 owner_id: user.id,
                 name: info.name,
                 image_url: info.imageUrl,
                 services: normalizedServices,
                 working_hours: info.workingHours,
-                status: 'Pending'
+                status: 'Pending',
+                phone: info.phone || '',
+                gallery: info.gallery || [] // ADDED
             };
 
-            let result;
-            if (info.id) {
-                // Update existing
-                result = await supabase
-                    .from('shops')
-                    .update(payload)
-                    .eq('id', info.id);
-            } else {
-                // Insert new
-                result = await supabase
-                    .from('shops')
-                    .insert([payload]);
+            const performSave = async (data) => {
+                if (info.id) {
+                    return await supabase.from('shops').update(data).eq('id', info.id).select();
+                } else {
+                    return await supabase.from('shops').insert([data]).select();
+                }
+            };
+
+            let result = await performSave(payload);
+
+            // Auto-fallback for missing columns (like 'phone' or 'gallery')
+            const errorMessage = result.error?.message || '';
+            const isMissingColumnError = (errorMessage.includes('column') && errorMessage.includes('not exist')) ||
+                (errorMessage.includes('column') && errorMessage.includes('schema cache'));
+
+            if (result.error && isMissingColumnError) {
+                // Try to extract column name from common error formats
+                let missingCol = errorMessage.match(/column "(.*)" does not exist/)?.[1] ||
+                    errorMessage.match(/find the '(.*)' column/)?.[1];
+
+                if (missingCol && payload[missingCol] !== undefined) {
+                    const { [missingCol]: _, ...newPayload } = payload;
+                    payload = newPayload;
+                    result = await performSave(payload);
+                }
             }
 
             if (result.error) {
@@ -406,40 +423,24 @@ export const StoreProvider = ({ children }) => {
                 return { success: false, error: result.error.message };
             } else {
                 await fetchShops();
-                // Update current shopInfo with the new data (especially the ID if it was new)
-                if (!info.id) {
-                    const { data: newData } = await supabase
-                        .from('shops')
-                        .select('*')
-                        .eq('owner_id', currentUser.id)
-                        .order('created_at', { ascending: false })
-                        .limit(1);
-                    if (newData && newData[0]) {
-                        const newShop = {
-                            id: newData[0].id,
-                            ownerId: newData[0].owner_id,
-                            name: newData[0].name,
-                            imageUrl: newData[0].image_url,
-                            services: newData[0].services,
-                            workingHours: newData[0].working_hours
-                        };
-                        setShopInfo(newShop);
-                    }
-                } else {
-                    // Update current local shopInfo if it was an update
+                const savedData = result.data?.[0];
+                if (savedData) {
                     setShopInfo({
-                        ...shopInfo,
-                        name: info.name,
-                        imageUrl: info.imageUrl,
-                        services: info.services,
-                        workingHours: info.workingHours
+                        id: savedData.id,
+                        ownerId: savedData.owner_id,
+                        name: savedData.name,
+                        imageUrl: savedData.image_url,
+                        services: savedData.services,
+                        workingHours: savedData.working_hours,
+                        phone: savedData.phone || '',
+                        gallery: savedData.gallery || []
                     });
                 }
                 return { success: true };
             }
         } catch (error) {
             console.error('Supabase error:', error);
-            return { success: false, error: 'Something went wrong while saving shop info' };
+            return { success: false, error: error.message || 'Something went wrong while saving shop info' };
         }
     };
 

@@ -42,6 +42,9 @@ const Booking = () => {
     const [selectedTime, setSelectedTime] = useState('');
     const [formData, setFormData] = useState({ name: '', phone: '' });
     const [errorMsg, setErrorMsg] = useState('');
+    const [showServicesList, setShowServicesList] = useState(false);
+    const [showPhoneDisplay, setShowPhoneDisplay] = useState(false);
+    const [fetchedPhone, setFetchedPhone] = useState('');
 
     if (!shopInfo || !shopInfo.name) {
         return <Navigate to="/" replace />;
@@ -49,6 +52,40 @@ const Booking = () => {
 
     const timeSlots = generateTimeSlots(shopInfo.workingHours?.start || '09:00', shopInfo.workingHours?.end || '18:00');
     const bookedSlots = queue.filter(q => q.status !== 'Done').map(q => q.time);
+
+    const salonPhone = shopInfo.phone || fetchedPhone || (shopInfo.ownerId?.startsWith('+998') ? shopInfo.ownerId : '');
+
+    React.useEffect(() => {
+        if (!shopInfo.phone && shopInfo.ownerId) {
+            const fetchOwnerPhone = async () => {
+                const { data } = await supabase
+                    .from('pending_salons')
+                    .select('owner_phone')
+                    .eq('owner_id', shopInfo.ownerId)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (data?.owner_phone) {
+                    setFetchedPhone(data.owner_phone);
+                } else {
+                    // Final fallback: try to find by salon name
+                    const { data: nameData } = await supabase
+                        .from('pending_salons')
+                        .select('owner_phone')
+                        .eq('name', shopInfo.name)
+                        .order('created_at', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (nameData?.owner_phone) {
+                        setFetchedPhone(nameData.owner_phone);
+                    }
+                }
+            };
+            fetchOwnerPhone();
+        }
+    }, [shopInfo.phone, shopInfo.ownerId, shopInfo.name]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -79,12 +116,14 @@ const Booking = () => {
         }
     };
 
-    const recentWork = [
-        "https://images.unsplash.com/photo-1599351473299-d8395e693175?w=400&q=80",
-        "https://images.unsplash.com/photo-1621605815841-db897cfd5118?w=400&q=80",
-        "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80",
-        "https://images.unsplash.com/photo-1622286332618-f28939b4bb6d?w=400&q=80"
-    ];
+    const galleryImages = (shopInfo.gallery && shopInfo.gallery.length > 0)
+        ? shopInfo.gallery
+        : [
+            "https://images.unsplash.com/photo-1599351473299-d8395e693175?w=400&q=80",
+            "https://images.unsplash.com/photo-1621605815841-db897cfd5118?w=400&q=80",
+            "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80",
+            "https://images.unsplash.com/photo-1622286332618-f28939b4bb6d?w=400&q=80"
+        ];
 
     return (
         <div className="flex flex-col gap-6 pb-40 -mt-8 -mx-6 bg-white min-h-screen">
@@ -117,28 +156,112 @@ const Booking = () => {
                                 <Star size={12} fill="#fbbf24" className="text-[#fbbf24]" /> 4.9 (500+ Izoh)
                             </div>
                             <div className="flex items-center gap-1.5 text-white/70 text-[10px] font-black uppercase tracking-widest">
-                                <MapPin size={14} className="text-primary" /> Toshkent, O'zbekiston
+                                <CheckCircle size={14} className="text-secondary" /> Tasdiqlangan
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="px-8 grid grid-cols-4 gap-4 mt-4">
-                {[
-                    { icon: Phone, label: 'Qo\'ng\'iroq', color: 'text-blue-500 bg-blue-50' },
-                    { icon: MessageSquare, label: 'Chat', color: 'text-primary bg-purple-50' },
-                    { icon: Navigation, label: 'Manzil', color: 'text-emerald-500 bg-emerald-50' },
-                    { icon: Globe, label: 'Sayt', color: 'text-orange-500 bg-orange-50' }
-                ].map((btn, i) => (
-                    <button key={i} className="flex flex-col items-center gap-3">
-                        <div className={`w-14 h-14 rounded-[1.5rem] flex items-center justify-center ${btn.color} shadow-sm active:scale-90 transition-all border border-slate-50`}>
-                            <btn.icon size={22} />
-                        </div>
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{btn.label}</span>
-                    </button>
-                ))}
+            <div className="px-8 grid grid-cols-2 gap-4 mt-6">
+                <button
+                    onClick={() => {
+                        if (salonPhone) {
+                            setShowPhoneDisplay(!showPhoneDisplay);
+                        } else {
+                            alert("Telefon raqami kiritilmagan");
+                        }
+                    }}
+                    className="flex flex-col items-center gap-3 group"
+                >
+                    <div className={`w-full h-16 rounded-[2rem] flex items-center justify-center transition-all border ${showPhoneDisplay ? 'bg-blue-500 text-white border-blue-500 shadow-xl' : 'text-blue-500 bg-blue-50 border-blue-100/50 shadow-sm'}`}>
+                        <Phone size={24} />
+                    </div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qo'ng'iroq</span>
+                </button>
+
+                <button
+                    onClick={() => setShowServicesList(!showServicesList)}
+                    className="flex flex-col items-center gap-3 group"
+                >
+                    <div className={`w-full h-16 rounded-[2rem] flex items-center justify-center transition-all border ${showServicesList ? 'bg-primary text-white border-primary shadow-xl' : 'text-primary bg-purple-50 border-purple-100/50 shadow-sm'}`}>
+                        <Scissors size={24} />
+                    </div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Xizmatlar</span>
+                </button>
             </div>
+
+            <AnimatePresence>
+                {showPhoneDisplay && salonPhone && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="px-8"
+                    >
+                        <a
+                            href={`tel:${salonPhone}`}
+                            className="flex items-center justify-between p-6 rounded-[2.5rem] bg-blue-50 border border-blue-100 shadow-xl shadow-blue-100/50 group"
+                        >
+                            <div className="flex flex-col">
+                                <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Raqamga bosib qo'ng'iroq qiling</span>
+                                <span className="text-xl font-black text-blue-600 tracking-[0.1em]">{salonPhone}</span>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                <Phone size={20} fill="currentColor" />
+                            </div>
+                        </a>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {showServicesList && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="px-8"
+                    >
+                        <div className="flex flex-col gap-6 p-10 rounded-[3.5rem] bg-slate-900 text-white shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
+                            <div className="flex justify-between items-center relative z-10">
+                                <h3 className="text-xl font-black uppercase italic tracking-tighter">Xizmatlar ro'yxati</h3>
+                                <button onClick={() => setShowServicesList(false)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
+                                    <X size={18} />
+                                </button>
+                            </div>
+                            <div className="flex flex-col gap-4 relative z-10">
+                                {(shopInfo.services || []).length > 0 ? shopInfo.services.map((service, idx) => {
+                                    const sName = typeof service === 'object' ? service.name : service;
+                                    const sPrice = typeof service === 'object' ? service.price : 50000;
+                                    return (
+                                        <div key={idx} className="flex justify-between items-center p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white/10 transition-all group">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="font-black uppercase italic text-sm tracking-tight">{sName}</span>
+                                                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{sPrice.toLocaleString()} SO'M</span>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedService(sName);
+                                                    setIsBookingOpen(true);
+                                                    setStep(2);
+                                                    setShowServicesList(false);
+                                                }}
+                                                className="px-5 py-2.5 bg-primary rounded-xl font-black text-[9px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                            >
+                                                Tanlash
+                                            </button>
+                                        </div>
+                                    );
+                                }) : (
+                                    <div className="py-10 text-center opacity-40 text-[10px] font-black uppercase tracking-widest">Hozircha xizmatlar yo'q</div>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="px-8 flex flex-col gap-4 mt-4">
                 <h2 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Salon haqida</h2>
@@ -152,10 +275,10 @@ const Booking = () => {
                     <h2 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Ishlardan namunalar</h2>
                     <button className="text-primary text-[10px] font-black uppercase tracking-widest border-b-2 border-primary/10">Barchasi</button>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    {recentWork.map((img, i) => (
-                        <div key={i} className="aspect-square rounded-[2.5rem] overflow-hidden bg-slate-100 shadow-xl shadow-slate-100 ring-4 ring-slate-50">
-                            <img src={img} alt="work" className="w-full h-full object-cover transition-transform hover:scale-110 duration-700" />
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                    {galleryImages.map((work, i) => (
+                        <div key={i} className="aspect-square rounded-[2rem] overflow-hidden shadow-lg border border-slate-50">
+                            <img src={work} alt={`Work ${i}`} className="w-full h-full object-cover" />
                         </div>
                     ))}
                 </div>

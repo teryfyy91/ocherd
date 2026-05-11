@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Building2, Phone, Lock, Loader2, CheckCircle2, ChevronLeft, Settings, Clock, Plus, X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Building2, Phone, Lock, Loader2, CheckCircle2, ChevronLeft, Settings, Clock, Plus, X, ArrowRight, ShieldCheck, Search } from 'lucide-react';
 import { supabase } from '../utils/supabase';
 import { useStore } from '../context/StoreContext';
 import PendingApproval from '../components/PendingApproval';
@@ -155,18 +155,15 @@ const Login = ({ onLogin }) => {
         const cleanPhone = phone.replace(/[^\d+]/g, '');
         const email = `${cleanPhone}@ocherd.app`;
 
-        if (!isLoginMode && role === 'owner' && regStep === 0) {
-            setRegStep(1);
-            return;
-        }
-
-        if (!isLoginMode && role === 'user' && regStep === 0) {
-            if (!selectedShopId) {
-                setErrorMsg("Iltimos, avval sartaroshingizni (salonni) tanlang.");
+        if (!isLoginMode && regStep === 0) {
+            if (!name || !phone || !password) {
+                setErrorMsg("Iltimos, barcha maydonlarni to'ldiring.");
                 return;
             }
-            setRegStep(1);
-            return;
+            if (role === 'owner') {
+                setRegStep(1);
+                return;
+            }
         }
 
         if (isLoginMode) {
@@ -414,7 +411,7 @@ const Login = ({ onLogin }) => {
 
                             <div className="flex flex-col gap-2">
                                 <h3 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">
-                                    {regStep === 1 ? (role === 'owner' ? 'Salon' : 'Profil') : isLoginMode ? 'Kirish' : "Ro'yxat"}
+                                    {regStep === 1 ? 'Salon' : isLoginMode ? 'Kirish' : "Ro'yxatdan o'tish"}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <div className="h-[2px] w-6 bg-primary rounded-full" />
@@ -512,46 +509,7 @@ const Login = ({ onLogin }) => {
                                                 )}
                                             </button>
                                         </div>
-                                    ) : (
-                                        <div className="flex flex-col gap-10">
-                                            <FloatingInput
-                                                icon={User}
-                                                label="F.I.SH"
-                                                type="text"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                placeholder="Ism familiya"
-                                                required
-                                            />
-                                            <FloatingInput
-                                                icon={Phone}
-                                                label="Telefon"
-                                                type="tel"
-                                                value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                placeholder="Telefon raqam"
-                                                required
-                                            />
-                                            <FloatingInput
-                                                icon={Lock}
-                                                label="Maxfiy Parol"
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                placeholder="Parol"
-                                                required
-                                            />
-
-                                            <button
-                                                type="submit"
-                                                disabled={loading}
-                                                className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group relative overflow-hidden"
-                                            >
-                                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                                                {loading ? <Loader2 className="animate-spin size-6" /> : 'DAVOM ETISH'}
-                                            </button>
-                                        </div>
-                                    )
+                                    ) : null
                                 ) : isLoginMode ? (
                                     <div className="flex flex-col gap-10">
                                         <FloatingInput
@@ -580,69 +538,6 @@ const Login = ({ onLogin }) => {
                                         >
                                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                                             {loading ? <Loader2 className="animate-spin size-6" /> : 'KIRISH'}
-                                        </button>
-                                    </div>
-                                ) : role === 'user' ? (
-                                    <div className="flex flex-col gap-6">
-                                        <div className="relative group">
-                                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" size={18} />
-                                            <input
-                                                type="text"
-                                                placeholder="Sartaroshni qidiring..."
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full h-14 pl-14 pr-6 glass-input rounded-2xl outline-none text-slate-800 font-bold placeholder:text-slate-300 focus:ring-4 focus:ring-primary/5 transition-all text-sm"
-                                            />
-                                        </div>
-
-                                        <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                            {allShops.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())).map(shop => (
-                                                <button
-                                                    key={shop.id}
-                                                    type="button"
-                                                    onClick={() => setSelectedShopId(shop.id)}
-                                                    className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center gap-4 text-left ${selectedShopId === shop.id ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10' : 'border-slate-50 bg-white hover:border-slate-200'}`}
-                                                >
-                                                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                                                        {shop.imageUrl ? (
-                                                            <img src={shop.imageUrl} alt={shop.name} className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-slate-300"><Building2 size={24} /></div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="font-black text-slate-800 text-sm uppercase italic truncate">{shop.name}</h4>
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{shop.workingHours?.start} - {shop.workingHours?.end}</span>
-                                                        </div>
-                                                    </div>
-                                                    {selectedShopId === shop.id && (
-                                                        <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"><CheckCircle2 size={14} /></div>
-                                                    )}
-                                                </button>
-                                            ))}
-                                            {allShops.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
-                                                <div className="py-10 text-center opacity-40">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Salon topilmadi</p>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                if (!selectedShopId) {
-                                                    setErrorMsg("Iltimos, avval sartaroshingizni (salonni) tanlang.");
-                                                    setTimeout(() => setErrorMsg(''), 3000);
-                                                    return;
-                                                }
-                                                setRegStep(1);
-                                            }}
-                                            className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group"
-                                        >
-                                            DAVOM ETISH
-                                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </div>
                                 ) : (
@@ -681,7 +576,7 @@ const Login = ({ onLogin }) => {
                                             className="w-full h-16 bg-primary text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.5em] shadow-xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-4 group relative overflow-hidden"
                                         >
                                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                                            {loading ? <Loader2 className="animate-spin size-6" /> : 'DAVOM ETISH'}
+                                            {loading ? <Loader2 className="animate-spin size-6" /> : (role === 'user' ? "RO'YXATDAN O'TISH" : 'DAVOM ETISH')}
                                         </button>
                                     </div>
                                 )}

@@ -12,10 +12,6 @@ import {
     Navigation,
     Clock,
     ChevronRight,
-    Sparkles,
-    Wind,
-    Palette,
-    Zap,
     MapPin,
     ArrowRight,
     Filter
@@ -28,12 +24,7 @@ const Landing = () => {
     const navigate = useNavigate();
     const { currentUser, allShops, setShopInfo } = useStore();
 
-    const services = [
-        { id: 1, name: 'Soch', icon: <Scissors size={20} />, color: 'bg-purple-100 text-primary', delay: 0.1 },
-        { id: 2, name: 'Soqol', icon: <Wind size={20} />, color: 'bg-blue-100 text-blue-600', delay: 0.2 },
-        { id: 3, name: 'Stil', icon: <Zap size={20} />, color: 'bg-orange-100 text-orange-600', delay: 0.3 },
-        { id: 4, name: 'Parvarish', icon: <Sparkles size={20} />, color: 'bg-pink-100 text-pink-600', delay: 0.4 },
-    ];
+
 
     const activeShops = (allShops || []).filter(s => s.status === 'Active' || !s.status);
     const topShops = activeShops.slice(0, 5);
@@ -76,54 +67,7 @@ const Landing = () => {
             </div>
 
             <main className="flex flex-col gap-10">
-                {/* Visual Promo Section */}
-                <section className="px-6 mt-4">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="h-56 rounded-[3rem] bg-slate-900 relative overflow-hidden shadow-2xl group cursor-pointer"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent z-10" />
-                        <img
-                            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80"
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 z-20 p-8 flex flex-col justify-center gap-4">
-                            <span className="bg-white/20 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-[0.5em] px-4 py-1.5 rounded-full w-fit">Yangi Taklif</span>
-                            <h2 className="text-3xl font-black text-white leading-none uppercase italic tracking-tighter max-w-[200px]">
-                                Soch Turmagi Endi <span className="text-white bg-slate-900 px-2">-30%</span>
-                            </h2>
-                            <button className="flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-widest mt-2 group">
-                                Batafsil <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
-                        </div>
-                    </motion.div>
-                </section>
 
-                {/* Categories with Horizontal Scroll and Stagger */}
-                <section className="flex flex-col gap-6 px-1">
-                    <div className="px-5 flex justify-between items-center">
-                        <h2 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Xizmatlar</h2>
-                        <button className="text-[10px] font-black text-primary uppercase tracking-[0.2em] opacity-80">Hammasi</button>
-                    </div>
-                    <div className="flex gap-6 overflow-x-auto px-5 pb-4 scrollbar-hide">
-                        {services.map((s) => (
-                            <motion.button
-                                key={s.id}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: s.delay }}
-                                whileTap={{ scale: 0.9 }}
-                                className="flex flex-col items-center gap-4 shrink-0"
-                            >
-                                <div className={`${s.color} w-20 h-20 rounded-[2.5rem] flex items-center justify-center shadow-xl shadow-slate-100 border border-white transition-all`}>
-                                    {s.icon}
-                                </div>
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">{s.name}</span>
-                            </motion.button>
-                        ))}
-                    </div>
-                </section>
 
                 {/* Featured Shop Story Style */}
                 <section className="flex flex-col gap-6">
@@ -161,21 +105,11 @@ const Landing = () => {
                                         </button>
                                     </div>
                                     <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-1">
-                                        <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none group-hover:translate-x-1 transition-transform">{shop.name}</h3>
+                                        <h3 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none group-hover:translate-x-1 transition-transform">{shop.name}</h3>
                                         <div className="flex items-center gap-2 text-white/70">
-                                            <MapPin size={14} className="text-primary" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest leading-none">{shop.address || 'Toshkent, Chilonzor'}</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest leading-none">Tasdiqlangan Salon</span>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="p-8 flex items-center justify-between">
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Narxlaridan</p>
-                                        <span className="text-2xl font-black text-primary tracking-tighter">80,000 so'm</span>
-                                    </div>
-                                    <button className="h-14 bg-slate-900 text-white px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-3 active:scale-95 transition-all">
-                                        Band qilish <ArrowRight size={18} className="text-primary" />
-                                    </button>
                                 </div>
                             </motion.div>
                         ))}
@@ -188,7 +122,7 @@ const Landing = () => {
                 .scrollbar-hide::-webkit-scrollbar { display: none; }
                 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
             `}} />
-        </div>
+        </div >
     );
 };
 

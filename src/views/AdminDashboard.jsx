@@ -183,7 +183,8 @@ const AdminDashboard = () => {
                 owner_id: d.owner_id,
                 name: d.name || 'Nomsiz Salon',
                 status: 'Active',
-                image_url: d.image_url || ''
+                image_url: d.image_url || '',
+                phone: d.owner_phone || ''
             };
             if (d.services) insertPayload.services = d.services;
             if (d.working_hours) insertPayload.working_hours = d.working_hours;

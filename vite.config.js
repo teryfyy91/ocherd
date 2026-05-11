@@ -47,7 +47,7 @@ export default defineConfig({
         clientsClaim: true,
       },
       devOptions: {
-        enabled: false // Dev mode-da PWA popup chiqmasligi uchun
+        enabled: true // Dev mode-da PWA popup chiqishi uchun
       }
     })
   ],
