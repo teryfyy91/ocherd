@@ -45,16 +45,29 @@ function App() {
   // Synchronize local login state with current user from Supabase
   useEffect(() => {
     const checkAndSync = async () => {
-      if (!loadingUser) {
-        setIsChecking(true);
-        if (currentUser) {
-          const userMeta = currentUser.user_metadata || {};
-          const userPhone = userMeta.phone || '';
-          const isAdmin = userPhone.includes('505521107');
-          const isOwner = userMeta.role === 'owner';
+      // Don't do anything while auth is still initializing
+      if (loadingUser) return;
 
-          // For non-admin salon owners, verify shop approval before granting access
-          if (isOwner && !isAdmin) {
+      setIsChecking(true);
+
+      if (currentUser) {
+        const userMeta = currentUser.user_metadata || {};
+        const userPhone = userMeta.phone || '';
+        const isAdmin = userPhone.includes('505521107');
+        const isOwner = userMeta.role === 'owner';
+
+        // Restore missing info in localStorage from Supabase metadata if needed
+        if (!localStorage.getItem('userRole')) {
+          localStorage.setItem('userRole', isOwner ? 'owner' : 'user');
+          setUserRole(isOwner ? 'owner' : 'user');
+        }
+        if (!localStorage.getItem('currentUserPhone')) {
+          localStorage.setItem('currentUserPhone', userPhone);
+        }
+
+        // For non-admin salon owners, verify shop approval before granting access
+        if (isOwner && !isAdmin) {
+          try {
             const { data: shopData } = await supabase
               .from('shops')
               .select('id')
@@ -67,19 +80,32 @@ function App() {
               setPendingLoginError(true);
               await supabase.auth.signOut();
               localStorage.removeItem('isLoggedIn');
+              localStorage.removeItem('userRole');
               setIsLoggedIn(false);
               setIsChecking(false);
               return;
             }
+          } catch (err) {
+            console.error('Shop verification error:', err);
+            // In case of error, we might want to stay logged in or show an error
           }
-          setIsLoggedIn(true);
-        } else if (!currentUser) {
+        }
+
+        setIsLoggedIn(true);
+        localStorage.setItem('isLoggedIn', 'true');
+      } else {
+        // Only clear if we were previously "logged in" according to component state
+        // but Supabase firmly says no user.
+        if (isLoggedIn) {
           setIsLoggedIn(false);
           localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userRole');
         }
-        setIsChecking(false);
       }
+
+      setIsChecking(false);
     };
+
     checkAndSync();
   }, [currentUser, loadingUser]);
 

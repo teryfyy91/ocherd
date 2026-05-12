@@ -284,12 +284,12 @@ const Booking = () => {
                 </div>
             </div>
 
-            <div className="fixed bottom-10 left-8 right-8 z-40">
+            <div className="fixed bottom-10 left-4 right-4 z-40">
                 <button
                     onClick={() => setIsBookingOpen(true)}
-                    className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-bold text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 active:scale-95 transition-all flex items-center justify-center gap-4"
+                    className="w-full h-[4.5rem] bg-slate-900 text-white rounded-[2rem] font-bold text-[12px] uppercase tracking-[0.3em] shadow-[0_20px_50px_rgba(0,0,0,0.3)] active:scale-95 transition-all flex items-center justify-center gap-4 border border-white/5"
                 >
-                    <Clock size={18} className="text-primary" /> Navbat olish
+                    <Clock size={20} className="text-primary" /> Navbat olish
                 </button>
             </div>
 

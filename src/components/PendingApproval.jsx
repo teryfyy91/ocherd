@@ -15,9 +15,9 @@ const PendingApproval = ({ onConfirm }) => {
                     <Clock size={48} strokeWidth={2.5} />
                 </div>
                 <div className="flex flex-col gap-4">
-                    <h2 className="text-4xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Yuborildi</h2>
-                    <p className="text-slate-500 font-bold text-[10px] uppercase tracking-[0.3em] leading-loose max-w-[280px] mx-auto">
-                        So‘rovingiz yuborildi. Admin tasdiqlashini kuting.
+                    <h2 className="text-3xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Muvaffaqiyatli</h2>
+                    <p className="text-slate-500 font-bold text-[11px] uppercase tracking-[0.2em] leading-relaxed max-w-[280px] mx-auto italic">
+                        Sizning so‘rovingiz yuborildi. Iltimos, admin tomonidan tasdiqlanishini kuting.
                     </p>
                 </div>
                 <button

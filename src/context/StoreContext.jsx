@@ -184,8 +184,8 @@ export const StoreProvider = ({ children }) => {
         const initUser = async () => {
             setLoadingUser(true);
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                setCurrentUser(user);
+                const { data: { session } } = await supabase.auth.getSession();
+                setCurrentUser(session?.user ?? null);
             } catch (err) {
                 console.error('Auth init error:', err);
                 setCurrentUser(null);
