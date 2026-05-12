@@ -123,8 +123,6 @@ export const StoreProvider = ({ children }) => {
         }
     };
 
-
-
     const [reviews, setReviews] = useState([]);
 
     const fetchReviews = async (shopId) => {
@@ -211,23 +209,18 @@ export const StoreProvider = ({ children }) => {
         if (currentUser && allShops.length > 0) {
             const ownerShops = allShops.filter(s => s.ownerId === currentUser.id);
             setMyShops(ownerShops);
-            // Auto-select first shop if none selected
-            if (!shopInfo.id && ownerShops.length > 0) {
-                // Don't auto-set if it's already set to something valid
-                // setShopInfo(ownerShops[0]);
-            }
         } else if (!currentUser) {
             setMyShops([]);
         }
     }, [allShops, currentUser]);
 
-    // Polling for new data (every 10 seconds)
+    // Polling for new data (every 60 seconds)
     useEffect(() => {
         const interval = setInterval(() => {
             fetchBookings();
             fetchMyBookings();
             if (shopInfo.id) fetchReviews();
-        }, 10000);
+        }, 60000);
 
         return () => clearInterval(interval);
     }, [shopInfo.id]);
@@ -257,7 +250,7 @@ export const StoreProvider = ({ children }) => {
                     workingHours: s.working_hours,
                     phone: s.phone || '',
                     gallery: s.gallery || [],
-                    status: s.status || 'Active', // Default to Active for older entries
+                    status: s.status || 'Active',
                     createdAt: s.created_at
                 }));
                 setAllShops(formattedShops);
@@ -295,7 +288,6 @@ export const StoreProvider = ({ children }) => {
             shop_name: booking.shopName,
             user_name: booking.name,
             user_phone: booking.phone,
-            // Encode price into service string: "buzz cut||30000"
             service: booking.price ? `${booking.service}||${booking.price}` : booking.service,
             time: booking.time,
             status: 'Pending',
@@ -308,7 +300,6 @@ export const StoreProvider = ({ children }) => {
 
             const insertedBooking = data[0];
 
-            // Still sync to local for user visibility
             if (userRole !== 'owner') {
                 const localQueue = getLocalStorage('queue_global', []);
                 setLocalStorage('queue_global', [...localQueue, { ...booking, id: insertedBooking.id, status: 'Pending' }]);
@@ -372,7 +363,6 @@ export const StoreProvider = ({ children }) => {
                 return { success: false, error: "Not logged in" };
             }
 
-            // Normalize services
             const normalizedServices = (info.services || []).map(s => {
                 if (typeof s === 'string' && s.startsWith('{')) {
                     try { return JSON.parse(s); } catch (e) { return { name: s, price: 50000 }; }
@@ -388,7 +378,7 @@ export const StoreProvider = ({ children }) => {
                 working_hours: info.workingHours,
                 status: 'Pending',
                 phone: info.phone || '',
-                gallery: info.gallery || [] // ADDED
+                gallery: info.gallery || []
             };
 
             const performSave = async (data) => {
@@ -399,23 +389,29 @@ export const StoreProvider = ({ children }) => {
                 }
             };
 
-            let result = await performSave(payload);
+            let result;
+            let currentPayload = { ...payload };
+            let maxRetries = 5;
+            let attempt = 0;
 
-            // Auto-fallback for missing columns (like 'phone' or 'gallery')
-            const errorMessage = result.error?.message || '';
-            const isMissingColumnError = (errorMessage.includes('column') && errorMessage.includes('not exist')) ||
-                (errorMessage.includes('column') && errorMessage.includes('schema cache'));
+            while (attempt < maxRetries) {
+                result = await performSave(currentPayload);
+                const errorMessage = result.error?.message || '';
+                const isMissingColumnError = (errorMessage.includes('column') && errorMessage.includes('not exist')) ||
+                    (errorMessage.includes('column') && errorMessage.includes('schema cache'));
 
-            if (result.error && isMissingColumnError) {
-                // Try to extract column name from common error formats
-                let missingCol = errorMessage.match(/column "(.*)" does not exist/)?.[1] ||
-                    errorMessage.match(/find the '(.*)' column/)?.[1];
+                if (result.error && isMissingColumnError) {
+                    let missingCol = errorMessage.match(/column "(.*)" does not exist/)?.[1] ||
+                        errorMessage.match(/find the '(.*)' column/)?.[1];
 
-                if (missingCol && payload[missingCol] !== undefined) {
-                    const { [missingCol]: _, ...newPayload } = payload;
-                    payload = newPayload;
-                    result = await performSave(payload);
+                    if (missingCol && currentPayload[missingCol] !== undefined) {
+                        const { [missingCol]: _, ...newPayload } = currentPayload;
+                        currentPayload = newPayload;
+                        attempt++;
+                        continue;
+                    }
                 }
+                break;
             }
 
             if (result.error) {
@@ -446,7 +442,6 @@ export const StoreProvider = ({ children }) => {
 
     const deleteShop = async (id) => {
         try {
-            // 1. Delete associated bookings first to avoid foreign key constraints
             const { error: bookingError } = await supabase
                 .from('bookings')
                 .delete()
@@ -456,7 +451,6 @@ export const StoreProvider = ({ children }) => {
                 console.warn('Could not delete associated bookings:', bookingError);
             }
 
-            // 2. Delete the shop itself
             const { data, error } = await supabase
                 .from('shops')
                 .delete()
@@ -466,12 +460,9 @@ export const StoreProvider = ({ children }) => {
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                console.error("Delete failed: No rows returned. This usually means RLS blocked the delete or the ID is wrong.", { id, user: currentUser?.id });
-                throw new Error("Salonni o'chirish imkoni bo'lmadi. Iltimos, sahifani yangilab qaytadan urinib ko'ring.");
+                throw new Error("Salonni o'chirish imkoni bo'lmadi.");
             }
 
-
-            // 3. Clear active shop if it was the one deleted
             if (shopInfo.id === id) {
                 setShopInfo({
                     name: '',
@@ -480,7 +471,6 @@ export const StoreProvider = ({ children }) => {
                 });
             }
 
-            // 4. Refresh the list
             await fetchShops();
             return { success: true };
         } catch (err) {
@@ -497,8 +487,6 @@ export const StoreProvider = ({ children }) => {
         localStorage.removeItem('hasSelectedLang');
         window.location.href = '/';
     };
-
-
 
     return (
         <StoreContext.Provider value={{
@@ -539,8 +527,6 @@ export const StoreProvider = ({ children }) => {
                 }
             }
         }}>
-
-
             {children}
         </StoreContext.Provider>
     );

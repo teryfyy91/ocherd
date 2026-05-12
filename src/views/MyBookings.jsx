@@ -44,14 +44,14 @@ const MyBookings = () => {
     return (
         <div className="flex flex-col gap-10 pb-32 pt-8">
             <header className="flex flex-col gap-2 mt-4 px-2">
-                <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Navbatlarim</h1>
-                <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-[9px]">Uchrashuvlaringiz tarixi</p>
+                <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase italic leading-none">Navbatlarim</h1>
+                <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[8px]">Uchrashuvlaringiz tarixi</p>
             </header>
 
             <div className="flex flex-col gap-8">
                 <div className="flex items-center gap-3 px-2">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <h2 className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Hozirda faol</h2>
+                    <h2 className="text-[9px] font-bold text-slate-800 uppercase tracking-widest">Hozirda faol</h2>
                 </div>
 
                 {activeBookings.length === 0 ? (
@@ -78,8 +78,8 @@ const MyBookings = () => {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl opacity-50" />
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">{item.shopName}</h3>
-                                        <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">
+                                        <h3 className="text-lg font-extrabold text-slate-800 uppercase italic tracking-tight leading-none">{item.shopName}</h3>
+                                        <div className="flex items-center gap-4 text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-2">
                                             <span className="flex items-center gap-1.5"><Scissors size={12} className="text-primary" /> {item.service}</span>
                                             <span className="flex items-center gap-1.5"><Clock size={12} className="text-primary" /> {item.time}</span>
                                         </div>
@@ -93,7 +93,7 @@ const MyBookings = () => {
                                     <div className="flex flex-col">
                                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Taxminiy vaqt</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-lg font-black text-slate-800 tracking-tighter leading-none">~15 daqiqa</span>
+                                            <span className="text-base font-extrabold text-slate-800 tracking-tight leading-none">~15 daqiqa</span>
                                             {item.status === 'In progress' && <div className="w-1.5 h-1.5 bg-primary rounded-full animate-ping" />}
                                         </div>
                                     </div>

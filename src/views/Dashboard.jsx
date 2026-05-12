@@ -27,7 +27,7 @@ const CustomTimePicker = ({ label, value, onChange }) => {
 
     return (
         <div className="flex flex-col gap-2 relative z-[60]">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{label}</label>
             <div
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full bg-slate-50 border-slate-200 px-6 py-4 rounded-2xl text-slate-800 font-bold cursor-pointer flex items-center justify-between hover:bg-slate-100 transition-all border"
@@ -47,13 +47,13 @@ const CustomTimePicker = ({ label, value, onChange }) => {
                             className="absolute top-full left-0 right-0 z-[110] bg-white shadow-2xl rounded-2xl p-4 flex gap-3 mt-2 min-w-[220px] border border-slate-100"
                         >
                             <div className="flex-1 flex flex-col gap-1">
-                                <span className="text-[8px] font-black uppercase text-slate-400 text-center opacity-50">HR</span>
+                                <span className="text-[8px] font-bold uppercase text-slate-400 text-center opacity-50">HR</span>
                                 <div className="h-48 overflow-y-auto scrollbar-hide flex flex-col gap-1">
                                     {hours.map(h => (
                                         <button
                                             key={h}
                                             onClick={() => handleSelect(h, minute)}
-                                            className={`py-2 rounded-lg font-black text-sm transition-all ${h === hour ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-800'}`}
+                                            className={`py-2 rounded-lg font-bold text-sm transition-all ${h === hour ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-800'}`}
                                         >
                                             {h}
                                         </button>
@@ -62,13 +62,13 @@ const CustomTimePicker = ({ label, value, onChange }) => {
                             </div>
                             <div className="w-[1px] bg-slate-100 my-2" />
                             <div className="flex-1 flex flex-col gap-1">
-                                <span className="text-[8px] font-black uppercase text-slate-400 text-center opacity-50">MIN</span>
+                                <span className="text-[8px] font-bold uppercase text-slate-400 text-center opacity-50">MIN</span>
                                 <div className="h-48 overflow-y-auto scrollbar-hide flex flex-col gap-1">
                                     {minutes.map(m => (
                                         <button
                                             key={m}
                                             onClick={() => handleSelect(hour, m)}
-                                            className={`py-2 rounded-lg font-black text-sm transition-all ${m === minute ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-800'}`}
+                                            className={`py-2 rounded-lg font-bold text-sm transition-all ${m === minute ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-800'}`}
                                         >
                                             {m}
                                         </button>
@@ -264,8 +264,8 @@ const Dashboard = () => {
 
                         <div className="relative z-10 flex justify-between items-start mb-8">
                             <div className="flex flex-col gap-1">
-                                <span className="text-[8px] font-black text-white/50 uppercase tracking-widest">BarberOS Premium</span>
-                                <h1 className="text-xl font-black text-white italic uppercase tracking-tighter">Mening Salonlarim</h1>
+                                <span className="text-[7px] font-bold text-white/50 uppercase tracking-widest">BarberOS</span>
+                                <h1 className="text-base font-bold text-white uppercase tracking-tight">Mening Salonim</h1>
                             </div>
                             <button onClick={signOut} className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/10 hover:bg-white/20 transition-all">
                                 <LogOut size={20} />
@@ -278,8 +278,8 @@ const Dashboard = () => {
                                     <User size={24} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">Salon Egasi</span>
-                                    <span className="text-sm font-black text-white uppercase italic tracking-tight">{localStorage.getItem('currentUserPhone')}</span>
+                                    <span className="text-[8px] font-bold text-white/60 uppercase tracking-widest">Salon Egasi</span>
+                                    <span className="text-xs font-bold text-white uppercase tracking-tight">{localStorage.getItem('currentUserPhone')}</span>
                                 </div>
                             </div>
                         </div>
@@ -288,10 +288,7 @@ const Dashboard = () => {
                     <div className="px-8 mt-12 space-y-12">
                         <section className="flex flex-col gap-6">
                             <div className="flex justify-between items-center px-1">
-                                <h3 className="text-xl font-black text-slate-800 uppercase italic tracking-tight leading-none">Faol Salonlar</h3>
-                                <button onClick={handleAddNew} className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
-                                    <Plus size={14} /> Qo'shish
-                                </button>
+                                <h3 className="text-lg font-bold text-slate-800 uppercase italic tracking-tight leading-none">Salon Faoliyati</h3>
                             </div>
 
                             {loadingShops ? (
@@ -302,8 +299,8 @@ const Dashboard = () => {
                                 <div className="py-20 text-center flex flex-col items-center gap-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[4rem]">
                                     <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center text-slate-200 shadow-xl"><Store size={40} /></div>
                                     <div className="flex flex-col gap-2">
-                                        <h4 className="text-slate-800 font-black uppercase italic text-lg tracking-tight leading-none">Salon Topilmadi</h4>
-                                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest opacity-60">Hali hech qanday salon ro'yxatga olinmagan</p>
+                                        <h4 className="text-slate-800 font-bold uppercase italic text-base tracking-tight leading-none">Salon Topilmadi</h4>
+                                        <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest opacity-60">Hali hech qanday salon ro'yxatga olinmagan</p>
                                     </div>
                                 </div>
                             ) : (
@@ -317,9 +314,9 @@ const Dashboard = () => {
                                             className="group relative bg-white border border-slate-100 rounded-[3rem] p-5 shadow-2xl shadow-slate-100 cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
                                         >
                                             <div className="flex gap-6 items-center">
-                                                <div className="w-24 h-24 rounded-[2rem] overflow-hidden bg-slate-50 shrink-0 shadow-lg relative">
+                                                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-50 shrink-0 shadow-lg relative">
                                                     {shop.imageUrl ? (
-                                                        <img src={shop.imageUrl} alt={shop.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                                        <img src={shop.imageUrl} alt={shop.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-200"><Store size={32} /></div>
                                                     )}
@@ -327,12 +324,12 @@ const Dashboard = () => {
                                                 <div className="flex-1 min-w-0 flex flex-col gap-2">
                                                     <div className="flex items-center gap-2">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active</span>
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Active</span>
                                                     </div>
-                                                    <h4 className="text-lg font-black text-slate-800 uppercase italic leading-none truncate group-hover:text-primary transition-colors">{shop.name}</h4>
+                                                    <h4 className="text-base font-bold text-slate-800 uppercase italic leading-none truncate group-hover:text-primary transition-colors">{shop.name}</h4>
                                                     <div className="flex items-center gap-1.5 text-slate-400">
                                                         <Clock size={12} className="text-primary" />
-                                                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">{shop.workingHours?.start} - {shop.workingHours?.end}</span>
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest leading-none">{shop.workingHours?.start} - {shop.workingHours?.end}</span>
                                                     </div>
                                                 </div>
                                                 <button
@@ -355,11 +352,11 @@ const Dashboard = () => {
                                 <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white p-10 rounded-[4rem] shadow-2xl max-w-sm w-full relative overflow-hidden text-center">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full -mr-16 -mt-16" />
                                     <div className="w-24 h-24 bg-red-50 text-red-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-500/10 relative z-10"><AlertTriangle size={48} /></div>
-                                    <h3 className="text-xl font-black text-slate-800 uppercase italic mb-3">O'chirilsinmi?</h3>
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-10 leading-loose opacity-60">"{shopToDelete?.name}" barcha ma'lumotlari bilan birga butunlay o'chiriladi.</p>
+                                    <h3 className="text-xl font-bold text-slate-800 uppercase italic mb-3">O'chirilsinmi?</h3>
+                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-10 leading-loose opacity-60">"{shopToDelete?.name}" barcha ma'lumotlari bilan birga butunlay o'chiriladi.</p>
                                     <div className="flex flex-col gap-4">
-                                        <button onClick={async () => { await deleteShop(shopToDelete.id); setDeleteModalOpen(false); showToast("O'chirildi!"); }} className="w-full h-16 bg-red-500 text-white rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-red-500/40 active:scale-95 transition-all">Ha, O'chirish</button>
-                                        <button onClick={() => setDeleteModalOpen(false)} className="w-full h-16 bg-slate-100 text-slate-400 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Bekor Qilish</button>
+                                        <button onClick={async () => { await deleteShop(shopToDelete.id); setDeleteModalOpen(false); showToast("O'chirildi!"); }} className="w-full h-16 bg-red-500 text-white rounded-[2rem] font-bold text-xs uppercase tracking-widest shadow-2xl shadow-red-500/40 active:scale-95 transition-all">Ha, O'chirish</button>
+                                        <button onClick={() => setDeleteModalOpen(false)} className="w-full h-16 bg-slate-100 text-slate-400 rounded-[2rem] font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Bekor Qilish</button>
                                     </div>
                                 </motion.div>
                             </div>
@@ -383,8 +380,8 @@ const Dashboard = () => {
                                     <ChevronLeft size={24} />
                                 </button>
                                 <div className="flex flex-col">
-                                    <h1 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">{shopInfo.name}</h1>
-                                    <span className="text-[8px] font-black text-white/50 uppercase tracking-widest mt-1">Salon Boshqaruvi</span>
+                                    <h1 className="text-base font-bold text-white uppercase leading-none">{shopInfo.name}</h1>
+                                    <span className="text-[7px] font-bold text-white/50 uppercase tracking-widest mt-1">Salon Boshqaruvi</span>
                                 </div>
                             </div>
                             <button onClick={() => setManagementTab('settings')} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10">
@@ -404,7 +401,7 @@ const Dashboard = () => {
                                     className={`flex-1 min-w-[90px] flex flex-col items-center gap-1.5 py-4 rounded-[2rem] transition-all duration-500 ${managementTab === tab.id ? 'bg-white text-primary shadow-2xl shadow-primary/30 scale-105' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
                                 >
                                     <tab.icon size={18} />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">{tab.label}</span>
+                                    <span className="text-[8px] font-bold uppercase tracking-widest">{tab.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -414,22 +411,22 @@ const Dashboard = () => {
                 <main className="p-8">
                     <AnimatePresence mode="wait">
                         {managementTab === 'queue' && (
-                            <motion.div key="queue" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="space-y-12">
+                            <motion.div key="queue" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="flex flex-col gap-16">
                                 <section className="grid grid-cols-2 gap-6">
                                     <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-50 relative overflow-visible group">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2 relative z-10 px-1">Qabulda</p>
-                                        <p className="text-2xl font-black text-slate-800 tracking-tighter relative z-10 leading-none px-1">{confirmedQueue.length}</p>
+                                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-2 relative z-10 px-1">Qabulda</p>
+                                        <p className="text-xl font-bold text-slate-800 tracking-tight relative z-10 leading-none px-1">{confirmedQueue.length}</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-50 relative overflow-visible group">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2 relative z-10 px-1">Kutilmoqda</p>
-                                        <p className="text-2xl font-black text-slate-800 tracking-tighter relative z-10 leading-none px-1">{pendingQueue.length}</p>
+                                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-2 relative z-10 px-1">Kutilmoqda</p>
+                                        <p className="text-xl font-bold text-slate-800 tracking-tight relative z-10 leading-none px-1">{pendingQueue.length}</p>
                                     </div>
                                 </section>
 
-                                <section className="space-y-8">
+                                <section className="space-y-8 pt-4">
                                     <div className="flex justify-between items-center px-2">
-                                        <h2 className="text-lg font-black text-slate-800 uppercase italic leading-none tracking-tight">Bugungi Reja</h2>
-                                        <span className="flex items-center gap-2 bg-slate-900 text-white text-[8px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest">{queue.length} mijoz</span>
+                                        <h2 className="text-sm font-bold text-slate-800 uppercase leading-none tracking-tight">Bugungi Reja</h2>
+                                        <span className="flex items-center gap-2 bg-slate-900 text-white text-[7px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">{queue.length} mijoz</span>
                                     </div>
 
                                     <div className="space-y-6">
@@ -440,11 +437,11 @@ const Dashboard = () => {
                                                         <Clock size={28} />
                                                     </div>
                                                     <div className="flex flex-col gap-1">
-                                                        <h4 className="font-black text-slate-800 text-lg uppercase italic leading-none">{item.name}</h4>
-                                                        <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest">{item.service} • {item.time}</p>
+                                                        <h4 className="font-bold text-slate-800 text-base uppercase leading-none">{item.name}</h4>
+                                                        <p className="text-[9px] text-amber-600 font-bold uppercase tracking-widest">{item.service} • {item.time}</p>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => updateBookingStatus(item.id, 'Waiting')} className="h-14 px-8 bg-amber-500 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-200 active:scale-95 transition-all hover:brightness-110">Qabul</button>
+                                                <button onClick={() => updateBookingStatus(item.id, 'Waiting')} className="h-14 px-8 bg-amber-500 text-white rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-amber-200 active:scale-95 transition-all hover:brightness-110">Qabul</button>
                                             </motion.div>
                                         ))}
 
@@ -453,17 +450,17 @@ const Dashboard = () => {
                                                 {item.status === 'In progress' && <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 animate-pulse" />}
 
                                                 <div className="flex items-center gap-6 relative z-10">
-                                                    <div className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center font-black text-xl transition-all duration-700 ${item.status === 'In progress' ? 'bg-primary text-white shadow-2xl shadow-primary/40 rotate-6' : 'bg-slate-50 text-slate-300'}`}>
+                                                    <div className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center font-bold text-xl transition-all duration-700 ${item.status === 'In progress' ? 'bg-primary text-white shadow-2xl shadow-primary/40 rotate-6' : 'bg-slate-50 text-slate-300'}`}>
                                                         {idx + 1}
                                                     </div>
                                                     <div onClick={() => setSelectedUserDetails(item)} className="flex flex-col gap-1 cursor-pointer">
                                                         <div className="flex items-center gap-3">
-                                                            <h4 className="font-black text-slate-800 text-lg uppercase italic leading-none group-hover:text-primary transition-colors">{item.name}</h4>
-                                                            {item.status === 'In progress' && <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest animate-pulse">Band</span>}
+                                                            <h4 className="font-bold text-slate-800 text-base uppercase leading-none group-hover:text-primary transition-colors">{item.name}</h4>
+                                                            {item.status === 'In progress' && <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-[7px] font-bold uppercase tracking-widest animate-pulse">Band</span>}
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <Scissors size={12} className="text-primary/40" />
-                                                            <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest leading-none mt-1">{item.service} • <span className="text-primary">{item.time}</span></p>
+                                                            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">{item.service} • <span className="text-primary">{item.time}</span></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -474,7 +471,7 @@ const Dashboard = () => {
                                                             <Check size={28} />
                                                         </button>
                                                     ) : (
-                                                        <button onClick={() => updateBookingStatus(item.id, 'In progress')} className="h-14 px-8 bg-white border border-slate-200 text-slate-400 rounded-[1.5rem] font-black text-[10px] uppercase tracking-widest hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">Boshlash</button>
+                                                        <button onClick={() => updateBookingStatus(item.id, 'In progress')} className="h-14 px-8 bg-white border border-slate-200 text-slate-400 rounded-[1.5rem] font-bold text-[10px] uppercase tracking-widest hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">Boshlash</button>
                                                     )}
                                                 </div>
                                             </motion.div>
@@ -484,8 +481,8 @@ const Dashboard = () => {
                                             <div className="py-24 text-center bg-slate-50 border-2 border-dashed border-slate-100 rounded-[4rem] flex flex-col items-center gap-8 opacity-40">
                                                 <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center text-slate-200 shadow-xl"><Users size={40} /></div>
                                                 <div className="flex flex-col gap-2">
-                                                    <h4 className="text-slate-800 font-black uppercase italic text-lg tracking-tight leading-none">Navbat Bo'sh</h4>
-                                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Mijozlar kutishmoqda...</p>
+                                                    <h4 className="text-slate-800 font-bold uppercase text-base tracking-tight leading-none">Navbat Bo'sh</h4>
+                                                    <p className="text-slate-400 text-[8px] font-bold uppercase tracking-widest">Mijozlar kutishmoqda...</p>
                                                 </div>
                                             </div>
                                         )}
@@ -496,25 +493,25 @@ const Dashboard = () => {
 
                         {managementTab === 'stats' && (
                             <motion.div key="stats" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="space-y-10">
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="p-8 rounded-[3rem] bg-slate-900 text-white shadow-2xl relative overflow-hidden">
-                                        <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/20 rounded-full -mr-16 -mb-16 blur-3xl" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Bugun</p>
-                                        <div className="flex items-baseline gap-2 mb-4">
-                                            <p className="text-3xl font-black tracking-tighter">{completedToday.length}</p>
-                                            <TrendingUp size={24} className="text-primary" />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-slate-900 px-2 py-5 rounded-[2rem] flex flex-col items-center text-center shadow-xl relative overflow-hidden">
+                                        <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/20 rounded-full blur-2xl" />
+                                        <span className="text-[7px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Bugun</span>
+                                        <div className="flex items-center gap-1.5 mb-1.5">
+                                            <span className="text-xl font-bold text-white">{completedToday.length}</span>
+                                            <TrendingUp size={14} className="text-primary" />
                                         </div>
-                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Mijozlar</span>
+                                        <span className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Mijozlar</span>
                                     </div>
-                                    <div className="p-8 rounded-[3rem] bg-white border border-slate-100 shadow-2xl shadow-slate-100">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Daromad</p>
-                                        <p className="text-3xl font-black text-slate-800 tracking-tighter">{incomeToday.toLocaleString()}</p>
-                                        <span className="text-[9px] font-black text-primary uppercase tracking-widest mt-6 block">O'zbek so'm</span>
+                                    <div className="bg-white border border-slate-100 px-2 py-5 rounded-[2rem] flex flex-col items-center text-center shadow-xl shadow-slate-50">
+                                        <span className="text-[7px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Daromad</span>
+                                        <span className="text-xl font-bold text-slate-800 mb-1.5">{incomeToday.toLocaleString()}</span>
+                                        <span className="text-[7px] font-bold text-primary uppercase tracking-widest">SO'M</span>
                                     </div>
                                 </div>
 
-                                <section className="bg-white border border-slate-100 p-10 rounded-[4rem] shadow-2xl shadow-slate-100 h-[450px]">
-                                    <h3 className="text-xl font-black text-slate-800 uppercase italic tracking-tight mb-12">Haftalik O'sish</h3>
+                                <section className="bg-white border border-slate-100 p-4 rounded-[2rem] shadow-xl shadow-slate-50 h-[350px]">
+                                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight mb-6 px-2">Haftalik O'sish</h3>
                                     <div className="h-[280px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <AreaChart data={dynamicStatsData}>
@@ -538,11 +535,11 @@ const Dashboard = () => {
                             <motion.div key="reviews" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
                                 <div className="bg-white border border-slate-100 p-10 rounded-[4rem] shadow-2xl shadow-slate-100 flex items-center justify-between">
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tight">O'rtacha Reyting</h3>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{reviews.length} mijoz fikri</p>
+                                        <h3 className="text-xl font-bold text-slate-800 uppercase italic leading-none tracking-tight">O'rtacha Reyting</h3>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{reviews.length} mijoz fikri</p>
                                     </div>
                                     <div className="bg-amber-50 p-6 rounded-[2.5rem] flex flex-col items-center gap-2">
-                                        <span className="text-4xl font-black text-amber-500 tracking-tighter leading-none">{avgRating}</span>
+                                        <span className="text-4xl font-bold text-amber-500 tracking-tighter leading-none">{avgRating}</span>
                                         <div className="flex gap-0.5"><Star size={12} className="fill-amber-500 text-amber-500" /></div>
                                     </div>
                                 </div>
@@ -551,16 +548,16 @@ const Dashboard = () => {
                                     {reviews.length === 0 ? (
                                         <div className="py-24 text-center flex flex-col items-center gap-8 opacity-30">
                                             <MessageSquare size={56} />
-                                            <p className="text-[11px] font-black uppercase tracking-[0.4em]">Hali izohlar mavjud emas</p>
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.4em]">Hali izohlar mavjud emas</p>
                                         </div>
                                     ) : reviews.map((review) => (
                                         <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} key={review.id} className="p-8 bg-white border border-slate-100 rounded-[3.5rem] shadow-xl relative overflow-hidden group">
                                             <div className="flex justify-between items-start mb-6">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center font-black text-primary text-lg uppercase transition-all group-hover:bg-primary group-hover:text-white group-hover:rotate-6">{(review.user_name || 'U')[0]}</div>
+                                                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center font-bold text-primary text-lg uppercase transition-all group-hover:bg-primary group-hover:text-white group-hover:rotate-6">{(review.user_name || 'U')[0]}</div>
                                                     <div className="flex flex-col">
-                                                        <h5 className="font-black text-slate-800 text-base italic uppercase tracking-tight">{review.user_name || 'Mijoz'}</h5>
-                                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</span>
+                                                        <h5 className="font-bold text-slate-800 text-base italic uppercase tracking-tight">{review.user_name || 'Mijoz'}</h5>
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-1 bg-amber-50/50 p-2 rounded-xl">
@@ -579,7 +576,7 @@ const Dashboard = () => {
                                 <section className="bg-white border border-slate-100 p-10 rounded-[4rem] shadow-2xl shadow-slate-100">
                                     <form onSubmit={handleSave} className="space-y-10">
                                         <div className="flex flex-col gap-4">
-                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] ml-2">Ishlardan Namuna (Galereya)</span>
+                                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em] ml-2">Ishlardan Namuna (Galereya)</span>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 {/* Existing Gallery */}
@@ -601,7 +598,7 @@ const Dashboard = () => {
                                                     <div key={`new-${idx}`} className="relative h-40 rounded-3xl overflow-hidden group shadow-lg border-2 border-primary/20">
                                                         <img src={img} className="w-full h-full object-cover" alt="New Gallery" />
                                                         <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center">
-                                                            <span className="text-[8px] font-black text-white uppercase tracking-widest bg-primary px-2 py-1 rounded-full shadow-lg">Yangi</span>
+                                                            <span className="text-[8px] font-bold text-white uppercase tracking-widest bg-primary px-2 py-1 rounded-full shadow-lg">Yangi</span>
                                                         </div>
                                                         <button
                                                             type="button"
@@ -619,7 +616,7 @@ const Dashboard = () => {
                                                     className="h-40 rounded-3xl border-2 border-dashed border-slate-100 bg-slate-50 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-100 hover:border-primary/20 transition-all text-slate-300"
                                                 >
                                                     <Plus size={32} className="opacity-50" />
-                                                    <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Rasm Qo'shish</span>
+                                                    <span className="text-[8px] font-bold uppercase tracking-widest opacity-50">Rasm Qo'shish</span>
                                                 </div>
                                             </div>
                                             <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryChange} />
@@ -627,13 +624,13 @@ const Dashboard = () => {
 
                                         <div className="space-y-8">
                                             <div className="flex flex-col gap-2">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Salon Nomi</label>
-                                                <input type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full h-16 bg-slate-50 rounded-[2rem] px-8 text-black font-black text-base italic uppercase tracking-tight focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all border-none outline-none" required />
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Salon Nomi</label>
+                                                <input type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full h-16 bg-slate-50 rounded-[2rem] px-8 text-black font-bold text-base italic uppercase tracking-tight focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all border-none outline-none" required />
                                             </div>
 
                                             <div className="flex flex-col gap-2">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Telefon Raqami (Mijozlar uchun)</label>
-                                                <input type="tel" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full h-16 bg-slate-50 rounded-[2rem] px-8 text-black font-black text-base italic uppercase tracking-tight focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all border-none outline-none" placeholder="+998..." />
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Telefon Raqami (Mijozlar uchun)</label>
+                                                <input type="tel" value={formData.phone || ''} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full h-16 bg-slate-50 rounded-[2rem] px-8 text-black font-bold text-base italic uppercase tracking-tight focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all border-none outline-none" placeholder="+998..." />
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-6">
@@ -642,11 +639,11 @@ const Dashboard = () => {
                                             </div>
 
                                             <div className="space-y-6">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Xizmatlar</label>
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Xizmatlar</label>
                                                 <div className="bg-slate-50 p-6 rounded-[3rem] space-y-4 border border-slate-100">
-                                                    <input type="text" value={serviceInput} onChange={e => setServiceInput(e.target.value)} className="w-full h-14 px-6 rounded-2xl bg-white text-sm font-black italic uppercase transition-all outline-none border-none shadow-sm focus:shadow-lg" placeholder="Xizmat nomi..." />
+                                                    <input type="text" value={serviceInput} onChange={e => setServiceInput(e.target.value)} className="w-full h-14 px-6 rounded-2xl bg-white text-sm font-bold italic uppercase transition-all outline-none border-none shadow-sm focus:shadow-lg" placeholder="Xizmat nomi..." />
                                                     <div className="flex gap-4">
-                                                        <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)} className="flex-1 h-14 px-6 rounded-2xl bg-white text-sm font-black italic uppercase transition-all outline-none border-none shadow-sm focus:shadow-lg" placeholder="Narxi..." />
+                                                        <input type="number" value={servicePrice} onChange={e => setServicePrice(e.target.value)} className="flex-1 h-14 px-6 rounded-2xl bg-white text-sm font-bold italic uppercase transition-all outline-none border-none shadow-sm focus:shadow-lg" placeholder="Narxi..." />
                                                         <button type="button" onClick={addService} className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-2xl active:scale-95 transition-all"><Plus /></button>
                                                     </div>
                                                     <div className="flex flex-wrap gap-2 pt-4">
@@ -655,7 +652,7 @@ const Dashboard = () => {
                                                             const sN = typeof p === 'object' ? p.name : p;
                                                             const sP = typeof p === 'object' ? p.price : 50000;
                                                             return (
-                                                                <div key={idx} className="bg-white px-5 py-3 rounded-2xl text-[10px] font-black text-slate-600 flex items-center gap-4 shadow-sm border border-slate-50 group hover:border-primary/20 transition-all">
+                                                                <div key={idx} className="bg-white px-5 py-3 rounded-2xl text-[10px] font-bold text-slate-600 flex items-center gap-4 shadow-sm border border-slate-50 group hover:border-primary/20 transition-all">
                                                                     <div className="flex flex-col">
                                                                         <span className="uppercase italic">{sN}</span>
                                                                         <span className="text-primary mt-0.5">{sP.toLocaleString()}</span>
@@ -669,7 +666,7 @@ const Dashboard = () => {
                                             </div>
                                         </div>
 
-                                        <button type="submit" className="w-full h-18 bg-primary text-white rounded-[2.5rem] font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 active:scale-95 transition-all mt-8">Saqlash</button>
+                                        <button type="submit" className="w-full h-18 bg-primary text-white rounded-[2.5rem] font-bold text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 active:scale-95 transition-all mt-8">Saqlash</button>
                                     </form>
                                 </section>
                             </motion.div>
@@ -683,25 +680,25 @@ const Dashboard = () => {
                             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-white rounded-[4.5rem] p-12 max-w-sm w-full relative overflow-hidden shadow-2xl border border-slate-100 text-center">
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24" />
                                 <div className="w-28 h-28 bg-primary/10 text-primary rounded-[3rem] flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-primary/10 relative z-10"><User size={56} /></div>
-                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-3 block">Mijoz</span>
-                                <h2 className="text-2xl font-black text-slate-800 mb-12 uppercase italic leading-none tracking-tight">{selectedUserDetails.name}</h2>
+                                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em] mb-3 block">Mijoz</span>
+                                <h2 className="text-2xl font-bold text-slate-800 mb-12 uppercase italic leading-none tracking-tight">{selectedUserDetails.name}</h2>
                                 <div className="space-y-4 mb-12">
                                     <div className="bg-slate-50 p-6 rounded-[2.5rem] flex items-center gap-6 group hover:bg-white hover:shadow-2xl transition-all border border-transparent hover:border-slate-100">
                                         <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-xl group-hover:bg-primary group-hover:text-white transition-all"><Phone size={24} /></div>
                                         <div className="text-left flex flex-col gap-0.5">
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Telefon</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Telefon</span>
                                             <a href={`tel:${selectedUserDetails.phone}`} className="text-slate-800 font-bold text-lg">{selectedUserDetails.phone}</a>
                                         </div>
                                     </div>
                                     <div className="bg-slate-50 p-6 rounded-[2.5rem] flex items-center gap-6 group hover:bg-white hover:shadow-2xl transition-all border border-transparent hover:border-slate-100">
                                         <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-xl group-hover:bg-primary group-hover:text-white transition-all"><Scissors size={24} /></div>
                                         <div className="text-left flex flex-col gap-0.5">
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Xizmat</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Xizmat</span>
                                             <span className="text-slate-800 font-bold text-lg">{selectedUserDetails.service}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <button onClick={() => setSelectedUserDetails(null)} className="w-full h-18 bg-slate-900 text-white rounded-[2.2rem] font-black text-xs uppercase tracking-[0.4em] shadow-2xl active:scale-95 transition-all">Yopish</button>
+                                <button onClick={() => setSelectedUserDetails(null)} className="w-full h-18 bg-slate-900 text-white rounded-[2.2rem] font-bold text-xs uppercase tracking-[0.4em] shadow-2xl active:scale-95 transition-all">Yopish</button>
                             </motion.div>
                         </div>
                     )}
@@ -709,7 +706,7 @@ const Dashboard = () => {
 
                 <AnimatePresence>
                     {successToast && (
-                        <motion.div initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 50, scale: 0.9 }} className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[1300] bg-slate-900 text-white px-10 py-6 rounded-[2.5rem] font-black shadow-2xl flex items-center gap-6 text-xs uppercase tracking-widest border border-white/10 backdrop-blur-2xl">
+                        <motion.div initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 50, scale: 0.9 }} className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[1300] bg-slate-900 text-white px-10 py-6 rounded-[2.5rem] font-bold shadow-2xl flex items-center gap-6 text-xs uppercase tracking-widest border border-white/10 backdrop-blur-2xl">
                             <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-2xl"><Check size={20} /></div>
                             {successMessage}
                         </motion.div>

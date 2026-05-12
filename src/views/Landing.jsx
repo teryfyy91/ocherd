@@ -53,14 +53,13 @@ const Landing = () => {
                     </div>
                 </header>
 
-                <div className="relative">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                <div className="relative group">
                     <input
                         type="text"
                         placeholder="Salon qidirish..."
-                        className="w-full h-16 pl-16 pr-6 bg-slate-50 border-none rounded-[2rem] outline-none text-sm font-black text-slate-800 placeholder:text-slate-300 focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all"
+                        className="w-full h-16 px-8 pr-14 bg-slate-50 border-none rounded-[2rem] outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300 focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all shadow-sm"
                     />
-                    <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                    <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
                         <Filter size={18} />
                     </button>
                 </div>

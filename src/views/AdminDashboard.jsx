@@ -303,8 +303,8 @@ const AdminDashboard = () => {
             <div className="text-center relative py-12 md:py-20">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[150px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-4">
-                    <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">Boshqaruv Markazi</span>
-                    <h2 className="text-5xl md:text-8xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">
+                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-[0.3em]">Admin Paneli</span>
+                    <h2 className="text-3xl md:text-5xl font-bold text-slate-800 uppercase tracking-tight leading-none">
                         Xush Kelibsiz, <br /> <span className="text-primary italic">Admin</span>
                     </h2>
                 </motion.div>
@@ -320,8 +320,8 @@ const AdminDashboard = () => {
                     <div className="w-24 h-24 bg-primary/5 text-primary rounded-[2rem] flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all shadow-xl shadow-primary/5">
                         <Building2 size={48} />
                     </div>
-                    <h3 className="text-3xl font-black text-slate-800 italic uppercase mb-3">Salonlar</h3>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] max-w-[200px] leading-relaxed">Ro'yxatdan o'tgan va tasdiqlash kutilayotgan salonlar boshqaruvi</p>
+                    <h3 className="text-xl font-bold text-slate-800 uppercase mb-3">Salonlar</h3>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[7px] max-w-[200px] leading-relaxed">Salonlar boshqaruvi</p>
                 </motion.button>
 
                 <motion.button
@@ -333,8 +333,8 @@ const AdminDashboard = () => {
                     <div className="w-24 h-24 bg-blue-50 text-blue-500 rounded-[2rem] flex items-center justify-center mb-8 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-xl shadow-blue-100">
                         <Users size={48} />
                     </div>
-                    <h3 className="text-3xl font-black text-slate-800 italic uppercase mb-3">Statistika</h3>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] max-w-[200px] leading-relaxed">Foydalanuvchilar soni va platforma faolligi monitoringi</p>
+                    <h3 className="text-xl font-bold text-slate-800 uppercase mb-3">Statistika</h3>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[7px] max-w-[200px] leading-relaxed">Platforma faolligi</p>
                 </motion.button>
             </div>
         </div>
@@ -359,7 +359,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-4">
                         <button onClick={() => setActiveTab('gateway')} className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ChevronRight size={20} className="rotate-180" /></button>
-                        <h3 className="text-2xl font-black text-slate-800 italic uppercase tracking-tighter">Salonlar</h3>
+                        <h3 className="text-xl font-bold text-slate-800 italic uppercase tracking-tight">Salonlar</h3>
                     </div>
                     <div className="flex bg-slate-100 px-6 py-4 rounded-[2rem] gap-3 w-full md:w-96">
                         <SearchIcon size={18} className="text-slate-400" />
@@ -377,7 +377,7 @@ const AdminDashboard = () => {
                     <div className="flex flex-col gap-6">
                         <div className="flex items-center gap-3">
                             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                            <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Yangi so'rovlar ({pendingShops.length})</h4>
+                            <h4 className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Yangi so'rovlar ({pendingShops.length})</h4>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {pendingShops.map((s) => (
@@ -385,12 +385,12 @@ const AdminDashboard = () => {
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl opacity-50" />
                                     <div className="flex flex-col gap-8 relative z-10">
                                         <div className="flex items-center gap-5">
-                                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 font-black text-2xl">
+                                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 font-bold text-2xl">
                                                 {s.name[0]}
                                             </div>
                                             <div>
-                                                <h4 className="text-xl font-black text-slate-800 italic uppercase">{s.name}</h4>
-                                                <p className="text-[9px] text-red-400 font-black uppercase tracking-widest mt-1">Kutilmoqda</p>
+                                                <h4 className="text-xl font-bold text-slate-800 italic uppercase">{s.name}</h4>
+                                                <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest mt-1">Kutilmoqda</p>
                                             </div>
                                         </div>
                                         <div className="flex gap-3">
@@ -403,7 +403,7 @@ const AdminDashboard = () => {
                                                         handleDeleteShop(s.id);
                                                     }
                                                 }}
-                                                className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all disabled:opacity-50"
+                                                className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all disabled:opacity-50"
                                             >
                                                 {loading ? '...' : 'Bekor qilish'}
                                             </button>
@@ -416,7 +416,7 @@ const AdminDashboard = () => {
                                                         handleApproveShop(s.id);
                                                     }
                                                 }}
-                                                className="flex-[2] py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                                className="flex-[2] py-4 bg-primary text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                                             >
                                                 {loading ? <Loader2 className="animate-spin size-4" /> : 'Tasdiqlash'}
                                             </button>
@@ -429,17 +429,17 @@ const AdminDashboard = () => {
                 )}
 
                 <div className="flex flex-col gap-6">
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Barcha salonlar</h4>
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Barcha salonlar</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {filteredActive.map((s, i) => (
                             <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-lg shadow-slate-100 flex items-center justify-between group">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-primary font-black text-xl border border-slate-100 shadow-sm">
+                                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-primary font-bold text-xl border border-slate-100 shadow-sm">
                                         {s.name[0]}
                                     </div>
                                     <div>
-                                        <h4 className="text-lg font-black text-slate-800 uppercase italic leading-none">{s.name}</h4>
-                                        <p className="text-[9px] text-emerald-500 font-black uppercase tracking-widest mt-1">Faol</p>
+                                        <h4 className="text-lg font-bold text-slate-800 uppercase italic leading-none">{s.name}</h4>
+                                        <p className="text-[9px] text-emerald-500 font-bold uppercase tracking-widest mt-1">Faol</p>
                                     </div>
                                 </div>
                                 <button onClick={() => handleDeleteShop(s.id)} className="w-10 h-10 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all">
@@ -457,15 +457,15 @@ const AdminDashboard = () => {
         <div className="flex flex-col gap-10 pt-6">
             <div className="flex items-center gap-4">
                 <button onClick={() => setActiveTab('gateway')} className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shadow-sm"><ChevronRight size={20} className="rotate-180" /></button>
-                <h3 className="text-2xl font-black text-slate-800 italic uppercase tracking-tighter">Foydalanuvchilar</h3>
+                <h3 className="text-2xl font-bold text-slate-800 italic uppercase tracking-tighter">Foydalanuvchilar</h3>
             </div>
 
             <div className="bg-slate-900 border-none p-10 md:p-16 rounded-[4rem] text-center relative overflow-hidden w-full text-white shadow-2xl">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
                 <div className="w-20 h-20 bg-white/10 text-white rounded-[1.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl border border-white/5"><Users size={40} /></div>
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4">Tizim Faolligi</h4>
-                <p className="text-6xl md:text-8xl font-black italic tracking-tighter mb-4">{stats.totalUsers}</p>
-                <p className="text-slate-400 font-black uppercase tracking-widest text-[9px]">Jami ro'yxatdan o'tgan foydalanuvchilar</p>
+                <h4 className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] mb-4">Tizim Faolligi</h4>
+                <p className="text-5xl md:text-7xl font-bold italic tracking-tight mb-4">{stats.totalUsers}</p>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-[8px]">Jami ro'yxatdan o'tgan foydalanuvchilar</p>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-12 w-full max-w-4xl mx-auto">
                     {[
@@ -474,8 +474,8 @@ const AdminDashboard = () => {
                         { label: 'Bloklangan', val: 0, color: 'text-red-400' }
                     ].map((stat, i) => (
                         <div key={i} className="bg-white/5 backdrop-blur-md p-6 rounded-[2.5rem] border border-white/5">
-                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">{stat.label}</p>
-                            <p className={`text-2xl font-black ${stat.color}`}>{stat.val}</p>
+                            <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500 mb-1">{stat.label}</p>
+                            <p className={`text-2xl font-bold ${stat.color}`}>{stat.val}</p>
                         </div>
                     ))}
                 </div>
@@ -483,14 +483,14 @@ const AdminDashboard = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-white border border-slate-100 p-8 rounded-[3rem] shadow-xl">
-                    <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 ml-1">So'nggi harakatlar</h5>
+                    <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 ml-1">So'nggi harakatlar</h5>
                     <div className="flex flex-col gap-6">
                         {stats.recentActions.length > 0 ? stats.recentActions.map((item, i) => (
                             <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 border border-slate-100 rounded-[2rem] transition-all hover:bg-slate-100">
-                                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary font-black uppercase">{item.name[0]}</div>
+                                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary font-bold uppercase">{item.name[0]}</div>
                                 <div className="flex-1">
-                                    <p className="text-sm font-black text-slate-800 line-clamp-1 italic">{item.name} {item.action}</p>
-                                    <p className="text-[9px] text-slate-400 uppercase font-black mt-1 tracking-widest">{item.time}</p>
+                                    <p className="text-sm font-bold text-slate-800 line-clamp-1 italic">{item.name} {item.action}</p>
+                                    <p className="text-[9px] text-slate-400 uppercase font-bold mt-1 tracking-widest">{item.time}</p>
                                 </div>
                             </div>
                         )) : (
@@ -500,7 +500,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="bg-white border border-slate-100 p-8 rounded-[3rem] shadow-xl h-fit">
-                    <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 ml-1">Tizim holati</h5>
+                    <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 ml-1">Tizim holati</h5>
                     <div className="flex flex-col gap-4">
                         {[
                             { name: 'Server', status: 'Online', color: 'text-emerald-500', bg: 'bg-emerald-50' },
@@ -508,8 +508,8 @@ const AdminDashboard = () => {
                             { name: 'Xavfsizlik', status: 'Yaxshi', color: 'text-emerald-500', bg: 'bg-emerald-50' }
                         ].map((s, i) => (
                             <div key={i} className="flex justify-between items-center p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
-                                <span className="text-sm text-slate-600 font-black uppercase italic">{s.name}</span>
-                                <span className={`px-4 py-1.5 ${s.bg} ${s.color} text-[8px] font-black rounded-full uppercase tracking-widest`}>{s.status}</span>
+                                <span className="text-sm text-slate-600 font-bold uppercase italic">{s.name}</span>
+                                <span className={`px-4 py-1.5 ${s.bg} ${s.color} text-[8px] font-bold rounded-full uppercase tracking-widest`}>{s.status}</span>
                             </div>
                         ))}
                     </div>
@@ -566,8 +566,8 @@ const AdminDashboard = () => {
 
                                             <div className="p-8 md:p-10 border-b border-slate-100 flex flex-col justify-center bg-slate-50/50 shrink-0 relative z-40">
                                                 <div className="flex flex-col gap-1 pr-16">
-                                                    <h3 className="text-2xl md:text-3xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Bildirishnomalar</h3>
-                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">{notifications.length} ta yangi xabar</p>
+                                                    <h3 className="text-2xl md:text-3xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Bildirishnomalar</h3>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">{notifications.length} ta yangi xabar</p>
                                                 </div>
                                             </div>
 
@@ -586,24 +586,24 @@ const AdminDashboard = () => {
                                                             </div>
                                                             <div className="flex-1 flex flex-col gap-4">
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-100 text-indigo-600' : 'bg-primary/10 text-primary'}`}>
+                                                                    <span className={`text-[9px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full ${(n.type === 'new_salon_registration' || n.type === 'registration') ? 'bg-indigo-100 text-indigo-600' : 'bg-primary/10 text-primary'}`}>
                                                                         {(n.type === 'new_salon_registration' || n.type === 'registration') ? "Yangi Salon Tasdiqlash" : "Xabar"}
                                                                     </span>
-                                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic opacity-60">
+                                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic opacity-60">
                                                                         {new Date(n.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}
                                                                     </span>
                                                                 </div>
-                                                                <p className="text-lg md:text-xl font-black text-slate-800 leading-tight italic tracking-tight">{n.message}</p>
+                                                                <p className="text-lg md:text-xl font-bold text-slate-800 leading-tight italic tracking-tight">{n.message}</p>
 
                                                                 {n.salonDetails && (
                                                                     <div className="bg-white/80 backdrop-blur-xl border border-indigo-100/50 rounded-[2rem] p-6 flex flex-col gap-4 mt-2 shadow-sm">
                                                                         <div className="flex items-center gap-4">
                                                                             <User size={18} className="text-indigo-400" />
-                                                                            <span className="text-xs font-black text-slate-700 uppercase tracking-wider">{n.salonDetails.owner_name}</span>
+                                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{n.salonDetails.owner_name}</span>
                                                                         </div>
                                                                         <div className="flex items-center gap-4">
                                                                             <Phone size={18} className="text-indigo-400" />
-                                                                            <span className="text-xs font-black text-slate-700 tracking-widest">{n.salonDetails.owner_phone}</span>
+                                                                            <span className="text-xs font-bold text-slate-700 tracking-widest">{n.salonDetails.owner_phone}</span>
                                                                         </div>
                                                                         {n.salonDetails.description && (
                                                                             <p className="text-[10px] text-slate-500 font-bold italic line-clamp-2 mt-1 leading-relaxed border-t border-slate-100 pt-3">
@@ -626,7 +626,7 @@ const AdminDashboard = () => {
                                                                             refreshShops();
                                                                         }
                                                                     }}
-                                                                    className="flex-1 h-14 bg-white border border-red-100 text-red-500 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm active:scale-95"
+                                                                    className="flex-1 h-14 bg-white border border-red-100 text-red-500 rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-sm active:scale-95"
                                                                 >
                                                                     Rad etish
                                                                 </button>
@@ -639,7 +639,7 @@ const AdminDashboard = () => {
                                                                             refreshShops();
                                                                         }
                                                                     }}
-                                                                    className="flex-[2] h-14 bg-emerald-500 text-white rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
+                                                                    className="flex-[2] h-14 bg-emerald-500 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
                                                                 >
                                                                     Tasdiqlash
                                                                 </button>
@@ -651,7 +651,7 @@ const AdminDashboard = () => {
                                                         <div className="w-24 h-24 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
                                                             <Bell size={48} strokeWidth={1} />
                                                         </div>
-                                                        <p className="text-[11px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
+                                                        <p className="text-[11px] font-bold uppercase text-slate-400 tracking-[0.5em] italic">Hozircha bo'sh</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -660,7 +660,7 @@ const AdminDashboard = () => {
                                                 <div className="p-8 md:p-10 border-t border-slate-100 bg-slate-50/50 shrink-0">
                                                     <button
                                                         onClick={() => setNotifications([])}
-                                                        className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.4em] shadow-xl active:scale-95 transition-all"
+                                                        className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-bold text-[11px] uppercase tracking-[0.4em] shadow-xl active:scale-95 transition-all"
                                                     >
                                                         Barchasini tozalash
                                                     </button>
@@ -699,9 +699,9 @@ const AdminDashboard = () => {
                         <div className="flex flex-col gap-1.5 flex-1 relative z-10">
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Yangi Bildirishnoma</span>
+                                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-emerald-400">Yangi Bildirishnoma</span>
                             </div>
-                            <p className="text-base font-black italic tracking-tight leading-tight">{newNotificationToast}</p>
+                            <p className="text-base font-bold italic tracking-tight leading-tight">{newNotificationToast}</p>
                         </div>
 
                         <button
@@ -728,7 +728,7 @@ const AdminDashboard = () => {
                         {activeTab === 'gateway' && <SuperGatewayTab />}
                         {activeTab === 'salons' && <SuperSalonsTab />}
                         {activeTab === 'super-users' && <SuperUsersTab />}
-                        {activeTab === 'settings' && <div className="py-32 text-center text-slate-300 font-black uppercase tracking-[0.5em] italic">Yaqinda...</div>}
+                        {activeTab === 'settings' && <div className="py-32 text-center text-slate-300 font-bold uppercase tracking-[0.5em] italic">Yaqinda...</div>}
                     </motion.div>
                 </AnimatePresence>
             </main>

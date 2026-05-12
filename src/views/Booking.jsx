@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Clock, User, Phone, CheckCircle2, ChevronLeft,
+    Clock, User, Phone, CheckCircle2, CheckCircle, ChevronLeft,
     Share2, Star, MessageSquare, Navigation, Globe,
     X, MapPin, Scissors
 } from 'lucide-react';
@@ -149,13 +149,13 @@ const Booking = () => {
 
                 <div className="absolute bottom-12 left-8 right-8 z-10">
                     <div className="flex flex-col gap-2">
-                        <span className="bg-primary/20 backdrop-blur-md text-primary px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] w-fit border border-primary/20">PREMIUM SALON</span>
-                        <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{shopInfo.name}</h1>
+                        <span className="bg-primary/20 backdrop-blur-md text-primary px-4 py-1 rounded-full text-[8px] font-bold uppercase tracking-[0.3em] w-fit border border-primary/20">SALON</span>
+                        <h1 className="text-2xl font-bold text-white tracking-tight uppercase leading-none">{shopInfo.name}</h1>
                         <div className="flex flex-wrap items-center gap-4 mt-3">
-                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[10px] font-black border border-white/10">
+                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[9px] font-bold border border-white/10">
                                 <Star size={12} fill="#fbbf24" className="text-[#fbbf24]" /> 4.9 (500+ Izoh)
                             </div>
-                            <div className="flex items-center gap-1.5 text-white/70 text-[10px] font-black uppercase tracking-widest">
+                            <div className="flex items-center gap-1.5 text-white/70 text-[9px] font-bold uppercase tracking-widest">
                                 <CheckCircle size={14} className="text-secondary" /> Tasdiqlangan
                             </div>
                         </div>
@@ -177,7 +177,7 @@ const Booking = () => {
                     <div className={`w-full h-16 rounded-[2rem] flex items-center justify-center transition-all border ${showPhoneDisplay ? 'bg-blue-500 text-white border-blue-500 shadow-xl' : 'text-blue-500 bg-blue-50 border-blue-100/50 shadow-sm'}`}>
                         <Phone size={24} />
                     </div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qo'ng'iroq</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Qo'ng'iroq</span>
                 </button>
 
                 <button
@@ -187,7 +187,7 @@ const Booking = () => {
                     <div className={`w-full h-16 rounded-[2rem] flex items-center justify-center transition-all border ${showServicesList ? 'bg-primary text-white border-primary shadow-xl' : 'text-primary bg-purple-50 border-purple-100/50 shadow-sm'}`}>
                         <Scissors size={24} />
                     </div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Xizmatlar</span>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Xizmatlar</span>
                 </button>
             </div>
 
@@ -204,8 +204,8 @@ const Booking = () => {
                             className="flex items-center justify-between p-6 rounded-[2.5rem] bg-blue-50 border border-blue-100 shadow-xl shadow-blue-100/50 group"
                         >
                             <div className="flex flex-col">
-                                <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Raqamga bosib qo'ng'iroq qiling</span>
-                                <span className="text-xl font-black text-blue-600 tracking-[0.1em]">{salonPhone}</span>
+                                <span className="text-[7px] font-bold text-blue-400 uppercase tracking-widest mb-1">Raqamga bosib qo'ng'iroq qiling</span>
+                                <span className="text-lg font-bold text-blue-600 tracking-[0.1em]">{salonPhone}</span>
                             </div>
                             <div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                 <Phone size={20} fill="currentColor" />
@@ -226,7 +226,7 @@ const Booking = () => {
                         <div className="flex flex-col gap-6 p-10 rounded-[3.5rem] bg-slate-900 text-white shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
                             <div className="flex justify-between items-center relative z-10">
-                                <h3 className="text-xl font-black uppercase italic tracking-tighter">Xizmatlar ro'yxati</h3>
+                                <h3 className="text-base font-bold uppercase tracking-tight">Xizmatlar ro'yxat</h3>
                                 <button onClick={() => setShowServicesList(false)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
                                     <X size={18} />
                                 </button>
@@ -238,8 +238,8 @@ const Booking = () => {
                                     return (
                                         <div key={idx} className="flex justify-between items-center p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white/10 transition-all group">
                                             <div className="flex flex-col gap-1">
-                                                <span className="font-black uppercase italic text-sm tracking-tight">{sName}</span>
-                                                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{sPrice.toLocaleString()} SO'M</span>
+                                                <span className="font-bold uppercase italic text-sm tracking-tight">{sName}</span>
+                                                <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{sPrice.toLocaleString()} SO'M</span>
                                             </div>
                                             <button
                                                 onClick={() => {
@@ -248,14 +248,14 @@ const Booking = () => {
                                                     setStep(2);
                                                     setShowServicesList(false);
                                                 }}
-                                                className="px-5 py-2.5 bg-primary rounded-xl font-black text-[9px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                                className="px-5 py-2.5 bg-primary rounded-xl font-bold text-[9px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
                                             >
                                                 Tanlash
                                             </button>
                                         </div>
                                     );
                                 }) : (
-                                    <div className="py-10 text-center opacity-40 text-[10px] font-black uppercase tracking-widest">Hozircha xizmatlar yo'q</div>
+                                    <div className="py-10 text-center opacity-40 text-[10px] font-bold uppercase tracking-widest">Hozircha xizmatlar yo'q</div>
                                 )}
                             </div>
                         </div>
@@ -264,16 +264,16 @@ const Booking = () => {
             </AnimatePresence>
 
             <div className="px-8 flex flex-col gap-4 mt-4">
-                <h2 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Salon haqida</h2>
-                <p className="text-slate-400 text-sm leading-relaxed font-bold uppercase tracking-wide opacity-80">
+                <h2 className="text-base font-bold text-slate-800 uppercase leading-none tracking-tight">Salon haqida</h2>
+                <p className="text-slate-400 text-xs leading-relaxed font-bold uppercase tracking-wide opacity-80">
                     {shopInfo.name} da premium xizmatdan bahra oling. Professional ustalarimiz sizga eng zamonaviy stildagi ko'rinishni taqdim etadilar.
                 </p>
             </div>
 
             <div className="px-8 flex flex-col gap-6 mt-4 pb-12">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">Ishlardan namunalar</h2>
-                    <button className="text-primary text-[10px] font-black uppercase tracking-widest border-b-2 border-primary/10">Barchasi</button>
+                    <h2 className="text-base font-bold text-slate-800 uppercase leading-none tracking-tight">Ishlardan namunalar</h2>
+                    <button className="text-primary text-[8px] font-bold uppercase tracking-widest border-b-2 border-primary/10">Barchasi</button>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-6">
                     {galleryImages.map((work, i) => (
@@ -287,7 +287,7 @@ const Booking = () => {
             <div className="fixed bottom-10 left-8 right-8 z-40">
                 <button
                     onClick={() => setIsBookingOpen(true)}
-                    className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 active:scale-95 transition-all flex items-center justify-center gap-4"
+                    className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-bold text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 active:scale-95 transition-all flex items-center justify-center gap-4"
                 >
                     <Clock size={18} className="text-primary" /> Navbat olish
                 </button>
@@ -315,7 +315,7 @@ const Booking = () => {
                             <AnimatePresence mode="wait">
                                 {step === 1 && (
                                     <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
-                                        <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Xizmatni tanlang</h3>
+                                        <h3 className="text-2xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Xizmatni tanlang</h3>
                                         <div className="flex flex-col gap-4">
                                             {shopInfo.services.map((service, idx) => {
                                                 const parsed = typeof service === 'string' && service.startsWith('{') ? JSON.parse(service) : service;
@@ -329,23 +329,23 @@ const Booking = () => {
                                                         className={`p-6 rounded-[2.5rem] border transition-all flex items-center justify-between ${isSel ? 'border-primary bg-purple-50/50 shadow-xl shadow-purple-100' : 'border-slate-100 bg-slate-50/50'}`}
                                                     >
                                                         <div className="text-left">
-                                                            <div className="font-black text-slate-800 uppercase italic tracking-tight">{sName}</div>
-                                                            <div className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">{sPrice.toLocaleString()} So'm</div>
+                                                            <div className="font-bold text-slate-800 uppercase italic tracking-tight">{sName}</div>
+                                                            <div className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">{sPrice.toLocaleString()} So'm</div>
                                                         </div>
                                                         <div className={`w-6 h-6 rounded-full border-2 transition-all ${isSel ? 'bg-primary border-primary scale-110' : 'border-slate-200 bg-white'}`} />
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <button disabled={!selectedService} onClick={() => setStep(2)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Davom etish</button>
+                                        <button disabled={!selectedService} onClick={() => setStep(2)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Davom etish</button>
                                     </motion.div>
                                 )}
 
                                 {step === 2 && (
                                     <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Vaqtni tanlang</h3>
-                                            <button onClick={() => setStep(1)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
+                                            <h3 className="text-2xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Vaqtni tanlang</h3>
+                                            <button onClick={() => setStep(1)} className="text-[9px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
                                         </div>
                                         <div className="grid grid-cols-3 gap-4">
                                             {timeSlots.map(time => {
@@ -358,21 +358,21 @@ const Booking = () => {
                                                         onClick={() => setSelectedTime(time)}
                                                         className={`h-16 rounded-[1.5rem] border flex flex-col items-center justify-center transition-all ${isBooked ? 'opacity-20 bg-slate-50 border-transparent grayscale' : isSel ? 'border-primary bg-purple-50 text-primary shadow-lg shadow-purple-100' : 'border-slate-100 bg-white shadow-sm'}`}
                                                     >
-                                                        <span className="text-lg font-black tracking-tighter leading-none">{time}</span>
-                                                        <span className="text-[7px] font-black uppercase tracking-widest mt-1">{isBooked ? 'Band' : 'Ochiq'}</span>
+                                                        <span className="text-lg font-bold tracking-tighter leading-none">{time}</span>
+                                                        <span className="text-[7px] font-bold uppercase tracking-widest mt-1">{isBooked ? 'Band' : 'Ochiq'}</span>
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <button disabled={!selectedTime} onClick={() => setStep(3)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Tasdiqlash</button>
+                                        <button disabled={!selectedTime} onClick={() => setStep(3)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Tasdiqlash</button>
                                     </motion.div>
                                 )}
 
                                 {step === 3 && (
                                     <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">Ma'lumotlar</h3>
-                                            <button onClick={() => setStep(2)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
+                                            <h3 className="text-2xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Ma'lumotlar</h3>
+                                            <button onClick={() => setStep(2)} className="text-[9px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
                                         </div>
                                         <div className="flex flex-col gap-4">
                                             <div className="relative">
@@ -382,7 +382,7 @@ const Booking = () => {
                                                     value={formData.name}
                                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                                     placeholder="Ismingiz"
-                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-black text-sm outline-none"
+                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-bold text-sm outline-none"
                                                 />
                                             </div>
                                             <div className="relative">
@@ -392,20 +392,20 @@ const Booking = () => {
                                                     value={formData.phone}
                                                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
                                                     placeholder="Telefon raqamingiz"
-                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-black text-sm outline-none"
+                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-bold text-sm outline-none"
                                                 />
                                             </div>
                                             <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 flex flex-col gap-3 mt-4">
                                                 <div className="flex justify-between">
-                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Ma'lumotlar</span>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ma'lumotlar</span>
                                                 </div>
                                                 <div className="flex justify-between items-end">
-                                                    <span className="text-lg font-black text-slate-800 uppercase italic leading-none">{selectedService}</span>
-                                                    <span className="text-2xl font-black text-primary tracking-tighter leading-none">{selectedTime}</span>
+                                                    <span className="text-lg font-bold text-slate-800 uppercase italic leading-none">{selectedService}</span>
+                                                    <span className="text-2xl font-bold text-primary tracking-tighter leading-none">{selectedTime}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={handleSubmit} className="w-full h-16 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all">Yakunlash</button>
+                                        <button onClick={handleSubmit} className="w-full h-16 bg-primary text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all">Yakunlash</button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
