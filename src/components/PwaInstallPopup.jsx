@@ -88,85 +88,102 @@ const PwaInstallPopup = () => {
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ y: 150, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 150, opacity: 0 }}
-                    transition={{ type: "spring", bounce: 0.25, duration: 0.6 }}
-                    className="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 z-50"
+                    initial={{ y: 20, opacity: 0, scale: 0.95 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 20, opacity: 0, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 w-[calc(100%-2rem)] md:w-[400px] z-[100]"
                 >
-                    {/* Glassmorphism Wrapper */}
-                    <div className="relative rounded-2xl overflow-hidden glass shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] border border-primary/20">
-                        {/* Dark Gradient Background: Black -> Dark Green -> Emerald */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-black via-[#012217] to-primary/20 opacity-90"></div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg/90 to-transparent"></div>
+                    <div className="relative group overflow-hidden rounded-[2rem] p-px bg-gradient-to-b from-white/20 to-white/5 luxury-shadow">
+                        {/* Background with Blur */}
+                        <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-2xl" />
 
-                        <div className="relative p-5 flex flex-col gap-4">
+                        {/* Animated Mesh Gradient Background */}
+                        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_-20%,#7C3AED,transparent_60%)]" />
+
+                        <div className="relative p-6 flex flex-col gap-6">
+                            {/* Close Button */}
                             <button
                                 onClick={handleClose}
-                                className="absolute top-3 right-3 text-white/50 hover:text-white transition-colors p-1"
-                                aria-label="Yopish"
+                                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all border border-white/10"
                             >
-                                <X size={20} />
+                                <X size={16} />
                             </button>
 
                             {showIosInstruction ? (
-                                <div className="flex flex-col gap-4 py-2 mt-2 animate-in fade-in zoom-in duration-300">
-                                    <h3 className="text-white font-bold text-sm leading-tight text-center mb-2">
-                                        iPhone'da o'rnatish yo'riqnomasi
+                                <div className="flex flex-col gap-5 py-2 mt-2">
+                                    <h3 className="text-white font-bold text-lg leading-tight text-center mb-2 italic tracking-tight">
+                                        iPhone'da o'rnatish
                                     </h3>
 
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center">
+                                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
+                                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/20">
                                             <Share className="text-primary" size={20} />
                                         </div>
-                                        <p className="text-white/80 text-xs font-medium leading-snug">
-                                            Pastdagi menyudan <strong className="text-white">Ulashish (Share)</strong> tugmasini bosing.
+                                        <p className="text-slate-300 text-[13px] font-medium leading-snug">
+                                            Pastdagi menyudan <strong className="text-white font-bold italic">Ulashish</strong> tugmasini bosing.
                                         </p>
                                     </div>
 
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center">
+                                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
+                                        <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/20">
                                             <PlusSquare className="text-primary" size={20} />
                                         </div>
-                                        <p className="text-white/80 text-xs font-medium leading-snug">
-                                            Menyudan <strong className="text-white">Asosiy ekranga qo'shish (Add to Home Screen)</strong> ni tanlang.
+                                        <p className="text-slate-300 text-[13px] font-medium leading-snug">
+                                            Menyudan <strong className="text-white font-bold italic">Asosiy ekranga qo'shish</strong> ni tanlang.
                                         </p>
                                     </div>
 
                                     <div className="w-full flex flex-col items-center mt-3 animate-bounce">
-                                        <span className="text-primary/70 text-[10px] uppercase font-bold tracking-widest mb-1">Pastga bosing</span>
-                                        <div className="w-1 h-8 rounded-full bg-gradient-to-b from-primary/50 to-transparent"></div>
+                                        <span className="text-primary/70 text-[9px] uppercase font-bold tracking-[0.3em] mb-2">Pastga bosing</span>
+                                        <div className="w-1 h-10 rounded-full bg-gradient-to-b from-primary to-transparent"></div>
                                     </div>
                                 </div>
                             ) : (
                                 <>
-                                    <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-black/40 border border-primary/30 flex items-center justify-center flex-shrink-0 animate-glow backdrop-blur-md">
-                                            <Download className="text-primary" size={24} />
+                                    <div className="flex items-start gap-5">
+                                        {/* Icon with Glow */}
+                                        <div className="relative flex-shrink-0">
+                                            <div className="absolute inset-0 bg-primary/40 blur-xl animate-pulse rounded-full" />
+                                            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center border border-white/20 shadow-lg">
+                                                {isDownloading ? (
+                                                    <Loader2 className="text-white animate-spin" size={28} />
+                                                ) : (
+                                                    <Download className="text-white animate-float-fast" size={28} />
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="pr-4">
-                                            <h3 className="text-white font-bold text-sm leading-tight mb-1">
-                                                App sifatida o‘rnatmoqchimisiz?
+
+                                        <div className="flex-1 pt-1">
+                                            <h3 className="text-white font-bold text-lg leading-tight mb-1.5 tracking-tight italic">
+                                                Ilovani O'rnatish
                                             </h3>
-                                            <p className="text-white/60 text-xs font-medium">
-                                                Tezroq va qulayroq foydalanish uchun
+                                            <p className="text-slate-400 text-[13px] leading-relaxed font-medium">
+                                                Tezroq va qulayroq foydalanish uchun asosiy ekranga qo'shib oling.
                                             </p>
                                         </div>
                                     </div>
 
+                                    {/* Action Button */}
                                     <button
                                         onClick={handleInstall}
                                         disabled={isDownloading}
-                                        className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-primary to-[#00DAC2] text-[#0B0F14] shadow-[0_0_20px_rgba(0,200,151,0.3)] hover:shadow-[0_0_30px_rgba(0,200,151,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:active:scale-100"
+                                        className="relative w-full group/btn h-14 flex items-center justify-center disabled:opacity-50"
                                     >
-                                        {isDownloading ? (
-                                            <>
-                                                <Loader2 className="animate-spin" size={20} />
-                                                Yuklanmoqda...
-                                            </>
-                                        ) : (
-                                            "⬇ Yuklab olish"
-                                        )}
+                                        <div className="absolute inset-0 bg-primary rounded-2xl transition-all duration-300 group-hover/btn:scale-[1.02] group-hover/btn:shadow-[0_0_30px_rgba(124,58,237,0.4)]" />
+                                        <div className="relative flex items-center gap-2 text-white font-bold text-[13px] uppercase tracking-widest">
+                                            {isDownloading ? (
+                                                <>
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                    Yuklanmoqda...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Download size={18} className="group-hover/btn:translate-y-1 transition-transform" />
+                                                    O'rnatish
+                                                </>
+                                            )}
+                                        </div>
                                     </button>
                                 </>
                             )}

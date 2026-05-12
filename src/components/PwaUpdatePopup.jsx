@@ -9,11 +9,10 @@ const PwaUpdatePopup = () => {
         updateServiceWorker,
     } = useRegisterSW({
         onRegistered(r) {
-            // Optional: periodically check for updates automatically
             if (r) {
                 setInterval(() => {
                     r.update();
-                }, 60 * 60 * 1000); // Check every hour
+                }, 60 * 60 * 1000);
             }
         },
         onRegisterError(error) {
@@ -22,17 +21,14 @@ const PwaUpdatePopup = () => {
     });
 
     const handleUpdate = async () => {
-        // Update function
         updateServiceWorker(true);
     };
 
     const handleClose = () => {
         setNeedRefresh(false);
-        // Sessiya davomida boshqa bezovta qilmasligi uchun
         sessionStorage.setItem('pwa_update_dismissed', 'true');
     };
 
-    // Agar sessiyada yopilgan bo'lsa, ko'rsatmaymiz
     if (sessionStorage.getItem('pwa_update_dismissed') === 'true') {
         return null;
     }
@@ -41,46 +37,57 @@ const PwaUpdatePopup = () => {
         <AnimatePresence>
             {needRefresh && (
                 <motion.div
-                    initial={{ y: 150, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 150, opacity: 0 }}
-                    transition={{ type: "spring", bounce: 0.25, duration: 0.6 }}
-                    className="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 z-[60]"
+                    initial={{ y: 20, opacity: 0, scale: 0.95 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 20, opacity: 0, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 w-[calc(100%-2rem)] md:w-[400px] z-[100]"
                 >
-                    {/* Glassmorphism Wrapper */}
-                    <div className="relative rounded-2xl overflow-hidden glass shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] border border-primary/20">
-                        {/* Dark Gradient Background: Black -> Dark Green -> Emerald */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-black via-[#012217] to-primary/20 opacity-90"></div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg/90 to-transparent"></div>
+                    <div className="relative group overflow-hidden rounded-[2rem] p-px bg-gradient-to-b from-white/20 to-white/5 luxury-shadow">
+                        {/* Background with Blur */}
+                        <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-2xl" />
 
-                        <div className="relative p-5 flex flex-col gap-4">
+                        {/* Animated Mesh Gradient Background */}
+                        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_-20%,#7C3AED,transparent_60%)]" />
+
+                        <div className="relative p-6 flex flex-col gap-6">
+                            {/* Close Button */}
                             <button
                                 onClick={handleClose}
-                                className="absolute top-3 right-3 text-white/50 hover:text-white transition-colors p-1"
-                                aria-label="Yopish"
+                                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all border border-white/10"
                             >
-                                <X size={20} />
+                                <X size={16} />
                             </button>
 
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-black/40 border border-primary/30 flex items-center justify-center flex-shrink-0 animate-glow backdrop-blur-md">
-                                    <RefreshCw className="text-primary" size={24} />
+                            <div className="flex items-start gap-5">
+                                {/* Icon with Glow */}
+                                <div className="relative flex-shrink-0">
+                                    <div className="absolute inset-0 bg-primary/40 blur-xl animate-pulse rounded-full" />
+                                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center border border-white/20 shadow-lg">
+                                        <RefreshCw className="text-white animate-spin-slow" size={28} />
+                                    </div>
                                 </div>
-                                <div className="pr-4">
-                                    <h3 className="text-white font-bold text-sm leading-tight mb-1">
+
+                                <div className="flex-1 pt-1">
+                                    <h3 className="text-white font-bold text-lg leading-tight mb-1.5 tracking-tight">
                                         Yangi versiya mavjud
                                     </h3>
-                                    <p className="text-white/60 text-xs font-medium">
-                                        Ilovangiz tezroq va barqaror ishlashi uchun yangilang
+                                    <p className="text-slate-400 text-[13px] leading-relaxed font-medium">
+                                        Ilovangiz tezroq va barqaror ishlashi uchun yangi versiyaga yangilang.
                                     </p>
                                 </div>
                             </div>
 
+                            {/* Action Button */}
                             <button
                                 onClick={handleUpdate}
-                                className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-primary to-[#00DAC2] text-[#0B0F14] shadow-[0_0_20px_rgba(0,200,151,0.3)] hover:shadow-[0_0_30px_rgba(0,200,151,0.5)] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                className="relative w-full group/btn h-12 flex items-center justify-center"
                             >
-                                🔄 Yangilash
+                                <div className="absolute inset-0 bg-primary rounded-2xl transition-all duration-300 group-hover/btn:scale-[1.02] group-hover/btn:shadow-[0_0_30px_rgba(124,58,237,0.4)]" />
+                                <div className="relative flex items-center gap-2 text-white font-bold text-sm">
+                                    <RefreshCw size={16} className="group-hover/btn:rotate-180 transition-transform duration-500" />
+                                    Yangilash
+                                </div>
                             </button>
                         </div>
                     </div>
