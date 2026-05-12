@@ -302,20 +302,22 @@ const Booking = () => {
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            className="bg-white w-full max-w-lg rounded-t-[4rem] p-10 pb-16 relative z-10 shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.1)] overflow-y-auto max-h-[90vh] scrollbar-hide border-t border-slate-50"
+                            className="bg-white w-full max-w-lg rounded-t-[4rem] px-12 pt-24 pb-12 relative z-10 shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.1)] overflow-y-auto h-[95vh] scrollbar-hide border-t border-slate-50"
                         >
-                            <div className="w-16 h-1.5 bg-slate-100 rounded-full mx-auto mb-10" />
+                            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-12 h-1 bg-slate-100 rounded-full" />
 
-                            <div className="flex mb-10 gap-3">
+                            <div className="flex mb-10 gap-2">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= i ? 'bg-primary' : 'bg-slate-100'}`} />
+                                    <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-500 ${step >= i ? 'bg-primary' : 'bg-slate-100'}`} />
                                 ))}
                             </div>
 
                             <AnimatePresence mode="wait">
                                 {step === 1 && (
-                                    <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
-                                        <h3 className="text-2xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Xizmatni tanlang</h3>
+                                    <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8 w-full">
+                                        <div className="w-full text-center">
+                                            <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight">Xizmatni tanlang</h3>
+                                        </div>
                                         <div className="flex flex-col gap-4">
                                             {shopInfo.services.map((service, idx) => {
                                                 const parsed = typeof service === 'string' && service.startsWith('{') ? JSON.parse(service) : service;
@@ -326,28 +328,28 @@ const Booking = () => {
                                                     <button
                                                         key={idx}
                                                         onClick={() => setSelectedService(sName)}
-                                                        className={`p-6 rounded-[2.5rem] border transition-all flex items-center justify-between ${isSel ? 'border-primary bg-purple-50/50 shadow-xl shadow-purple-100' : 'border-slate-100 bg-slate-50/50'}`}
+                                                        className={`p-8 rounded-[2.5rem] border transition-all flex items-center justify-between ${isSel ? 'border-primary bg-purple-50 shadow-xl shadow-purple-100/20' : 'border-slate-100 bg-slate-50/30'}`}
                                                     >
-                                                        <div className="text-left">
-                                                            <div className="font-bold text-slate-800 uppercase italic tracking-tight">{sName}</div>
-                                                            <div className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">{sPrice.toLocaleString()} So'm</div>
+                                                        <div className="text-left flex-1 mr-4 overflow-hidden">
+                                                            <div className="font-bold text-slate-800 uppercase text-lg tracking-tight truncate mb-1">{sName}</div>
+                                                            <div className="text-sm font-bold text-primary uppercase tracking-widest">{sPrice.toLocaleString()} So'm</div>
                                                         </div>
-                                                        <div className={`w-6 h-6 rounded-full border-2 transition-all ${isSel ? 'bg-primary border-primary scale-110' : 'border-slate-200 bg-white'}`} />
+                                                        <div className={`w-6 h-6 rounded-full border-2 transition-all flex-shrink-0 ${isSel ? 'bg-primary border-primary scale-125' : 'border-slate-200 bg-white'}`} />
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <button disabled={!selectedService} onClick={() => setStep(2)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Davom etish</button>
+                                        <button disabled={!selectedService} onClick={() => setStep(2)} className="w-full h-15 bg-slate-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Davom etish</button>
                                     </motion.div>
                                 )}
 
                                 {step === 2 && (
-                                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="text-2xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Vaqtni tanlang</h3>
-                                            <button onClick={() => setStep(1)} className="text-[9px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
+                                    <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8 w-full">
+                                        <div className="flex flex-col items-center text-center w-full gap-3">
+                                            <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight">Vaqtni tanlang</h3>
+                                            <button onClick={() => setStep(1)} className="px-6 py-2 bg-slate-50 text-slate-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-100 active:scale-95 transition-all">Orqaga qaytish</button>
                                         </div>
-                                        <div className="grid grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-3 gap-3">
                                             {timeSlots.map(time => {
                                                 const isBooked = bookedSlots.includes(time);
                                                 const isSel = selectedTime === time;
@@ -356,56 +358,54 @@ const Booking = () => {
                                                         key={time}
                                                         disabled={isBooked}
                                                         onClick={() => setSelectedTime(time)}
-                                                        className={`h-16 rounded-[1.5rem] border flex flex-col items-center justify-center transition-all ${isBooked ? 'opacity-20 bg-slate-50 border-transparent grayscale' : isSel ? 'border-primary bg-purple-50 text-primary shadow-lg shadow-purple-100' : 'border-slate-100 bg-white shadow-sm'}`}
+                                                        className={`h-14 rounded-2xl border flex flex-col items-center justify-center transition-all ${isBooked ? 'opacity-20 bg-slate-50 border-transparent' : isSel ? 'border-primary bg-purple-50 text-primary shadow-lg shadow-purple-100' : 'border-slate-100 bg-white shadow-sm'}`}
                                                     >
-                                                        <span className="text-lg font-bold tracking-tighter leading-none">{time}</span>
-                                                        <span className="text-[7px] font-bold uppercase tracking-widest mt-1">{isBooked ? 'Band' : 'Ochiq'}</span>
+                                                        <span className="text-base font-bold tracking-tight">{time}</span>
+                                                        <span className="text-[7px] font-bold uppercase tracking-widest mt-0.5">{isBooked ? 'Band' : 'Ochiq'}</span>
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <button disabled={!selectedTime} onClick={() => setStep(3)} className="w-full h-16 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Tasdiqlash</button>
+                                        <button disabled={!selectedTime} onClick={() => setStep(3)} className="w-full h-15 bg-slate-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-30 mt-4 transition-all">Tasdiqlash</button>
                                     </motion.div>
                                 )}
 
                                 {step === 3 && (
-                                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="text-2xl font-bold text-slate-800 uppercase italic tracking-tighter leading-none">Ma'lumotlar</h3>
-                                            <button onClick={() => setStep(2)} className="text-[9px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200">Orqaga</button>
+                                    <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8 w-full">
+                                        <div className="flex flex-col items-center text-center w-full gap-3">
+                                            <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight">Ma'lumotlar</h3>
+                                            <button onClick={() => setStep(2)} className="px-6 py-2 bg-slate-50 text-slate-400 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-100 active:scale-95 transition-all">Orqaga qaytish</button>
                                         </div>
-                                        <div className="flex flex-col gap-4">
+                                        <div className="flex flex-col gap-3">
                                             <div className="relative">
-                                                <User className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                                                 <input
                                                     type="text"
                                                     value={formData.name}
                                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                                     placeholder="Ismingiz"
-                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-bold text-sm outline-none"
+                                                    className="w-full h-15 px-8 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-bold text-xs outline-none"
                                                 />
                                             </div>
                                             <div className="relative">
-                                                <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                                                 <input
                                                     type="tel"
                                                     value={formData.phone}
                                                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
                                                     placeholder="Telefon raqamingiz"
-                                                    className="w-full h-16 pl-16 pr-6 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-bold text-sm outline-none"
+                                                    className="w-full h-15 px-8 rounded-2xl bg-slate-50 border border-transparent focus:bg-white focus:border-primary transition-all font-bold text-xs outline-none"
                                                 />
                                             </div>
-                                            <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 flex flex-col gap-3 mt-4">
+                                            <div className="p-5 rounded-[2rem] bg-slate-50 border border-slate-100 flex flex-col gap-3 mt-4">
                                                 <div className="flex justify-between">
-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ma'lumotlar</span>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Xizmat va Vaqt</span>
                                                 </div>
-                                                <div className="flex justify-between items-end">
-                                                    <span className="text-lg font-bold text-slate-800 uppercase italic leading-none">{selectedService}</span>
-                                                    <span className="text-2xl font-bold text-primary tracking-tighter leading-none">{selectedTime}</span>
+                                                <div className="flex justify-between items-center gap-4">
+                                                    <span className="text-sm font-bold text-slate-800 uppercase truncate flex-1">{selectedService}</span>
+                                                    <span className="text-xl font-bold text-primary tracking-tighter leading-none">{selectedTime}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={handleSubmit} className="w-full h-16 bg-primary text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all">Yakunlash</button>
+                                        <button onClick={handleSubmit} className="w-full h-15 bg-primary text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all">Yakunlash</button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

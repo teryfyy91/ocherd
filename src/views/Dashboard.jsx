@@ -493,20 +493,20 @@ const Dashboard = () => {
 
                         {managementTab === 'stats' && (
                             <motion.div key="stats" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="space-y-10">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-slate-900 px-2 py-5 rounded-[2rem] flex flex-col items-center text-center shadow-xl relative overflow-hidden">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-slate-900 px-6 py-6 rounded-[2rem] flex flex-col items-center text-center shadow-xl relative overflow-hidden">
                                         <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/20 rounded-full blur-2xl" />
-                                        <span className="text-[7px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Bugun</span>
+                                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Bugun</span>
                                         <div className="flex items-center gap-1.5 mb-1.5">
-                                            <span className="text-xl font-bold text-white">{completedToday.length}</span>
-                                            <TrendingUp size={14} className="text-primary" />
+                                            <span className="text-2xl font-bold text-white">{completedToday.length}</span>
+                                            <TrendingUp size={16} className="text-primary" />
                                         </div>
-                                        <span className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Mijozlar</span>
+                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Mijozlar</span>
                                     </div>
-                                    <div className="bg-white border border-slate-100 px-2 py-5 rounded-[2rem] flex flex-col items-center text-center shadow-xl shadow-slate-50">
-                                        <span className="text-[7px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Daromad</span>
-                                        <span className="text-xl font-bold text-slate-800 mb-1.5">{incomeToday.toLocaleString()}</span>
-                                        <span className="text-[7px] font-bold text-primary uppercase tracking-widest">SO'M</span>
+                                    <div className="bg-white border border-slate-100 px-6 py-6 rounded-[2rem] flex flex-col items-center text-center shadow-xl shadow-slate-50">
+                                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Daromad</span>
+                                        <span className="text-2xl font-bold text-slate-800 mb-1.5">{incomeToday.toLocaleString()}</span>
+                                        <span className="text-[8px] font-bold text-primary uppercase tracking-widest">SO'M</span>
                                     </div>
                                 </div>
 
@@ -535,7 +535,7 @@ const Dashboard = () => {
                             <motion.div key="reviews" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
                                 <div className="bg-white border border-slate-100 p-10 rounded-[4rem] shadow-2xl shadow-slate-100 flex items-center justify-between">
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold text-slate-800 uppercase italic leading-none tracking-tight">O'rtacha Reyting</h3>
+                                        <h3 className="text-xl font-bold text-slate-800 uppercase leading-none">O'rtacha Reyting</h3>
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{reviews.length} mijoz fikri</p>
                                     </div>
                                     <div className="bg-amber-50 p-6 rounded-[2.5rem] flex flex-col items-center gap-2">
@@ -556,7 +556,7 @@ const Dashboard = () => {
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center font-bold text-primary text-lg uppercase transition-all group-hover:bg-primary group-hover:text-white group-hover:rotate-6">{(review.user_name || 'U')[0]}</div>
                                                     <div className="flex flex-col">
-                                                        <h5 className="font-bold text-slate-800 text-base italic uppercase tracking-tight">{review.user_name || 'Mijoz'}</h5>
+                                                        <h5 className="font-bold text-slate-800 text-base uppercase">{review.user_name || 'Mijoz'}</h5>
                                                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
@@ -564,7 +564,7 @@ const Dashboard = () => {
                                                     {[...Array(5)].map((_, i) => <Star key={i} size={10} className={i < review.rating ? "fill-amber-400 text-amber-400" : "text-slate-200"} />)}
                                                 </div>
                                             </div>
-                                            <p className="text-slate-500 font-bold text-sm italic leading-relaxed pl-2 border-l-4 border-slate-100 group-hover:border-primary/20 transition-all">"{review.comment}"</p>
+                                            <p className="text-slate-500 font-bold text-sm leading-relaxed pl-2 border-l-4 border-slate-100 group-hover:border-primary/20 transition-all">"{review.comment}"</p>
                                         </motion.div>
                                     ))}
                                 </div>

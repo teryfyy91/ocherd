@@ -40,7 +40,7 @@ const Landing = () => {
                         </div>
                         <div className="flex flex-col gap-1">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Xush Kelibsiz</p>
-                            <h1 className="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none">
+                            <h1 className="text-2xl font-black text-slate-800 uppercase leading-none">
                                 Salom, {currentUser?.user_metadata?.full_name?.split(' ')[0] || 'Mijoz'}!
                             </h1>
                         </div>
@@ -71,7 +71,7 @@ const Landing = () => {
                 {/* Featured Shop Story Style */}
                 <section className="flex flex-col gap-6">
                     <div className="px-6 flex justify-between items-center">
-                        <h2 className="text-xl font-black text-slate-800 uppercase italic tracking-tighter">Mashhur Salonlar</h2>
+                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Mashhur Salonlar</h2>
                         <button className="text-[10px] font-black text-primary uppercase tracking-[0.2em] opacity-80" onClick={() => navigate('/discovery')}>Xaritada</button>
                     </div>
                     <div className="flex flex-col gap-6 px-6">

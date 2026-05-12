@@ -43,13 +43,13 @@ const MyBookings = () => {
 
     return (
         <div className="flex flex-col gap-10 pb-32 pt-8">
-            <header className="flex flex-col gap-2 mt-4 px-2">
-                <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase italic leading-none">Navbatlarim</h1>
+            <header className="flex flex-col gap-2 mt-4 px-4">
+                <h1 className="text-3xl font-extrabold text-slate-800 uppercase leading-none">Navbatlarim</h1>
                 <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[8px]">Uchrashuvlaringiz tarixi</p>
             </header>
 
             <div className="flex flex-col gap-8">
-                <div className="flex items-center gap-3 px-2">
+                <div className="flex items-center gap-3 px-4">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <h2 className="text-[9px] font-bold text-slate-800 uppercase tracking-widest">Hozirda faol</h2>
                 </div>
@@ -66,25 +66,25 @@ const MyBookings = () => {
                         <Link to="/" className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Discovery</Link>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-5 px-2">
+                    <div className="flex flex-col gap-5 px-4">
                         {activeBookings.map((item, idx) => (
                             <motion.div
                                 key={item.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-xl shadow-slate-100 relative overflow-hidden group"
+                                className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-xl shadow-slate-100 relative overflow-hidden group"
                             >
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl opacity-50" />
                                 <div className="flex justify-between items-start mb-6">
-                                    <div className="flex flex-col gap-1">
-                                        <h3 className="text-lg font-extrabold text-slate-800 uppercase italic tracking-tight leading-none">{item.shopName}</h3>
-                                        <div className="flex items-center gap-4 text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-                                            <span className="flex items-center gap-1.5"><Scissors size={12} className="text-primary" /> {item.service}</span>
-                                            <span className="flex items-center gap-1.5"><Clock size={12} className="text-primary" /> {item.time}</span>
+                                    <div className="flex flex-col gap-1 w-full flex-1 min-w-0">
+                                        <h3 className="text-xl font-bold text-slate-800 uppercase tracking-tight leading-none truncate">{item.shopName}</h3>
+                                        <div className="flex items-center gap-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 overflow-x-auto scrollbar-hide">
+                                            <span className="flex items-center gap-1.5 flex-shrink-0"><Scissors size={12} className="text-primary" /> {item.service}</span>
+                                            <span className="flex items-center gap-1.5 flex-shrink-0"><Clock size={12} className="text-primary" /> {item.time}</span>
                                         </div>
                                     </div>
-                                    <span className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest ${item.status === 'In progress' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-100 text-slate-500'}`}>
+                                    <span className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest flex-shrink-0 ml-4 ${item.status === 'In progress' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-100 text-slate-500'}`}>
                                         {item.status === 'In progress' ? 'Xizmatda' : 'Kutilmoqda'}
                                     </span>
                                 </div>
@@ -117,12 +117,12 @@ const MyBookings = () => {
                         {pastBookings.map((item) => (
                             <div key={item.id} className="bg-slate-50 border border-slate-100 p-6 rounded-[2rem] flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-white shadow-sm rounded-xl flex items-center justify-center text-slate-300">
-                                        <Check size={20} />
+                                    <div className="w-12 h-12 bg-primary/10 shadow-sm rounded-xl flex items-center justify-center text-primary flex-shrink-0">
+                                        <Check size={24} />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <h4 className="font-black text-slate-800 italic uppercase leading-none text-sm">{item.shopName}</h4>
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">{item.service} • {item.time}</p>
+                                    <div className="flex flex-col min-w-0">
+                                        <h4 className="font-bold text-slate-800 uppercase leading-none text-sm truncate">{item.shopName}</h4>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">{item.service} • {item.time}</p>
                                     </div>
                                 </div>
                                 <button
@@ -148,8 +148,8 @@ const MyBookings = () => {
                                 <div className="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
                                     <MessageSquare size={32} />
                                 </div>
-                                <h3 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Fikringiz</h3>
-                                <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-[9px]">{selectedBooking?.shopName}</p>
+                                <h3 className="text-2xl font-bold text-slate-800 tracking-tight uppercase text-center leading-none">Fikringiz</h3>
+                                <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-center text-[10px]">{selectedBooking?.shopName}</p>
                             </div>
 
                             <div className="flex flex-col gap-10">
@@ -166,7 +166,7 @@ const MyBookings = () => {
                                     <textarea
                                         value={comment}
                                         onChange={(e) => setComment(e.target.value)}
-                                        className="w-full h-32 bg-slate-50 border border-slate-100 p-6 rounded-[2rem] outline-none text-slate-800 font-bold placeholder:text-slate-300 transition-all resize-none"
+                                        className="w-full h-32 bg-slate-50 border border-slate-100 px-10 pt-8 pb-6 rounded-[2.5rem] outline-none text-slate-800 font-bold placeholder:text-slate-300 transition-all resize-none text-sm"
                                         placeholder="Xizmat qanday bo'ldi?..."
                                     />
                                 </div>
