@@ -250,7 +250,7 @@ const Login = ({ onLogin }) => {
             if (signUpError) throw signUpError;
 
             if (signUpData?.user) {
-                if (signUpData.session && role === 'owner') {
+                if (role === 'owner') {
                     // Save to pending_salons table
                     const { data: pendingResult, error: pendingError } = await supabase
                         .from('pending_salons')
@@ -266,6 +266,13 @@ const Login = ({ onLogin }) => {
                             status: 'pending'
                         }])
                         .select();
+
+                    if (pendingError) {
+                        console.error('Pending salon registration error:', pendingError);
+                        setErrorMsg("Salon ma'lumotlarini saqlashda xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.");
+                        setLoading(false);
+                        return;
+                    }
 
                     if (pendingResult && pendingResult[0]) {
                         const newId = pendingResult[0].id;
