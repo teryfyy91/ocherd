@@ -133,6 +133,11 @@ const Login = ({ onLogin }) => {
         if (allShops.length === 0) {
             refreshShops();
         }
+
+        // Persist pending approval screen on refresh
+        if (sessionStorage.getItem('awaitingApproval') === 'true') {
+            setRegSuccess(true);
+        }
     }, []);
 
     const addService = () => {
@@ -152,15 +157,26 @@ const Login = ({ onLogin }) => {
         setErrorMsg('');
         setSuccessMsg('');
 
-        const cleanPhone = phone.replace(/[^\d+]/g, '');
+        const cleanPhone = phone.replace(/[^\d]/g, ''); // Strip everything but digits
         const email = `${cleanPhone}@ocherd.app`;
 
-        if (!isLoginMode && regStep === 0) {
+        if (!isLoginMode) {
             if (!name || !phone || !password) {
                 setErrorMsg("Iltimos, barcha maydonlarni to'ldiring.");
+                setLoading(false);
                 return;
             }
-            if (role === 'owner') {
+            if (password.length < 6) {
+                setErrorMsg("Parol kamida 6 ta belgidan iborat bo'lishi kerak.");
+                setLoading(false);
+                return;
+            }
+            if (cleanPhone.length < 9) {
+                setErrorMsg("Telefon raqami noto'g'ri.");
+                setLoading(false);
+                return;
+            }
+            if (regStep === 0 && role === 'owner') {
                 setRegStep(1);
                 return;
             }
