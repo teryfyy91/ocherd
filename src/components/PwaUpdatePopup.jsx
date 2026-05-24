@@ -9,7 +9,8 @@ const PwaUpdatePopup = () => {
         updateServiceWorker,
     } = useRegisterSW({
         onRegistered(r) {
-            if (r) {
+            if (r && !import.meta.env.DEV) {
+                // Check for updates every hour in production only
                 setInterval(() => {
                     r.update();
                 }, 60 * 60 * 1000);
@@ -29,13 +30,11 @@ const PwaUpdatePopup = () => {
         sessionStorage.setItem('pwa_update_dismissed', 'true');
     };
 
-    if (sessionStorage.getItem('pwa_update_dismissed') === 'true') {
-        return null;
-    }
+    const showPopup = needRefresh && sessionStorage.getItem('pwa_update_dismissed') !== 'true';
 
     return (
         <AnimatePresence>
-            {needRefresh && (
+            {showPopup && (
                 <motion.div
                     initial={{ y: 20, opacity: 0, scale: 0.95 }}
                     animate={{ y: 0, opacity: 1, scale: 1 }}

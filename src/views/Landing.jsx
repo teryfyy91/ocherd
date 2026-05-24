@@ -26,8 +26,8 @@ const Landing = () => {
 
 
 
-    const activeShops = (allShops || []).filter(s => s.status === 'Active' || !s.status);
-    const topShops = activeShops.slice(0, 5);
+    const activeShops = React.useMemo(() => (allShops || []).filter(s => s.status === 'Active' || !s.status), [allShops]);
+    const topShops = React.useMemo(() => activeShops.slice(0, 5), [activeShops]);
 
     return (
         <div className="flex flex-col gap-0 pb-32 bg-white min-h-screen overflow-x-hidden select-none">
@@ -72,7 +72,6 @@ const Landing = () => {
                 <section className="flex flex-col gap-6">
                     <div className="px-6 flex justify-between items-center">
                         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Mashhur Salonlar</h2>
-                        <button className="text-[10px] font-black text-primary uppercase tracking-[0.2em] opacity-80" onClick={() => navigate('/discovery')}>Xaritada</button>
                     </div>
                     <div className="flex flex-col gap-6 px-6">
                         {activeShops.map((shop, idx) => (

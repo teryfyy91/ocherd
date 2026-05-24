@@ -12,7 +12,6 @@ const Navbar = () => {
 
     const navItems = [
         { path: '/', icon: Home, label: 'Asosiy' },
-        { path: '/discovery', icon: Search, label: 'Qidiruv' },
         { path: '/my-bookings', icon: Calendar, label: 'Navbatlar' },
     ];
 
@@ -20,28 +19,31 @@ const Navbar = () => {
 
     return (
         <>
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] max-w-[400px] z-[1100]">
-                <nav className="bg-slate-900/90 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] px-4 py-2 flex justify-between items-center shadow-2xl shadow-slate-400/20">
+            <div className="fixed bottom-8 left-8 z-[1100] flex pointer-events-none">
+                <nav className="w-[420px] bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-stretch shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
                     {navItems.map((item) => (
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
-                            className="relative flex items-center justify-center py-3 px-4 rounded-full transition-all group overflow-hidden"
+                            className="relative flex-1 flex items-center justify-center py-5 transition-all group"
                         >
                             {isActive(item.path) && (
-                                <motion.div layoutId="nav-glow" className="absolute inset-0 bg-primary opacity-100 rounded-full" />
+                                <motion.div
+                                    layoutId="nav-glow"
+                                    className="absolute inset-0 bg-primary"
+                                />
                             )}
-                            <div className="relative z-10 flex items-center gap-2">
+                            <div className="relative z-10 flex items-center gap-4">
                                 <item.icon
-                                    size={20}
-                                    strokeWidth={isActive(item.path) ? 2.5 : 2}
-                                    className={`transition-colors duration-300 ${isActive(item.path) ? "text-white" : "text-slate-400 group-hover:text-white"}`}
+                                    size={24}
+                                    strokeWidth={isActive(item.path) ? 3 : 2}
+                                    className={`transition-colors duration-300 ${isActive(item.path) ? "text-white" : "text-slate-500 group-hover:text-white"}`}
                                 />
                                 {isActive(item.path) && (
                                     <motion.span
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="text-[10px] font-black text-white uppercase tracking-widest hidden sm:block"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="text-[13px] font-black text-white uppercase tracking-[0.3em]"
                                     >
                                         {item.label}
                                     </motion.span>
@@ -49,16 +51,6 @@ const Navbar = () => {
                             </div>
                         </button>
                     ))}
-
-                    <button
-                        onClick={() => setShowProfileMenu(true)}
-                        className={`flex items-center justify-center p-3 rounded-full transition-all group ${showProfileMenu ? 'bg-white/10' : ''}`}
-                    >
-                        <User
-                            size={20}
-                            className={`transition-colors duration-300 ${showProfileMenu ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}
-                        />
-                    </button>
                 </nav>
             </div>
 

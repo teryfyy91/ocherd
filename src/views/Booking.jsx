@@ -50,8 +50,8 @@ const Booking = () => {
         return <Navigate to="/" replace />;
     }
 
-    const timeSlots = generateTimeSlots(shopInfo.workingHours?.start || '09:00', shopInfo.workingHours?.end || '18:00');
-    const bookedSlots = queue.filter(q => q.status !== 'Done').map(q => q.time);
+    const timeSlots = React.useMemo(() => generateTimeSlots(shopInfo.workingHours?.start || '09:00', shopInfo.workingHours?.end || '18:00'), [shopInfo.workingHours]);
+    const bookedSlots = React.useMemo(() => queue.filter(q => q.status !== 'Done').map(q => q.time), [queue]);
 
     const salonPhone = shopInfo.phone || fetchedPhone || (shopInfo.ownerId?.startsWith('+998') ? shopInfo.ownerId : '');
 
@@ -223,23 +223,37 @@ const Booking = () => {
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="px-8"
                     >
-                        <div className="flex flex-col gap-6 p-10 rounded-[3.5rem] bg-slate-900 text-white shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
+                        <div className="flex flex-col gap-5 p-5 md:p-8 rounded-[2rem] bg-slate-900 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden border border-white/5">
+                            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 blur-[100px] rounded-full" />
+
                             <div className="flex justify-between items-center relative z-10">
-                                <h3 className="text-base font-bold uppercase tracking-tight">Xizmatlar ro'yxat</h3>
-                                <button onClick={() => setShowServicesList(false)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
-                                    <X size={18} />
+                                <div className="flex flex-col gap-1">
+                                    <h3 className="text-sm md:text-base font-black uppercase italic tracking-tighter">Xizmatlar Ro'yxati</h3>
+                                    <div className="h-1 w-8 bg-primary rounded-full" />
+                                </div>
+                                <button
+                                    onClick={() => setShowServicesList(false)}
+                                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 transition-all border border-white/5"
+                                >
+                                    <X size={20} />
                                 </button>
                             </div>
-                            <div className="flex flex-col gap-4 relative z-10">
+
+                            <div className="flex flex-col gap-3 relative z-10 max-h-[60vh] overflow-y-auto scrollbar-hide pr-1">
                                 {(shopInfo.services || []).length > 0 ? shopInfo.services.map((service, idx) => {
                                     const sName = typeof service === 'object' ? service.name : service;
                                     const sPrice = typeof service === 'object' ? service.price : 50000;
                                     return (
-                                        <div key={idx} className="flex justify-between items-center p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white/10 transition-all group">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="font-bold uppercase italic text-sm tracking-tight">{sName}</span>
-                                                <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{sPrice.toLocaleString()} SO'M</span>
+                                        <div
+                                            key={idx}
+                                            className="flex items-center gap-4 p-4 bg-white/[0.03] border border-white/5 rounded-2xl hover:bg-white/[0.08] hover:border-white/10 transition-all group"
+                                        >
+                                            <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                                <span className="font-black uppercase italic text-xs md:text-sm tracking-tight truncate leading-tight block text-slate-100">{sName}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
+                                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.1em]">{sPrice.toLocaleString()} SO'M</span>
+                                                </div>
                                             </div>
                                             <button
                                                 onClick={() => {
@@ -248,14 +262,18 @@ const Booking = () => {
                                                     setStep(2);
                                                     setShowServicesList(false);
                                                 }}
-                                                className="px-5 py-2.5 bg-primary rounded-xl font-bold text-[9px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                                                className="px-5 h-10 bg-primary text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 shrink-0 flex items-center justify-center gap-2"
                                             >
-                                                Tanlash
+                                                <span>Tanlash</span>
+                                                <div className="w-1 h-1 bg-white/40 rounded-full" />
                                             </button>
                                         </div>
                                     );
                                 }) : (
-                                    <div className="py-10 text-center opacity-40 text-[10px] font-bold uppercase tracking-widest">Hozircha xizmatlar yo'q</div>
+                                    <div className="py-20 text-center opacity-30 flex flex-col items-center gap-4">
+                                        <Scissors size={40} strokeWidth={1} />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.4em] italic">Hozircha xizmatlar yo'q</span>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -266,7 +284,7 @@ const Booking = () => {
             <div className="px-8 flex flex-col gap-4 mt-4">
                 <h2 className="text-base font-bold text-slate-800 uppercase leading-none tracking-tight">Salon haqida</h2>
                 <p className="text-slate-400 text-xs leading-relaxed font-bold uppercase tracking-wide opacity-80">
-                    {shopInfo.name} da premium xizmatdan bahra oling. Professional ustalarimiz sizga eng zamonaviy stildagi ko'rinishni taqdim etadilar.
+                    {shopInfo.description || `${shopInfo.name} da premium xizmatdan bahra oling. Professional ustalarimiz sizga eng zamonaviy stildagi ko'rinishni taqdim etadilar.`}
                 </p>
             </div>
 
@@ -328,13 +346,13 @@ const Booking = () => {
                                                     <button
                                                         key={idx}
                                                         onClick={() => setSelectedService(sName)}
-                                                        className={`p-8 rounded-[2.5rem] border transition-all flex items-center justify-between ${isSel ? 'border-primary bg-purple-50 shadow-xl shadow-purple-100/20' : 'border-slate-100 bg-slate-50/30'}`}
+                                                        className={`p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border transition-all flex items-center justify-between gap-4 ${isSel ? 'border-primary bg-purple-50 shadow-xl shadow-purple-100/20' : 'border-slate-100 bg-slate-50/30'}`}
                                                     >
-                                                        <div className="text-left flex-1 mr-4 overflow-hidden">
-                                                            <div className="font-bold text-slate-800 uppercase text-lg tracking-tight truncate mb-1">{sName}</div>
-                                                            <div className="text-sm font-bold text-primary uppercase tracking-widest">{sPrice.toLocaleString()} So'm</div>
+                                                        <div className="text-left flex-1 min-w-0">
+                                                            <div className="font-bold text-slate-800 uppercase text-base md:text-lg tracking-tight truncate leading-tight mb-0.5">{sName}</div>
+                                                            <div className="text-[10px] md:text-sm font-bold text-primary uppercase tracking-widest">{sPrice.toLocaleString()} So'm</div>
                                                         </div>
-                                                        <div className={`w-6 h-6 rounded-full border-2 transition-all flex-shrink-0 ${isSel ? 'bg-primary border-primary scale-125' : 'border-slate-200 bg-white'}`} />
+                                                        <div className={`w-6 h-6 rounded-full border-2 transition-all flex-shrink-0 ${isSel ? 'bg-primary border-primary scale-110 shadow-lg shadow-primary/30' : 'border-slate-200 bg-white'}`} />
                                                     </button>
                                                 );
                                             })}

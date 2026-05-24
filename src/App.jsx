@@ -24,6 +24,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole'));
   const [showSplash, setShowSplash] = useState(true);
+  const [awaitingApproval, setAwaitingApproval] = useState(false);
 
   const handleLogin = (role) => {
     localStorage.setItem('isLoggedIn', 'true');
@@ -40,7 +41,6 @@ function App() {
   }, []);
 
   const [isChecking, setIsChecking] = useState(true);
-  const [pendingLoginError, setPendingLoginError] = useState(false);
 
   // Synchronize local login state with current user from Supabase
   useEffect(() => {
@@ -68,26 +68,39 @@ function App() {
         // For non-admin salon owners, verify shop approval before granting access
         if (isOwner && !isAdmin) {
           try {
+            // Check established shops
             const { data: shopData } = await supabase
               .from('shops')
-              .select('id')
+              .select('id, status')
               .eq('owner_id', currentUser.id)
               .limit(1);
 
-            const isApproved = shopData && shopData.length > 0;
+            const hasActiveShop = shopData && shopData.length > 0 && shopData[0].status === 'Active';
+            const hasPendingShop = shopData && shopData.length > 0 && shopData[0].status === 'Pending';
 
-            if (!isApproved) {
-              setPendingLoginError(true);
-              await supabase.auth.signOut();
-              localStorage.removeItem('isLoggedIn');
-              localStorage.removeItem('userRole');
-              setIsLoggedIn(false);
+            // Also check pending registrations
+            const { data: pendingData } = await supabase
+              .from('pending_salons')
+              .select('id, status')
+              .eq('owner_id', currentUser.id)
+              .limit(1);
+
+            const hasPendingRegistration = pendingData && pendingData.length > 0 && pendingData[0].status === 'pending';
+
+            if (!hasActiveShop && (hasPendingShop || hasPendingRegistration)) {
+              // Pending approval — block all dashboard access
+              setAwaitingApproval(true);
+              setIsLoggedIn(false); // Critical: keeps BrowserRouter from rendering
               setIsChecking(false);
               return;
+            } else if (!hasActiveShop && !hasPendingShop && !hasPendingRegistration) {
+              setIsLoggedIn(true);
+            } else {
+              setAwaitingApproval(false);
+              setIsLoggedIn(true);
             }
           } catch (err) {
             console.error('Shop verification error:', err);
-            // In case of error, we might want to stay logged in or show an error
           }
         }
 
@@ -95,8 +108,9 @@ function App() {
         localStorage.setItem('isLoggedIn', 'true');
       } else {
         // Only clear if we were previously "logged in" according to component state
-        // but Supabase firmly says no user.
-        if (isLoggedIn) {
+        // and NOT in bypass mode
+        const isBypass = localStorage.getItem('authBypass') === 'true';
+        if (isLoggedIn && !isBypass) {
           setIsLoggedIn(false);
           localStorage.removeItem('isLoggedIn');
           localStorage.removeItem('userRole');
@@ -119,28 +133,23 @@ function App() {
     );
   }
 
+  // If awaiting approval, show ONLY the pending screen — block all routing
+  if (awaitingApproval) {
+    return (
+      <PendingApproval
+        onConfirm={async () => {
+          await supabase.auth.signOut();
+          setAwaitingApproval(false);
+          setIsLoggedIn(false);
+          window.location.href = '/';
+        }}
+      />
+    );
+  }
+
   return (
     <>
       <AnimatePresence mode="wait">
-        {pendingLoginError && (
-          <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white p-10 rounded-[3rem] text-center max-w-sm flex flex-col items-center gap-6 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full" />
-              <div className="w-20 h-20 bg-primary/10 text-primary border border-primary/20 rounded-[2rem] flex items-center justify-center rotate-6">
-                <Clock size={40} />
-              </div>
-              <div className="relative z-10 w-full">
-                <h3 className="text-2xl font-black text-slate-800 uppercase italic">Kutilmoqda</h3>
-                <p className="text-[11px] text-slate-500 font-bold mt-3 uppercase tracking-widest leading-loose">
-                  Xurmatli mijoz, saloningiz hali admin tomonidan tasdiqlanmagan. Iltimos kuting.
-                </p>
-              </div>
-              <button onClick={() => setPendingLoginError(false)} className="w-full h-14 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest mt-2 active:scale-95 transition-all outline-none">
-                Tushunarli
-              </button>
-            </motion.div>
-          </div>
-        )}
         {!isLoggedIn ? (
           <Login key="login" onLogin={handleLogin} />
         ) : (
@@ -164,7 +173,6 @@ function App() {
                   : (localStorage.getItem('userRole') === 'owner' ? <Dashboard /> : <Navigate to="/" replace />)
               } />
 
-              {/* Display doesn't use the main Layout with Navbar */}
               <Route path="/display" element={<QueueDisplay />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

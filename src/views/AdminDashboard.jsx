@@ -9,15 +9,17 @@ import {
     Search as SearchIcon, Filter, Calendar,
     UserPlus, ChevronRight, User, Phone,
     Building2, Star, MessageSquare, ShieldCheck,
-    Loader2
+    Loader2, Trash2, AlertTriangle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
 const AdminDashboard = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const {
-        shopInfo, queue, updateBookingStatus,
+        shopInfo, setShopInfo, queue, updateBookingStatus,
         deleteBooking, reviews, currentUser, allShops: contextShops,
         deleteShop, approveShop, refreshShops, signOut, setAllShops
     } = useStore();
@@ -33,6 +35,7 @@ const AdminDashboard = () => {
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [newNotificationToast, setNewNotificationToast] = useState(null);
+    const [shopToDelete, setShopToDelete] = useState(null);
 
     useEffect(() => {
         if (isSuperAdmin) {
@@ -285,16 +288,20 @@ const AdminDashboard = () => {
     };
 
     const handleDeleteShop = async (id) => {
-        if (window.confirm("Rostdan ham ushbu salonni o'chirishni xohlaysizmi?")) {
-            setLoading(true);
-            try {
-                await deleteShop(id);
+        setLoading(true);
+        try {
+            const res = await deleteShop(id);
+            if (res.success) {
                 await refreshShops();
-            } catch (err) {
-                console.error('Error deleting shop:', err);
-            } finally {
-                setLoading(false);
+                setShopToDelete(null);
+            } else {
+                alert(res.error || "O'chirishda xatolik yuz berdi");
             }
+        } catch (err) {
+            console.error('Error deleting shop:', err);
+            alert("Kutilmagan xatolik yuz berdi");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -342,13 +349,18 @@ const AdminDashboard = () => {
 
     const SuperSalonsTab = () => {
         const pendingShops = [
-            ...allShops.filter(s => s.status === 'Pending'),
+            ...allShops.filter(s => s.status === 'Pending').map(s => ({ ...s, isNewReg: false })),
             ...notifications.filter(n => n.type === 'new_salon_registration').map(n => ({
                 id: n.id,
                 name: n.salonDetails?.name || 'Kutilmoqda',
                 status: 'Pending',
                 isNewReg: true,
-                notifData: n
+                notifData: n,
+                description: n.salonDetails?.description || '',
+                services: n.salonDetails?.services || [],
+                workingHours: n.salonDetails?.working_hours || { start: '09:00', end: '18:00' },
+                phone: n.salonDetails?.owner_phone || '',
+                ownerId: n.salonDetails?.owner_id
             }))
         ];
         const activeShops = allShops.filter(s => s.status !== 'Pending');
@@ -381,7 +393,16 @@ const AdminDashboard = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {pendingShops.map((s) => (
-                                <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white border border-red-100 p-8 rounded-[3rem] shadow-xl shadow-red-50 relative overflow-hidden group">
+                                <motion.div
+                                    key={s.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    onClick={() => {
+                                        setShopInfo(s);
+                                        navigate('/booking');
+                                    }}
+                                    className="bg-white border border-red-100 p-8 rounded-[3rem] shadow-xl shadow-red-50 relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all"
+                                >
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl opacity-50" />
                                     <div className="flex flex-col gap-8 relative z-10">
                                         <div className="flex items-center gap-5">
@@ -390,13 +411,18 @@ const AdminDashboard = () => {
                                             </div>
                                             <div>
                                                 <h4 className="text-xl font-bold text-slate-800 italic uppercase">{s.name}</h4>
-                                                <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest mt-1">Kutilmoqda</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest">Kutilmoqda</p>
+                                                    <div className="w-1 h-1 bg-red-200 rounded-full" />
+                                                    <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Ma'lumotlar uchun bosing</p>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex gap-3">
                                             <button
                                                 disabled={loading}
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     if (s.isNewReg) {
                                                         handleRejectNewRegistration(s.notifData);
                                                     } else {
@@ -409,7 +435,8 @@ const AdminDashboard = () => {
                                             </button>
                                             <button
                                                 disabled={loading}
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     if (s.isNewReg) {
                                                         handleApproveNewRegistration(s.notifData);
                                                     } else {
@@ -428,22 +455,47 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
-                <div className="flex flex-col gap-6">
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Barcha salonlar</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-8">
+                    <div className="flex items-center justify-between px-2">
+                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Barcha salonlar</h4>
+                        <div className="h-[1px] flex-1 mx-8 bg-gradient-to-r from-slate-100 via-slate-50 to-transparent" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredActive.map((s, i) => (
-                            <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-lg shadow-slate-100 flex items-center justify-between group">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-primary font-bold text-xl border border-slate-100 shadow-sm">
+                            <motion.div
+                                key={s.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.05 }}
+                                onClick={() => {
+                                    setShopInfo(s);
+                                    navigate('/booking');
+                                }}
+                                className="bg-white border border-slate-100/50 p-6 rounded-[2.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex items-center justify-between group hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-primary/20 transition-all duration-500 relative overflow-hidden cursor-pointer active:scale-95"
+                            >
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
+
+                                <div className="flex items-center gap-5 relative z-10">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-slate-50 to-slate-100 rounded-[1.5rem] flex items-center justify-center text-primary font-black text-2xl border border-white shadow-inner group-hover:scale-105 transition-transform duration-500">
                                         {s.name[0]}
                                     </div>
-                                    <div>
-                                        <h4 className="text-lg font-bold text-slate-800 uppercase italic leading-none">{s.name}</h4>
-                                        <p className="text-[9px] text-emerald-500 font-bold uppercase tracking-widest mt-1">Faol</p>
+                                    <div className="flex flex-col gap-1">
+                                        <h4 className="text-lg font-black text-slate-800 uppercase italic leading-none tracking-tight group-hover:text-primary transition-colors">{s.name}</h4>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                            <span className="text-[9px] text-emerald-500 font-black uppercase tracking-widest">Faol</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <button onClick={() => handleDeleteShop(s.id)} className="w-10 h-10 rounded-xl text-slate-200 hover:text-red-500 hover:bg-red-50 transition-all">
-                                    <X size={18} />
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShopToDelete(s);
+                                    }}
+                                    className="w-12 h-12 rounded-[1.2rem] bg-slate-50 text-slate-300 hover:text-white hover:bg-red-500 hover:shadow-[0_10px_20px_rgba(239,68,68,0.2)] transition-all duration-300 flex items-center justify-center relative z-10 group/btn"
+                                >
+                                    <Trash2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
                                 </button>
                             </motion.div>
                         ))}
@@ -518,6 +570,22 @@ const AdminDashboard = () => {
         </div>
     );
 
+    const handleClearAllNotifications = async () => {
+        try {
+            // Delete all notifications from DB
+            const { error } = await supabase
+                .from('notifications')
+                .delete()
+                .neq('id', 0); // Hack to delete all since we need a filter
+
+            if (error) throw error;
+            setNotifications([]);
+        } catch (err) {
+            console.error('Error clearing notifications:', err);
+            alert('Bildirishnomalarni oʻchirishda xatolik yuz berdi');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-white text-slate-800 flex flex-col font-['Inter'] pb-32">
             <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 flex items-center justify-between sticky top-0 z-[50]">
@@ -554,7 +622,7 @@ const AdminDashboard = () => {
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95, y: 50 }}
                                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                                            className="w-full max-w-4xl max-h-[85vh] h-auto flex flex-col bg-white shadow-[0_50px_100px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-slate-100 pointer-events-auto"
+                                            className="w-full max-w-[95vw] md:max-w-6xl h-[92vh] flex flex-col bg-white shadow-[0_50px_100px_rgba(0,0,0,0.4)] rounded-[2.5rem] overflow-hidden border border-slate-100 pointer-events-auto"
                                         >
                                             {/* Absolute Close Button (X) */}
                                             <button
@@ -571,7 +639,7 @@ const AdminDashboard = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="flex-1 overflow-y-auto p-8 md:p-10 flex flex-col gap-8 scrollbar-hide pt-12 md:pt-16">
+                                            <div className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col gap-6 scrollbar-hide pt-20 md:pt-24 pb-20">
                                                 {notifications.length > 0 ? notifications.map((n, i) => (
                                                     <motion.div
                                                         initial={{ opacity: 0, y: 20 }}
@@ -659,7 +727,7 @@ const AdminDashboard = () => {
                                             {notifications.length > 0 && (
                                                 <div className="p-8 md:p-10 border-t border-slate-100 bg-slate-50/50 shrink-0">
                                                     <button
-                                                        onClick={() => setNotifications([])}
+                                                        onClick={handleClearAllNotifications}
                                                         className="w-full h-16 bg-slate-900 text-white rounded-[2rem] font-bold text-[11px] uppercase tracking-[0.4em] shadow-xl active:scale-95 transition-all"
                                                     >
                                                         Barchasini tozalash
@@ -749,6 +817,87 @@ const AdminDashboard = () => {
                     </button>
                 ))}
             </div>
+
+            <AnimatePresence>
+                {shopToDelete && (
+                    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShopToDelete(null)}
+                            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="relative bg-white w-full max-w-md p-0 rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.3)] overflow-hidden border border-slate-100 flex flex-col items-center"
+                        >
+                            {/* Decorative Danger Header */}
+                            <div className="w-full h-32 bg-red-500 relative flex items-center justify-center overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-red-600 to-rose-400" />
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-black/10 rounded-full blur-3xl" />
+
+                                <motion.div
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="relative z-10 w-20 h-20 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/30 shadow-2xl"
+                                >
+                                    <Trash2 size={40} className="text-white" />
+                                </motion.div>
+                            </div>
+
+                            <div className="p-10 flex flex-col items-center text-center gap-8 w-full">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-center gap-2 text-red-500 mb-1">
+                                        <AlertTriangle size={16} strokeWidth={3} />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Diqqat!</span>
+                                    </div>
+                                    <h3 className="text-3xl font-black text-slate-800 uppercase italic leading-none tracking-tighter">
+                                        Salonnni <br /> <span className="text-red-500">O'chirish</span>
+                                    </h3>
+                                    <div className="h-1 w-12 bg-slate-100 mx-auto rounded-full" />
+                                    <p className="text-sm text-slate-500 font-bold leading-relaxed px-4">
+                                        Rostdan ham <span className="text-slate-900 font-black italic underline decoration-red-500/30 underline-offset-4">"{shopToDelete.name}"</span> salonini o'chirishni xohlaysizmi? <br />
+                                        <span className="text-[10px] text-slate-400 mt-4 block font-black uppercase tracking-widest">
+                                            (Bu amalni hozir ortga qaytarib bo'lmaydi)
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-4 w-full">
+                                    <button
+                                        onClick={() => setShopToDelete(null)}
+                                        className="flex-1 h-16 bg-slate-50 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-100 hover:text-slate-600 transition-all active:scale-95"
+                                    >
+                                        Yo'q, Qolsin
+                                    </button>
+                                    <button
+                                        disabled={loading}
+                                        onClick={() => handleDeleteShop(shopToDelete.id)}
+                                        className="flex-[1.5] h-16 bg-red-500 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(239,68,68,0.3)] hover:bg-red-600 active:scale-95 transition-all flex items-center justify-center gap-3 relative overflow-hidden group disabled:opacity-50"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-font-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                                        {loading ? (
+                                            <Loader2 className="animate-spin size-5" />
+                                        ) : (
+                                            <>
+                                                <span>Ha, O'chirish</span>
+                                                <X size={18} />
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

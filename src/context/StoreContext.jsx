@@ -49,10 +49,14 @@ export const StoreProvider = ({ children }) => {
 
         try {
             // Fetch ALL bookings for this shop to check availability and for owner dashboard
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
             const { data, error } = await supabase
                 .from('bookings')
                 .select('*')
                 .eq('shop_id', activeShopId)
+                .gte('created_at', thirtyDaysAgo.toISOString())
                 .order('created_at', { ascending: true });
 
             if (data) {
@@ -214,15 +218,29 @@ export const StoreProvider = ({ children }) => {
         }
     }, [allShops, currentUser]);
 
-    // Polling for new data (every 60 seconds)
+    // Polling for new data (every 60 seconds), only when tab is visible
     useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                fetchBookings();
+                fetchMyBookings();
+                if (shopInfo.id) fetchReviews();
+            }
+        };
+
         const interval = setInterval(() => {
-            fetchBookings();
-            fetchMyBookings();
-            if (shopInfo.id) fetchReviews();
+            if (document.visibilityState === 'visible') {
+                fetchBookings();
+                fetchMyBookings();
+                if (shopInfo.id) fetchReviews();
+            }
         }, 60000);
 
-        return () => clearInterval(interval);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, [shopInfo.id]);
 
     const fetchShops = async () => {
@@ -442,6 +460,9 @@ export const StoreProvider = ({ children }) => {
 
     const deleteShop = async (id) => {
         try {
+            console.log('Attempting to delete shop:', id);
+
+            // 1. Delete associated bookings
             const { error: bookingError } = await supabase
                 .from('bookings')
                 .delete()
@@ -449,19 +470,40 @@ export const StoreProvider = ({ children }) => {
 
             if (bookingError) {
                 console.warn('Could not delete associated bookings:', bookingError);
+            } else {
+                console.log('Associated bookings deleted successfully');
             }
 
+            // 2. Delete associated reviews
+            const { error: reviewError } = await supabase
+                .from('reviews')
+                .delete()
+                .eq('shop_id', id);
+
+            if (reviewError) {
+                console.warn('Could not delete associated reviews:', reviewError);
+            } else {
+                console.log('Associated reviews deleted successfully');
+            }
+
+            // 3. Delete the shop itself
             const { data, error } = await supabase
                 .from('shops')
                 .delete()
                 .eq('id', id)
                 .select();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Database error during shop deletion:', error);
+                throw new Error("Bazadan o'chirishda xatolik: " + (error.message || 'Noma\'lum xato'));
+            }
 
             if (!data || data.length === 0) {
-                throw new Error("Salonni o'chirish imkoni bo'lmadi.");
+                console.error('No rows deleted from shops. RLS or ID mismatch?');
+                throw new Error("Salon topilmadi yoki uni o'chirish uchun ruxsatingiz yo'q (RLS).");
             }
+
+            console.log('Shop deleted successfully:', data[0]);
 
             if (shopInfo.id === id) {
                 setShopInfo({
@@ -474,7 +516,7 @@ export const StoreProvider = ({ children }) => {
             await fetchShops();
             return { success: true };
         } catch (err) {
-            console.error('Error deleting shop:', err);
+            console.error('Error in deleteShop caught:', err);
             return { success: false, error: err.message };
         }
     };
@@ -485,6 +527,7 @@ export const StoreProvider = ({ children }) => {
         localStorage.removeItem('userRole');
         localStorage.removeItem('currentUserPhone');
         localStorage.removeItem('hasSelectedLang');
+        localStorage.removeItem('authBypass');
         window.location.href = '/';
     };
 

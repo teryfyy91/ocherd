@@ -163,7 +163,7 @@ const Dashboard = () => {
             setGalleryPreviews([]);
             if (firstTime) {
                 await sendNotification("Yangi salon qabul qilasizmi?");
-                navigate('/success');
+                window.location.href = '/';
             }
         } else {
             alert(result?.error || "Saqlashda xatolik yuz berdi");
@@ -210,9 +210,9 @@ const Dashboard = () => {
         setFormData({ ...formData, services: currentServices.filter(s => (typeof s === 'string' ? s : s.name) !== serviceName) });
     };
 
-    const pendingQueue = queue.filter(q => q.status === 'Pending');
-    const confirmedQueue = queue.filter(q => q.status === 'Waiting' || q.status === 'In progress');
-    const completedQueue = queue.filter(q => q.status === 'Done');
+    const pendingQueue = React.useMemo(() => queue.filter(q => q.status === 'Pending'), [queue]);
+    const confirmedQueue = React.useMemo(() => queue.filter(q => q.status === 'Waiting' || q.status === 'In progress'), [queue]);
+    const completedQueue = React.useMemo(() => queue.filter(q => q.status === 'Done'), [queue]);
 
     const handleSelectShop = (shop) => {
         setShopInfo(shop);
@@ -239,11 +239,11 @@ const Dashboard = () => {
         return ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'].map(day => dataMap[day]);
     };
 
-    const dynamicStatsData = getStatsData();
-    const todayStr = new Date().toISOString().split('T')[0];
-    const completedToday = queue.filter(q => q.status === 'Done' && q.createdAt?.startsWith(todayStr));
-    const incomeToday = completedToday.reduce((acc, q) => acc + (q.price || 50000), 0);
-    const avgRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1) : "5.0";
+    const dynamicStatsData = React.useMemo(() => getStatsData(), [queue]);
+    const todayStr = React.useMemo(() => new Date().toISOString().split('T')[0], []);
+    const completedToday = React.useMemo(() => queue.filter(q => q.status === 'Done' && q.createdAt?.startsWith(todayStr)), [queue, todayStr]);
+    const incomeToday = React.useMemo(() => completedToday.reduce((acc, q) => acc + (q.price || 50000), 0), [completedToday]);
+    const avgRating = React.useMemo(() => reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1) : "5.0", [reviews]);
 
     const handleAddNew = () => {
         setShopInfo({ name: '', services: [], workingHours: { start: '09:00', end: '18:00' } });
@@ -376,10 +376,7 @@ const Dashboard = () => {
                     <div className="relative z-10 flex flex-col gap-8">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                <button onClick={() => setViewMode('list')} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 hover:bg-white/30 transition-all shadow-xl shadow-primary/20">
-                                    <ChevronLeft size={24} />
-                                </button>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col ml-1">
                                     <h1 className="text-base font-bold text-white uppercase leading-none">{shopInfo.name}</h1>
                                     <span className="text-[7px] font-bold text-white/50 uppercase tracking-widest mt-1">Salon Boshqaruvi</span>
                                 </div>
