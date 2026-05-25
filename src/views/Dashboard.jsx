@@ -107,6 +107,7 @@ const Dashboard = () => {
     const [selectedUserDetails, setSelectedUserDetails] = useState(null);
     const [galleryFiles, setGalleryFiles] = useState([]);
     const [galleryPreviews, setGalleryPreviews] = useState([]);
+    const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = React.useRef(null);
 
     const showToast = (msg) => {
@@ -130,43 +131,52 @@ const Dashboard = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        const firstTime = !shopInfo.id;
-        let finalGallery = [...(formData.gallery || [])];
+        setIsSaving(true);
+        try {
+            const firstTime = !shopInfo.id;
+            let finalGallery = [...(formData.gallery || [])];
 
-        if (galleryFiles.length > 0) {
-            for (const file of galleryFiles) {
-                try {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-                    const { error: uploadError } = await supabase.storage
-                        .from('avatars')
-                        .upload(fileName, file);
-
-                    if (!uploadError) {
-                        const { data: urlData } = supabase.storage
+            if (galleryFiles.length > 0) {
+                for (const file of galleryFiles) {
+                    try {
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                        const { error: uploadError } = await supabase.storage
                             .from('avatars')
-                            .getPublicUrl(fileName);
-                        finalGallery.push(urlData.publicUrl);
+                            .upload(fileName, file);
+
+                        if (!uploadError) {
+                            const { data: urlData } = supabase.storage
+                                .from('avatars')
+                                .getPublicUrl(fileName);
+                            finalGallery.push(urlData.publicUrl);
+                        }
+                    } catch (err) {
+                        console.error("Gallery upload error:", err);
                     }
-                } catch (err) {
-                    console.error("Gallery upload error:", err);
                 }
             }
-        }
 
-        const primaryImage = finalGallery.length > 0 ? finalGallery[0] : formData.imageUrl;
-        const result = await updateShopInfo({ ...formData, imageUrl: primaryImage, gallery: finalGallery });
-        if (result && result.success) {
-            showToast("Muvaffaqiyatli saqlandi!");
-            setIsEditing(false);
-            setGalleryFiles([]);
-            setGalleryPreviews([]);
-            setManagementTab('queue'); // Switch back to Queue tab after saving
-            if (firstTime) {
-                await sendNotification("Yangi salon qabul qilasizmi?");
+            const primaryImage = finalGallery.length > 0 ? finalGallery[0] : formData.imageUrl;
+            const result = await updateShopInfo({ ...formData, imageUrl: primaryImage, gallery: finalGallery });
+
+            if (result && result.success) {
+                showToast("Muvaffaqiyatli saqlandi!");
+                setIsEditing(false);
+                setGalleryFiles([]);
+                setGalleryPreviews([]);
+                setManagementTab('queue');
+                if (firstTime) {
+                    await sendNotification("Yangi salon qabul qilasizmi?");
+                }
+            } else {
+                alert(result?.error || "Saqlashda xatolik yuz berdi");
             }
-        } else {
-            alert(result?.error || "Saqlashda xatolik yuz berdi");
+        } catch (err) {
+            console.error("Critical save error:", err);
+            alert("Kutilmagan xatolik yuz berdi");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -663,7 +673,13 @@ const Dashboard = () => {
                                             </div>
                                         </div>
 
-                                        <button type="submit" className="w-full h-18 bg-primary text-white rounded-[2.5rem] font-bold text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 active:scale-95 transition-all mt-8">Saqlash</button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSaving}
+                                            className="w-full h-18 bg-primary text-white rounded-[2.5rem] font-bold text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 active:scale-95 transition-all mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isSaving ? 'Saqlanmoqda...' : 'Saqlash'}
+                                        </button>
                                     </form>
                                 </section>
                             </motion.div>
