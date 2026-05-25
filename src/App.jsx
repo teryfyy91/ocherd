@@ -34,9 +34,15 @@ function App() {
   };
 
   useEffect(() => {
-    // Only show splash for a very short time if we're not loading anything else
+    const hasShownSplash = sessionStorage.getItem('hasShownSplash');
+    if (hasShownSplash) {
+      setShowSplash(false);
+      return;
+    }
+
     const timer = setTimeout(() => {
       setShowSplash(false);
+      sessionStorage.setItem('hasShownSplash', 'true');
     }, 800);
     return () => clearTimeout(timer);
   }, []);
@@ -91,7 +97,8 @@ function App() {
       } else {
         if (mounted) {
           const isBypass = localStorage.getItem('authBypass') === 'true';
-          if (isLoggedIn && !isBypass) {
+          const wasLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+          if (wasLoggedIn && !isBypass && !loadingUser) {
             setIsLoggedIn(false);
             localStorage.removeItem('isLoggedIn');
           }
@@ -106,7 +113,10 @@ function App() {
 
 
 
-  if ((showSplash || loadingUser || isChecking) && !isLoggedIn) {
+  // Only show splash if it's the first time in this session AND we are not already logged in
+  const shouldShowSplash = showSplash && !sessionStorage.getItem('hasShownSplash') && !localStorage.getItem('isLoggedIn');
+
+  if ((shouldShowSplash || loadingUser || isChecking) && !isLoggedIn) {
     return (
       <AnimatePresence>
         <SplashScreen key="splash" />
