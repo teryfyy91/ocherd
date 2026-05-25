@@ -405,13 +405,13 @@ export const StoreProvider = ({ children }) => {
                 return typeof s === 'string' ? { name: s, price: 50000 } : s;
             });
 
-            // Base record data
+            // Prepare payload using snake_case as expected by PostgREST/Supabase
             let payload = {
                 owner_id: user.id,
                 name: info.name,
-                image_url: info.imageUrl,
+                image_url: info.imageUrl || info.image_url || '',
                 services: normalizedServices,
-                working_hours: info.workingHours,
+                working_hours: info.workingHours || info.working_hours,
                 phone: info.phone || '',
                 gallery: info.gallery || [],
                 status: info.status || 'Active'
@@ -427,34 +427,37 @@ export const StoreProvider = ({ children }) => {
 
             let result = await performSave(payload);
 
-            // If error, try to strip potentially missing columns
+            // Robust retry logic for schema cache mismatches or missing columns
             if (result.error) {
                 const errorMessage = result.error.message.toLowerCase();
-                if (errorMessage.includes('column') && (errorMessage.includes('not exist') || errorMessage.includes('schema'))) {
-                    // Identify the likely culprit column
-                    const columns = ['gallery', 'phone', 'status', 'image_url'];
+                if (errorMessage.includes('column') || errorMessage.includes('cache') || errorMessage.includes('not exist')) {
+                    // List of potentially problematic/new columns
+                    const optionalColumns = ['phone', 'gallery', 'status', 'image_url', 'working_hours', 'services'];
                     let retryPayload = { ...payload };
+                    let changed = false;
 
-                    for (const col of columns) {
+                    for (const col of optionalColumns) {
                         if (errorMessage.includes(col)) {
                             delete retryPayload[col];
+                            changed = true;
                         }
                     }
 
-                    // Simple retry with safest fields
-                    const fallbackPayload = {
-                        owner_id: user.id,
-                        name: payload.name,
-                        services: payload.services,
-                        working_hours: payload.working_hours
-                    };
+                    // Fallback: if adding 'phone' specifically failed as shown in the error, be aggressive
+                    if (errorMessage.includes('phone') && retryPayload.phone !== undefined) {
+                        delete retryPayload.phone;
+                        changed = true;
+                    }
 
-                    result = await performSave(fallbackPayload);
+                    if (changed) {
+                        console.warn('Retrying save after stripping problematic columns due to schema error.');
+                        result = await performSave(retryPayload);
+                    }
                 }
             }
 
             if (result.error) {
-                throw new Error(result.error.message);
+                throw result.error;
             }
 
             const savedData = result.data?.[0];
@@ -476,8 +479,13 @@ export const StoreProvider = ({ children }) => {
 
             return { success: true };
         } catch (error) {
-            console.error('Save error details:', error);
-            return { success: false, error: "Saqlashda xatolik: " + error.message };
+            console.error('Salon save error:', error);
+            // Translate common Supabase errors for the user
+            let friendlyError = error.message;
+            if (friendlyError.includes('schema cache')) {
+                friendlyError = "Ma'lumotlar bazasi sxemasi mos kelmadi. Iltimos, Supabase-da 'phone' ustunini qo'shing.";
+            }
+            return { success: false, error: "Saqlashda xatolik: " + friendlyError };
         }
     };
 

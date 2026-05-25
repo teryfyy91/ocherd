@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const PendingApproval = ({ onConfirm }) => {
     return (

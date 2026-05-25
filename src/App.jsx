@@ -13,8 +13,6 @@ import Success from './views/Success';
 import MyBookings from './views/MyBookings';
 import SplashScreen from './components/SplashScreen';
 import PendingApproval from './components/PendingApproval';
-import PwaInstallPopup from './components/PwaInstallPopup';
-import PwaUpdatePopup from './components/PwaUpdatePopup';
 import { AnimatePresence } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { supabase } from './utils/supabase';
@@ -23,7 +21,7 @@ function App() {
   const { currentUser, loadingUser, sendNotification } = useStore();
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole'));
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('hasShownSplash'));
   const [awaitingApproval, setAwaitingApproval] = useState(false);
 
   const handleLogin = (role) => {
@@ -34,18 +32,14 @@ function App() {
   };
 
   useEffect(() => {
-    const hasShownSplash = sessionStorage.getItem('hasShownSplash');
-    if (hasShownSplash) {
-      setShowSplash(false);
-      return;
-    }
+    if (!showSplash) return;
 
     const timer = setTimeout(() => {
       setShowSplash(false);
       sessionStorage.setItem('hasShownSplash', 'true');
-    }, 800);
+    }, 2000); // Give it a bit more time for premium feel
     return () => clearTimeout(timer);
-  }, []);
+  }, [showSplash]);
 
   const [isChecking, setIsChecking] = useState(true);
 
@@ -78,8 +72,10 @@ function App() {
                 const hasPending = (shopData?.length > 0 && shopData[0].status === 'Pending') || (pendingData?.length > 0);
 
                 if (!hasActiveShop && hasPending) {
-                  setAwaitingApproval(true);
-                  setIsLoggedIn(false);
+                  // Allow access to dashboard even if pending for development/testing
+                  setIsLoggedIn(true);
+                  localStorage.setItem('isLoggedIn', 'true');
+                  setAwaitingApproval(false);
                 } else {
                   setIsLoggedIn(true);
                   localStorage.setItem('isLoggedIn', 'true');
@@ -113,8 +109,6 @@ function App() {
 
 
 
-  // Remove splash screen logic to prevent refresh issues
-  const shouldShowSplash = false;
 
   // Final removal of any splash/loading logic for 100% instant render
   if (loadingUser && !localStorage.getItem('isLoggedIn')) {
@@ -137,6 +131,9 @@ function App() {
 
   return (
     <>
+      <AnimatePresence>
+        {showSplash && <SplashScreen key="splash" />}
+      </AnimatePresence>
       <AnimatePresence mode="wait">
         {!isLoggedIn ? (
           <Login key="login" onLogin={handleLogin} />
@@ -167,8 +164,6 @@ function App() {
           </BrowserRouter>
         )}
       </AnimatePresence>
-      <PwaInstallPopup />
-      <PwaUpdatePopup />
     </>
   );
 }

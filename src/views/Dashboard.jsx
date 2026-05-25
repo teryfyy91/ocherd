@@ -133,6 +133,15 @@ const Dashboard = () => {
         e.preventDefault();
         setIsSaving(true);
         try {
+            // Auto-add any pending service inputs before saving
+            let updatedServices = [...(formData.services || [])];
+            if (serviceInput.trim() && servicePrice.trim()) {
+                const newService = { name: serviceInput.trim(), price: parseInt(servicePrice) };
+                updatedServices.push(newService);
+                setServiceInput('');
+                setServicePrice('');
+            }
+
             const firstTime = !shopInfo.id;
             let finalGallery = [...(formData.gallery || [])];
 
@@ -158,7 +167,12 @@ const Dashboard = () => {
             }
 
             const primaryImage = finalGallery.length > 0 ? finalGallery[0] : formData.imageUrl;
-            const result = await updateShopInfo({ ...formData, imageUrl: primaryImage, gallery: finalGallery });
+            const result = await updateShopInfo({
+                ...formData,
+                services: updatedServices,
+                imageUrl: primaryImage,
+                gallery: finalGallery
+            });
 
             if (result && result.success) {
                 showToast("Muvaffaqiyatli saqlandi!");
