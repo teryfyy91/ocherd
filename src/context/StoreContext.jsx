@@ -395,8 +395,7 @@ export const StoreProvider = ({ children }) => {
         try {
             const user = currentUser;
             if (!user) {
-                alert("Please log in first");
-                return { success: false, error: "Not logged in" };
+                return { success: false, error: "Tizimga kirmagansiz" };
             }
 
             const normalizedServices = (info.services || []).map(s => {
@@ -406,15 +405,16 @@ export const StoreProvider = ({ children }) => {
                 return typeof s === 'string' ? { name: s, price: 50000 } : s;
             });
 
+            // Base record data
             let payload = {
                 owner_id: user.id,
                 name: info.name,
                 image_url: info.imageUrl,
                 services: normalizedServices,
                 working_hours: info.workingHours,
-                status: 'Pending',
                 phone: info.phone || '',
-                gallery: info.gallery || []
+                gallery: info.gallery || [],
+                status: info.status || 'Active'
             };
 
             const performSave = async (data) => {
@@ -425,54 +425,59 @@ export const StoreProvider = ({ children }) => {
                 }
             };
 
-            let result;
-            let currentPayload = { ...payload };
-            let maxRetries = 5;
-            let attempt = 0;
+            let result = await performSave(payload);
 
-            while (attempt < maxRetries) {
-                result = await performSave(currentPayload);
-                const errorMessage = result.error?.message || '';
-                const isMissingColumnError = (errorMessage.includes('column') && errorMessage.includes('not exist')) ||
-                    (errorMessage.includes('column') && errorMessage.includes('schema cache'));
+            // If error, try to strip potentially missing columns
+            if (result.error) {
+                const errorMessage = result.error.message.toLowerCase();
+                if (errorMessage.includes('column') && (errorMessage.includes('not exist') || errorMessage.includes('schema'))) {
+                    // Identify the likely culprit column
+                    const columns = ['gallery', 'phone', 'status', 'image_url'];
+                    let retryPayload = { ...payload };
 
-                if (result.error && isMissingColumnError) {
-                    let missingCol = errorMessage.match(/column "(.*)" does not exist/)?.[1] ||
-                        errorMessage.match(/find the '(.*)' column/)?.[1];
-
-                    if (missingCol && currentPayload[missingCol] !== undefined) {
-                        const { [missingCol]: _, ...newPayload } = currentPayload;
-                        currentPayload = newPayload;
-                        attempt++;
-                        continue;
+                    for (const col of columns) {
+                        if (errorMessage.includes(col)) {
+                            delete retryPayload[col];
+                        }
                     }
+
+                    // Simple retry with safest fields
+                    const fallbackPayload = {
+                        owner_id: user.id,
+                        name: payload.name,
+                        services: payload.services,
+                        working_hours: payload.working_hours
+                    };
+
+                    result = await performSave(fallbackPayload);
                 }
-                break;
             }
 
             if (result.error) {
-                console.error('Error saving shop:', result.error);
-                return { success: false, error: result.error.message };
-            } else {
-                await fetchShops();
-                const savedData = result.data?.[0];
-                if (savedData) {
-                    setShopInfo({
-                        id: savedData.id,
-                        ownerId: savedData.owner_id,
-                        name: savedData.name,
-                        imageUrl: savedData.image_url,
-                        services: savedData.services,
-                        workingHours: savedData.working_hours,
-                        phone: savedData.phone || '',
-                        gallery: savedData.gallery || []
-                    });
-                }
-                return { success: true };
+                throw new Error(result.error.message);
             }
+
+            const savedData = result.data?.[0];
+            if (savedData) {
+                const newShopInfo = {
+                    id: savedData.id,
+                    ownerId: savedData.owner_id,
+                    name: savedData.name,
+                    imageUrl: savedData.image_url,
+                    services: savedData.services,
+                    workingHours: savedData.working_hours,
+                    phone: savedData.phone || '',
+                    gallery: savedData.gallery || [],
+                    status: savedData.status
+                };
+                setShopInfo(newShopInfo);
+                await fetchShops(); // Refresh the list
+            }
+
+            return { success: true };
         } catch (error) {
-            console.error('Supabase error:', error);
-            return { success: false, error: error.message || 'Something went wrong while saving shop info' };
+            console.error('Save error details:', error);
+            return { success: false, error: "Saqlashda xatolik: " + error.message };
         }
     };
 
