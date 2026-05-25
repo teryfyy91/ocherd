@@ -116,8 +116,9 @@ function App() {
   // Remove splash screen logic to prevent refresh issues
   const shouldShowSplash = false;
 
+  // Final removal of any splash/loading logic for 100% instant render
   if (loadingUser && !localStorage.getItem('isLoggedIn')) {
-    return <div className="min-h-screen bg-white" />; // Minimal blank screen while loading only if not logged in
+    return null; // Return nothing during initial background auth check to prevent flash
   }
 
   // If awaiting approval, show ONLY the pending screen — block all routing
