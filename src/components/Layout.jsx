@@ -6,6 +6,7 @@ const Layout = () => {
     const location = useLocation();
     const isBookingPage = location.pathname === '/booking';
     const isLandingPage = location.pathname === '/';
+    const isMyBookingsPage = location.pathname === '/my-bookings';
 
     return (
         <div className="min-h-screen bg-white text-slate-900 selection:bg-[#7C3AED] selection:text-white overflow-x-hidden">
@@ -15,7 +16,7 @@ const Layout = () => {
                 <div className="absolute -top-48 -right-24 w-[400px] h-[400px] bg-[#7C3AED]/5 rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute -bottom-48 -left-24 w-[400px] h-[400px] bg-[#7C3AED]/5 rounded-full blur-[100px] pointer-events-none" />
 
-                <div className={`relative ${isBookingPage || isLandingPage ? 'px-0 pt-0' : 'px-10 pt-10'} ${isBookingPage ? 'pb-10' : 'pb-32'}`}>
+                <div className={`relative ${isBookingPage || isLandingPage || isMyBookingsPage ? 'px-4 md:px-10' : 'px-10'} ${isBookingPage || isLandingPage ? 'pt-0' : 'pt-10'} ${isBookingPage ? 'pb-10' : 'pb-32'}`}>
                     <Outlet />
                 </div>
             </main>
