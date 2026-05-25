@@ -141,8 +141,8 @@ const MyBookings = () => {
                 {reviewModal && (
                     <div className="fixed inset-0 z-[1200] flex items-center justify-center p-6">
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setReviewModal(false)} className="absolute inset-0 bg-white/80 backdrop-blur-md" />
-                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white border border-slate-100 p-10 rounded-[3rem] w-full max-w-md relative z-10 shadow-2xl">
-                            <button onClick={() => setReviewModal(false)} className="absolute top-10 right-10 text-slate-300 hover:text-slate-800 transition-colors"><X size={20} /></button>
+                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white border border-slate-100 p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] w-[92vw] max-w-md relative z-10 shadow-2xl overflow-hidden">
+                            <button onClick={() => setReviewModal(false)} className="absolute top-6 right-6 md:top-10 md:right-10 text-slate-300 hover:text-slate-800 transition-colors"><X size={20} /></button>
 
                             <div className="text-center mb-10">
                                 <div className="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
@@ -166,7 +166,7 @@ const MyBookings = () => {
                                     <textarea
                                         value={comment}
                                         onChange={(e) => setComment(e.target.value)}
-                                        className="w-full h-32 bg-slate-50 border border-slate-100 px-10 pt-8 pb-6 rounded-[2.5rem] outline-none text-slate-800 font-bold placeholder:text-slate-300 transition-all resize-none text-sm"
+                                        className="w-full h-32 bg-slate-50 border border-slate-100 px-6 py-5 rounded-[1.5rem] outline-none text-slate-800 font-bold placeholder:text-slate-300 transition-all resize-none text-sm"
                                         placeholder="Xizmat qanday bo'ldi?..."
                                     />
                                 </div>
