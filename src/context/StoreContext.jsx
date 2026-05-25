@@ -218,7 +218,25 @@ export const StoreProvider = ({ children }) => {
         }
     }, [allShops, currentUser]);
 
-    // Polling for new data (every 60 seconds), only when tab is visible
+    // Real-time subscriptions for bookings and reviews
+    useEffect(() => {
+        const channel = supabase
+            .channel('realtime-updates')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, (payload) => {
+                fetchBookings();
+                fetchMyBookings();
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, (payload) => {
+                fetchReviews();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [shopInfo.id]);
+
+    // Polling for new data (every 60 seconds), as a fallback and for tab visibility
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
