@@ -34,9 +34,10 @@ function App() {
   };
 
   useEffect(() => {
+    // Only show splash for a very short time if we're not loading anything else
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 1500);
+    }, 800);
     return () => clearTimeout(timer);
   }, []);
 
@@ -44,11 +45,10 @@ function App() {
 
   // Synchronize local login state with current user from Supabase
   useEffect(() => {
-    const checkAndSync = async () => {
-      // Don't do anything while auth is still initializing
-      if (loadingUser) return;
+    let mounted = true;
 
-      setIsChecking(true);
+    const checkAndSync = async () => {
+      if (loadingUser) return;
 
       if (currentUser) {
         const userMeta = currentUser.user_metadata || {};
@@ -56,79 +56,60 @@ function App() {
         const isAdmin = userPhone.includes('505521107');
         const isOwner = userMeta.role === 'owner';
 
-        // Restore missing info in localStorage from Supabase metadata if needed
-        if (!localStorage.getItem('userRole')) {
-          localStorage.setItem('userRole', isOwner ? 'owner' : 'user');
-          setUserRole(isOwner ? 'owner' : 'user');
-        }
-        if (!localStorage.getItem('currentUserPhone')) {
-          localStorage.setItem('currentUserPhone', userPhone);
-        }
-
-        // For non-admin salon owners, verify shop approval before granting access
-        if (isOwner && !isAdmin) {
-          try {
-            // Check established shops
-            const { data: shopData } = await supabase
-              .from('shops')
-              .select('id, status')
-              .eq('owner_id', currentUser.id)
-              .limit(1);
-
-            const hasActiveShop = shopData && shopData.length > 0 && shopData[0].status === 'Active';
-            const hasPendingShop = shopData && shopData.length > 0 && shopData[0].status === 'Pending';
-
-            // Also check pending registrations
-            const { data: pendingData } = await supabase
-              .from('pending_salons')
-              .select('id, status')
-              .eq('owner_id', currentUser.id)
-              .limit(1);
-
-            const hasPendingRegistration = pendingData && pendingData.length > 0 && pendingData[0].status === 'pending';
-
-            if (!hasActiveShop && (hasPendingShop || hasPendingRegistration)) {
-              // Pending approval — block all dashboard access
-              setAwaitingApproval(true);
-              setIsLoggedIn(false); // Critical: keeps BrowserRouter from rendering
-              setIsChecking(false);
-              return;
-            } else if (!hasActiveShop && !hasPendingShop && !hasPendingRegistration) {
-              setIsLoggedIn(true);
-            } else {
-              setAwaitingApproval(false);
-              setIsLoggedIn(true);
-            }
-          } catch (err) {
-            console.error('Shop verification error:', err);
+        if (mounted) {
+          if (!localStorage.getItem('userRole')) {
+            localStorage.setItem('userRole', isOwner ? 'owner' : 'user');
+            setUserRole(isOwner ? 'owner' : 'user');
           }
-        }
 
-        setIsLoggedIn(true);
-        localStorage.setItem('isLoggedIn', 'true');
+          if (isOwner && !isAdmin) {
+            try {
+              const { data: shopData } = await supabase.from('shops').select('id, status').eq('owner_id', currentUser.id).limit(1);
+              const { data: pendingData } = await supabase.from('pending_salons').select('id, status').eq('owner_id', currentUser.id).limit(1);
+
+              if (mounted) {
+                const hasActiveShop = shopData?.length > 0 && shopData[0].status === 'Active';
+                const hasPending = (shopData?.length > 0 && shopData[0].status === 'Pending') || (pendingData?.length > 0);
+
+                if (!hasActiveShop && hasPending) {
+                  setAwaitingApproval(true);
+                  setIsLoggedIn(false);
+                } else {
+                  setIsLoggedIn(true);
+                  localStorage.setItem('isLoggedIn', 'true');
+                }
+              }
+            } catch (err) {
+              console.error('Verify error:', err);
+            }
+          } else {
+            setIsLoggedIn(true);
+            localStorage.setItem('isLoggedIn', 'true');
+          }
+          setIsChecking(false);
+        }
       } else {
-        // Only clear if we were previously "logged in" according to component state
-        // and NOT in bypass mode
-        const isBypass = localStorage.getItem('authBypass') === 'true';
-        if (isLoggedIn && !isBypass) {
-          setIsLoggedIn(false);
-          localStorage.removeItem('isLoggedIn');
-          localStorage.removeItem('userRole');
+        if (mounted) {
+          const isBypass = localStorage.getItem('authBypass') === 'true';
+          if (isLoggedIn && !isBypass) {
+            setIsLoggedIn(false);
+            localStorage.removeItem('isLoggedIn');
+          }
+          setIsChecking(false);
         }
       }
-
-      setIsChecking(false);
     };
 
     checkAndSync();
+    return () => { mounted = false; };
   }, [currentUser, loadingUser]);
 
 
 
-  if (showSplash || loadingUser || isChecking) {
+  if ((showSplash || loadingUser || isChecking) && !isLoggedIn) {
     return (
       <AnimatePresence>
-        {(showSplash || loadingUser || isChecking) && <SplashScreen key="splash" />}
+        <SplashScreen key="splash" />
       </AnimatePresence>
     );
   }
