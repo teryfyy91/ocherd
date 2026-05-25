@@ -161,9 +161,9 @@ const Dashboard = () => {
             setIsEditing(false);
             setGalleryFiles([]);
             setGalleryPreviews([]);
+            setManagementTab('queue'); // Switch back to Queue tab after saving
             if (firstTime) {
                 await sendNotification("Yangi salon qabul qilasizmi?");
-                window.location.href = '/';
             }
         } else {
             alert(result?.error || "Saqlashda xatolik yuz berdi");
