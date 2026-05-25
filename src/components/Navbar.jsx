@@ -19,13 +19,13 @@ const Navbar = () => {
 
     return (
         <>
-            <div className="fixed bottom-8 left-8 z-[1100] flex pointer-events-none">
-                <nav className="w-[420px] bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] flex items-stretch shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 md:bottom-8 md:left-8 md:translate-x-0 z-[1100] flex pointer-events-none w-full px-4 md:w-auto md:px-0">
+                <nav className="w-full max-w-[320px] md:w-[420px] mx-auto md:mx-0 bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-[1.5rem] md:rounded-[2.5rem] flex items-stretch shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto overflow-hidden">
                     {navItems.map((item) => (
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
-                            className="relative flex-1 flex items-center justify-center py-5 transition-all group"
+                            className="relative flex-1 flex items-center justify-center py-3 md:py-5 transition-all group"
                         >
                             {isActive(item.path) && (
                                 <motion.div
@@ -33,17 +33,17 @@ const Navbar = () => {
                                     className="absolute inset-0 bg-primary"
                                 />
                             )}
-                            <div className="relative z-10 flex items-center gap-4">
+                            <div className="relative z-10 flex items-center gap-2 md:gap-4">
                                 <item.icon
-                                    size={24}
+                                    size={isActive(item.path) ? 20 : 22}
                                     strokeWidth={isActive(item.path) ? 3 : 2}
-                                    className={`transition-colors duration-300 ${isActive(item.path) ? "text-white" : "text-slate-500 group-hover:text-white"}`}
+                                    className={`transition-all duration-300 ${isActive(item.path) ? "text-white" : "text-slate-500 group-hover:text-white"}`}
                                 />
                                 {isActive(item.path) && (
                                     <motion.span
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        className="text-[13px] font-black text-white uppercase tracking-[0.3em]"
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="text-[10px] md:text-[13px] font-black text-white uppercase tracking-[0.2em] md:tracking-[0.3em]"
                                     >
                                         {item.label}
                                     </motion.span>

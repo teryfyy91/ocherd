@@ -31,8 +31,8 @@ const Landing = () => {
 
     return (
         <div className="flex flex-col gap-0 pb-32 bg-white min-h-screen overflow-x-hidden select-none">
-            {/* Elegant Header Section */}
-            <div className="px-6 pt-12 pb-6 flex flex-col gap-8">
+            {/* Elegant Header Section - Sticky at top */}
+            <div className="sticky top-0 z-[1000] bg-white px-6 pt-12 pb-6 flex flex-col gap-8 border-b border-slate-50/50 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)]">
                 <header className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-auto flex items-center justify-center overflow-hidden">
@@ -57,7 +57,7 @@ const Landing = () => {
                     <input
                         type="text"
                         placeholder="Salon qidirish..."
-                        className="w-full h-16 px-8 pr-14 bg-slate-50 border-none rounded-[2rem] outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300 focus:bg-white focus:shadow-2xl focus:shadow-slate-100 transition-all shadow-sm"
+                        className="w-full h-16 px-8 pr-14 bg-slate-50 border-none rounded-[2rem] outline-none text-sm font-bold text-slate-800 placeholder:text-slate-300 focus:bg-white transition-all shadow-sm"
                     />
                     <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
                         <Filter size={18} />
@@ -77,24 +77,25 @@ const Landing = () => {
                         {activeShops.map((shop, idx) => (
                             <motion.div
                                 key={shop.id || idx}
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.4, delay: Math.min(idx * 0.05, 0.3) }}
                                 onClick={() => {
                                     setShopInfo(shop);
                                     navigate('/booking');
                                 }}
-                                className="bg-white rounded-[3.5rem] overflow-hidden shadow-2xl shadow-slate-100 border border-slate-50 group cursor-pointer active:scale-[0.98] transition-all"
+                                className="bg-white rounded-[3.5rem] overflow-hidden shadow-xl shadow-slate-100 border border-slate-50 group cursor-pointer active:scale-[0.98] transition-all"
                             >
                                 <div className="h-64 relative overflow-hidden">
                                     <img
                                         src={shop.imageUrl || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80"}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        loading="lazy"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
                                     <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
-                                        <div className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 flex items-center gap-2">
+                                        <div className="px-4 py-2 rounded-2xl bg-black/20 backdrop-blur-md border border-white/20 flex items-center gap-2">
                                             <Star size={14} fill="#FFD700" className="text-[#FFD700]" />
                                             <span className="text-white text-xs font-black">4.9 (1.2k)</span>
                                         </div>
@@ -103,7 +104,7 @@ const Landing = () => {
                                         </button>
                                     </div>
                                     <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-1">
-                                        <h3 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none group-hover:translate-x-1 transition-transform">{shop.name}</h3>
+                                        <h3 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none">{shop.name}</h3>
                                         <div className="flex items-center gap-2 text-white/70">
                                             <span className="text-[10px] font-black uppercase tracking-widest leading-none">Tasdiqlangan Salon</span>
                                         </div>
