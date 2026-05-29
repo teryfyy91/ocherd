@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '../utils/supabase';
 
 const generateTimeSlots = (start, end) => {
     const slots = [];
@@ -40,10 +41,9 @@ const Booking = () => {
     const [step, setStep] = useState(1);
     const [selectedService, setSelectedService] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
-    const [formData, setFormData] = useState({ name: '', phone: '' });
     const [errorMsg, setErrorMsg] = useState('');
     const [showServicesList, setShowServicesList] = useState(false);
-    const [showPhoneDisplay, setShowPhoneDisplay] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [fetchedPhone, setFetchedPhone] = useState('');
 
     if (!shopInfo || !shopInfo.name) {
@@ -87,43 +87,37 @@ const Booking = () => {
         }
     }, [shopInfo.phone, shopInfo.ownerId, shopInfo.name]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setErrorMsg('');
+    const [formData, setFormData] = useState({ name: '', phone: '' });
 
-        if (!selectedService || !selectedTime || !formData.name || !formData.phone) {
-            setErrorMsg('Iltimos, barcha maydonlarni to\'ldiring');
-            return;
-        }
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        try {
+            const serviceObj = (shopInfo.services || []).find(s => (typeof s === 'string' ? s : s.name) === selectedService);
+            const price = typeof serviceObj === 'string' ? 50000 : (serviceObj?.price || 50000);
 
-        const serviceObj = shopInfo.services.find(s => (typeof s === 'string' ? s : s.name) === selectedService);
-        const price = typeof serviceObj === 'string' ? 50000 : (serviceObj?.price || 50000);
+            const result = await addBooking({
+                shopId: shopInfo.id,
+                shopName: shopInfo.name,
+                service: selectedService,
+                price: price,
+                time: selectedTime,
+                name: formData.name,
+                phone: formData.phone
+            });
 
-        const result = await addBooking({
-            shopId: shopInfo.id,
-            shopName: shopInfo.name,
-            service: selectedService,
-            price: price,
-            time: selectedTime,
-            name: formData.name,
-            phone: formData.phone
-        });
-
-        if (result.success) {
-            navigate('/success');
-        } else {
-            setErrorMsg(result.message);
+            if (result.success) {
+                navigate('/success');
+            } else {
+                setErrorMsg(result.message);
+            }
+        } catch (err) {
+            setErrorMsg(t('common.error'));
+            console.error('Booking error:', err);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const galleryImages = (shopInfo.gallery && shopInfo.gallery.length > 0)
-        ? shopInfo.gallery
-        : [
-            "https://images.unsplash.com/photo-1599351473299-d8395e693175?w=400&q=80",
-            "https://images.unsplash.com/photo-1621605815841-db897cfd5118?w=400&q=80",
-            "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80",
-            "https://images.unsplash.com/photo-1622286332618-f28939b4bb6d?w=400&q=80"
-        ];
 
     return (
         <div className="flex flex-col gap-6 pb-40 -mt-8 -mx-6 bg-white min-h-screen">
@@ -163,57 +157,37 @@ const Booking = () => {
                 </div>
             </div>
 
-            <div className="px-8 grid grid-cols-2 gap-4 mt-6">
-                <button
-                    onClick={() => {
-                        if (salonPhone) {
-                            setShowPhoneDisplay(!showPhoneDisplay);
-                        } else {
-                            alert("Telefon raqami kiritilmagan");
-                        }
-                    }}
-                    className="flex flex-col items-center gap-3 group"
-                >
-                    <div className={`w-full h-16 rounded-[2rem] flex items-center justify-center transition-all border ${showPhoneDisplay ? 'bg-blue-500 text-white border-blue-500 shadow-xl' : 'text-blue-500 bg-blue-50 border-blue-100/50 shadow-sm'}`}>
-                        <Phone size={24} />
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Qo'ng'iroq</span>
-                </button>
-
-                <button
-                    onClick={() => setShowServicesList(!showServicesList)}
-                    className="flex flex-col items-center gap-3 group"
-                >
-                    <div className={`w-full h-16 rounded-[2rem] flex items-center justify-center transition-all border ${showServicesList ? 'bg-primary text-white border-primary shadow-xl' : 'text-primary bg-purple-50 border-purple-100/50 shadow-sm'}`}>
-                        <Scissors size={24} />
-                    </div>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Xizmatlar</span>
-                </button>
-            </div>
-
-            <AnimatePresence>
-                {showPhoneDisplay && salonPhone && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="px-8"
+            <div className="px-8 mt-6">
+                <div className="flex flex-col gap-4">
+                    <button
+                        onClick={() => setShowServicesList(!showServicesList)}
+                        className={`w-full h-16 rounded-[2rem] flex items-center justify-center gap-3 transition-all border ${showServicesList ? 'bg-primary text-white border-primary shadow-xl' : 'text-primary bg-purple-50 border-purple-100/50 shadow-sm'}`}
                     >
-                        <a
-                            href={`tel:${salonPhone}`}
-                            className="flex items-center justify-between p-6 rounded-[2.5rem] bg-blue-50 border border-blue-100 shadow-xl shadow-blue-100/50 group"
-                        >
-                            <div className="flex flex-col">
-                                <span className="text-[7px] font-bold text-blue-400 uppercase tracking-widest mb-1">Raqamga bosib qo'ng'iroq qiling</span>
-                                <span className="text-lg font-bold text-blue-600 tracking-[0.1em]">{salonPhone}</span>
+                        <Scissors size={20} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Xizmatlar Ro'yxati</span>
+                    </button>
+
+                    {salonPhone && (
+                        <div className="flex items-center justify-between p-6 rounded-[2.5rem] bg-slate-50 border border-slate-100/50 shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-blue-500 shadow-sm">
+                                    <Phone size={20} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Bog'lanish uchun</span>
+                                    <span className="text-sm font-bold text-slate-700 tracking-wider">{salonPhone}</span>
+                                </div>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                                <Phone size={20} fill="currentColor" />
-                            </div>
-                        </a>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            <a
+                                href={`tel:${salonPhone}`}
+                                className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+                            >
+                                <Phone size={16} fill="currentColor" />
+                            </a>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <AnimatePresence>
                 {showServicesList && (
@@ -289,16 +263,37 @@ const Booking = () => {
             </div>
 
             <div className="px-8 flex flex-col gap-6 mt-4 pb-12">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-base font-bold text-slate-800 uppercase leading-none tracking-tight">Ishlardan namunalar</h2>
-                    <button className="text-primary text-[8px] font-bold uppercase tracking-widest border-b-2 border-primary/10">Barchasi</button>
+                <div className="flex justify-between items-center px-1">
+                    <h2 className="text-base font-black text-slate-800 uppercase italic tracking-tighter leading-none">Ishlardan namunalar</h2>
+                    {shopInfo.gallery?.length > 0 && (
+                        <span className="text-[8px] font-black text-primary uppercase tracking-[0.2em] bg-purple-50 px-3 py-1.5 rounded-full">{shopInfo.gallery.length} Rasm</span>
+                    )}
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                    {galleryImages.map((work, i) => (
-                        <div key={i} className="aspect-square rounded-[2rem] overflow-hidden shadow-lg border border-slate-50">
-                            <img src={work} alt={`Work ${i}`} className="w-full h-full object-cover" />
-                        </div>
-                    ))}
+                
+                <div className="grid grid-cols-2 gap-5 mt-4">
+                    {shopInfo.gallery && shopInfo.gallery.length > 0 ? (
+                        shopInfo.gallery.map((work, i) => (
+                            <motion.div 
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className="aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-100 border border-slate-50 group relative"
+                            >
+                                <img src={work} alt={`Work ${i}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </motion.div>
+                        ))
+                    ) : (
+                        // Premium Styled Fallback if no gallery images are set in settings
+                        [1, 2, 3, 4].map((_, i) => (
+                            <div key={i} className="aspect-[4/5] rounded-[2.5rem] bg-slate-50 border border-slate-100 flex flex-col items-center justify-center gap-3 text-slate-200">
+                                <Navigation size={24} className="opacity-20" />
+                                <span className="text-[7px] font-black uppercase tracking-[0.3em] opacity-40">Namuna {i + 1}</span>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -379,7 +374,7 @@ const Booking = () => {
                                                         className={`h-14 rounded-2xl border flex flex-col items-center justify-center transition-all ${isBooked ? 'opacity-20 bg-slate-50 border-transparent' : isSel ? 'border-primary bg-purple-50 text-primary shadow-lg shadow-purple-100' : 'border-slate-100 bg-white shadow-sm'}`}
                                                     >
                                                         <span className="text-base font-bold tracking-tight">{time}</span>
-                                                        <span className="text-[7px] font-bold uppercase tracking-widest mt-0.5">{isBooked ? 'Band' : 'Ochiq'}</span>
+                                                        <span className="text-[7px] font-bold uppercase tracking-widest mt-0.5">{isBooked ? 'Band' : 'Bo\'sh'}</span>
                                                     </button>
                                                 );
                                             })}
@@ -423,7 +418,9 @@ const Booking = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={handleSubmit} className="w-full h-15 bg-primary text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all">Yakunlash</button>
+                                        <button disabled={isSubmitting} onClick={handleSubmit} className="w-full h-18 bg-primary text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 mt-4 transition-all disabled:opacity-50">
+                                            {isSubmitting ? 'Saqlanmoqda...' : 'Yakunlash'}
+                                        </button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

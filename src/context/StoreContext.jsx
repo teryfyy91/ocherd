@@ -218,6 +218,24 @@ export const StoreProvider = ({ children }) => {
         }
     }, [allShops, currentUser]);
 
+    // Keep shopInfo synchronized with fresh data from allShops
+    useEffect(() => {
+        if (shopInfo.id && allShops.length > 0) {
+            const freshShop = allShops.find(s => s.id === shopInfo.id);
+            if (freshShop) {
+                // Check if any critical data has changed to avoid unnecessary re-renders
+                const hasGalleryChanged = JSON.stringify(freshShop.gallery) !== JSON.stringify(shopInfo.gallery);
+                const hasServicesChanged = JSON.stringify(freshShop.services) !== JSON.stringify(shopInfo.services);
+                const hasNameChanged = freshShop.name !== shopInfo.name;
+                const hasImageChanged = freshShop.imageUrl !== shopInfo.imageUrl;
+
+                if (hasGalleryChanged || hasServicesChanged || hasNameChanged || hasImageChanged) {
+                    setShopInfo(prev => ({ ...prev, ...freshShop }));
+                }
+            }
+        }
+    }, [allShops, shopInfo.id]);
+
     // Real-time subscriptions for bookings and reviews
     useEffect(() => {
         const channel = supabase
@@ -426,35 +444,6 @@ export const StoreProvider = ({ children }) => {
             };
 
             let result = await performSave(payload);
-
-            // Robust retry logic for schema cache mismatches or missing columns
-            if (result.error) {
-                const errorMessage = result.error.message.toLowerCase();
-                if (errorMessage.includes('column') || errorMessage.includes('cache') || errorMessage.includes('not exist')) {
-                    // List of potentially problematic/new columns
-                    const optionalColumns = ['phone', 'gallery', 'status', 'image_url', 'working_hours', 'services'];
-                    let retryPayload = { ...payload };
-                    let changed = false;
-
-                    for (const col of optionalColumns) {
-                        if (errorMessage.includes(col)) {
-                            delete retryPayload[col];
-                            changed = true;
-                        }
-                    }
-
-                    // Fallback: if adding 'phone' specifically failed as shown in the error, be aggressive
-                    if (errorMessage.includes('phone') && retryPayload.phone !== undefined) {
-                        delete retryPayload.phone;
-                        changed = true;
-                    }
-
-                    if (changed) {
-                        console.warn('Retrying save after stripping problematic columns due to schema error.');
-                        result = await performSave(retryPayload);
-                    }
-                }
-            }
 
             if (result.error) {
                 throw result.error;

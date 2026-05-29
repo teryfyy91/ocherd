@@ -159,9 +159,15 @@ const Dashboard = () => {
                                 .from('avatars')
                                 .getPublicUrl(fileName);
                             finalGallery.push(urlData.publicUrl);
+                        } else {
+                            if (uploadError.message.includes('Bucket not found')) {
+                                throw new Error("Supabase-da 'avatars' nomli public bucket topilmadi. Iltimos, bazada bucket yarating.");
+                            }
+                            throw uploadError;
                         }
                     } catch (err) {
                         console.error("Gallery upload error:", err);
+                        throw new Error(`Rasm yuklashda xatolik: ${err.message || 'Noma\'lum xato'}`);
                     }
                 }
             }
@@ -188,7 +194,7 @@ const Dashboard = () => {
             }
         } catch (err) {
             console.error("Critical save error:", err);
-            alert("Kutilmagan xatolik yuz berdi");
+            alert(`Kutilmagan xatolik: ${err.message || 'Noma\'lum xato'}`);
         } finally {
             setIsSaving(false);
         }
@@ -242,8 +248,6 @@ const Dashboard = () => {
         setShopInfo(shop);
         setViewMode('manage');
         setManagementTab('queue');
-        setSalonImagePreview(null);
-        setSalonImageFile(null);
     };
 
     const getStatsData = () => {
@@ -274,8 +278,6 @@ const Dashboard = () => {
         setViewMode('manage');
         setIsEditing(true);
         setManagementTab('settings');
-        setSalonImagePreview(null);
-        setSalonImageFile(null);
     };
 
     if (viewMode === 'list') {
