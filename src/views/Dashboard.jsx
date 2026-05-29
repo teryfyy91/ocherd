@@ -97,6 +97,8 @@ const Dashboard = () => {
     const [managementTab, setManagementTab] = useState('queue');
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState(shopInfo || {});
+    const [primaryImageFile, setPrimaryImageFile] = useState(null);
+    const [primaryPreview, setPrimaryPreview] = useState(shopInfo?.imageUrl || '');
     const [serviceInput, setServiceInput] = useState('');
     const [servicePrice, setServicePrice] = useState('');
     const [activeMenuId, setActiveMenuId] = useState(null);
@@ -108,6 +110,7 @@ const Dashboard = () => {
     const [galleryFiles, setGalleryFiles] = useState([]);
     const [galleryPreviews, setGalleryPreviews] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
+    const primaryImageInputRef = React.useRef(null);
     const fileInputRef = React.useRef(null);
 
     const showToast = (msg) => {
@@ -120,6 +123,7 @@ const Dashboard = () => {
         if (shopInfo && shopInfo.id) {
             setViewMode('manage');
             setFormData(shopInfo || {});
+            setPrimaryPreview(shopInfo?.imageUrl || '');
         } else {
             setViewMode('list');
         }
@@ -127,6 +131,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         setFormData(shopInfo || {});
+        setPrimaryPreview(shopInfo?.imageUrl || '');
     }, [shopInfo]);
 
     const handleSave = async (e) => {
@@ -145,6 +150,30 @@ const Dashboard = () => {
             const firstTime = !shopInfo.id;
             let finalGallery = [...(formData.gallery || [])];
 
+            // Upload primary salon image if changed
+            let finalImageUrl = formData.imageUrl || '';
+            if (primaryImageFile) {
+                try {
+                    const fileExt = primaryImageFile.name.split('.').pop();
+                    const fileName = `primary_${Date.now()}.${fileExt}`;
+                    const { error: uploadError } = await supabase.storage
+                        .from('avatars')
+                        .upload(fileName, primaryImageFile);
+                    if (!uploadError) {
+                        const { data: urlData } = supabase.storage
+                            .from('avatars')
+                            .getPublicUrl(fileName);
+                        finalImageUrl = urlData.publicUrl;
+                    } else {
+                        throw uploadError;
+                    }
+                } catch (err) {
+                    console.error("Primary image upload error:", err);
+                    throw new Error(`Salon rasmi yuklashda xatolik: ${err.message}`);
+                }
+            }
+
+            // Upload gallery images
             if (galleryFiles.length > 0) {
                 for (const file of galleryFiles) {
                     try {
@@ -172,17 +201,17 @@ const Dashboard = () => {
                 }
             }
 
-            const primaryImage = finalGallery.length > 0 ? finalGallery[0] : formData.imageUrl;
             const result = await updateShopInfo({
                 ...formData,
                 services: updatedServices,
-                imageUrl: primaryImage,
+                imageUrl: finalImageUrl,
                 gallery: finalGallery
             });
 
             if (result && result.success) {
                 showToast("Muvaffaqiyatli saqlandi!");
                 setIsEditing(false);
+                setPrimaryImageFile(null);
                 setGalleryFiles([]);
                 setGalleryPreviews([]);
                 setManagementTab('queue');
@@ -599,7 +628,46 @@ const Dashboard = () => {
                                 <section className="bg-white border border-slate-100 p-10 rounded-[4rem] shadow-2xl shadow-slate-100">
                                     <form onSubmit={handleSave} className="space-y-10">
                                         <div className="flex flex-col gap-4">
-                                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em] ml-2">Ishlardan Namuna (Galereya)</span>
+                                            {/* === SALON ASOSIY RASMI === */}
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] ml-2">Salon Rasmi</span>
+                                            <div
+                                                onClick={() => primaryImageInputRef.current?.click()}
+                                                className="relative w-full h-48 rounded-[2.5rem] overflow-hidden bg-slate-50 border-2 border-dashed border-slate-200 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group flex items-center justify-center"
+                                            >
+                                                {primaryPreview ? (
+                                                    <>
+                                                        <img src={primaryPreview} alt="Salon rasmi" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                                                            <div className="flex flex-col items-center gap-2 text-white">
+                                                                <Camera size={28} />
+                                                                <span className="text-[9px] font-bold uppercase tracking-widest">Rasmni O'zgartirish</span>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="flex flex-col items-center gap-3 text-slate-300">
+                                                        <Camera size={36} className="opacity-50" />
+                                                        <span className="text-[9px] font-bold uppercase tracking-widest opacity-60">Salon Rasmi Qo'shish</span>
+                                                        <span className="text-[8px] text-slate-400 opacity-40">Foydalanuvchilarga ko'rinadi</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <input
+                                                ref={primaryImageInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files[0];
+                                                    if (file) {
+                                                        setPrimaryImageFile(file);
+                                                        setPrimaryPreview(URL.createObjectURL(file));
+                                                    }
+                                                }}
+                                            />
+
+                                            {/* === GALEREYA === */}
+                                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em] ml-2 mt-4">Ishlardan Namuna (Galereya)</span>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 {/* Existing Gallery */}
@@ -633,7 +701,7 @@ const Dashboard = () => {
                                                     </div>
                                                 ))}
 
-                                                {/* Add Button */}
+                                                {/* Gallery Add Button */}
                                                 <div
                                                     onClick={() => fileInputRef.current?.click()}
                                                     className="h-40 rounded-3xl border-2 border-dashed border-slate-100 bg-slate-50 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-100 hover:border-primary/20 transition-all text-slate-300"
