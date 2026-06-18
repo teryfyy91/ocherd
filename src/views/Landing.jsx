@@ -22,7 +22,7 @@ import { useStore } from '../context/StoreContext';
 const Landing = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { currentUser, allShops, setShopInfo } = useStore();
+    const { currentUser, allShops, setShopInfo, signOut } = useStore();
 
 
 
@@ -35,12 +35,16 @@ const Landing = () => {
             <div className="sticky top-0 z-[1000] bg-white px-6 pt-12 pb-6 flex flex-col gap-8 border-b border-slate-50/50 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)]">
                 <header className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-auto flex items-center justify-center overflow-hidden">
+                        <button
+                            onClick={() => signOut()}
+                            className="w-16 h-auto flex items-center justify-center overflow-hidden active:scale-95 transition-transform cursor-pointer"
+                            aria-label="Chiqish"
+                        >
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                        </div>
+                        </button>
                         <div className="flex flex-col gap-1">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Xush Kelibsiz</p>
-                            <h1 className="text-2xl font-black text-slate-800 uppercase leading-none">
+                            <h1 className="text-2xl font-black text-slate-800 uppercase leading-[1.1] tracking-tight">
                                 Salom, {currentUser?.user_metadata?.full_name?.split(' ')[0] || 'Mijoz'}!
                             </h1>
                         </div>

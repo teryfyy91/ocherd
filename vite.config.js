@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       injectRegister: 'auto',
       manifest: {
         name: 'BarberOS',
@@ -45,9 +45,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
+        skipWaiting: true,
       },
       devOptions: {
-        enabled: true // Dev mode-da PWA popup chiqishi uchun
+        enabled: false
       }
     })
   ],
