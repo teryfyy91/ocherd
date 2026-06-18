@@ -111,9 +111,9 @@ function App() {
 
 
   // Final removal of any splash/loading logic for 100% instant render
-  if (loadingUser && !localStorage.getItem('isLoggedIn')) {
-    return null; // Return nothing during initial background auth check to prevent flash
-  }
+  // if (loadingUser && !localStorage.getItem('isLoggedIn')) {
+  //   return null; // Return nothing during initial background auth check to prevent flash
+  // }
 
   // If awaiting approval, show ONLY the pending screen — block all routing
   if (awaitingApproval) {
