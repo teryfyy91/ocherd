@@ -1049,28 +1049,33 @@ const Dashboard = () => {
 
                 <AnimatePresence>
                     {showWalkInModal && (
-                        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-6 bg-slate-900/90 backdrop-blur-2xl">
+                        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-2xl">
                             <motion.div
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 50 }}
-                                className="bg-white rounded-[3.5rem] p-10 max-w-md w-full relative overflow-hidden shadow-2xl border border-slate-100"
+                                className="bg-white rounded-[2.5rem] max-w-md w-full relative shadow-2xl border border-slate-100 overflow-hidden"
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 animate-pulse" />
-                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full -ml-16 -mb-16" />
-
-                                <div className="relative z-10">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <h3 className="text-xl font-bold text-slate-800 uppercase italic">Yangi Mijoz (Walk-in)</h3>
+                                {/* Header */}
+                                <div className="bg-primary px-7 pt-7 pb-6 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-12 -mt-12" />
+                                    <div className="flex items-center justify-between relative z-10">
+                                        <div>
+                                            <p className="text-[9px] font-bold text-white/50 uppercase tracking-[0.3em] mb-1">Tez Qabul</p>
+                                            <h3 className="text-lg font-bold text-white uppercase italic leading-tight">Yangi Mijoz</h3>
+                                            <p className="text-[9px] font-bold text-white/60 uppercase tracking-widest mt-0.5">Walk-in</p>
+                                        </div>
                                         <button
                                             onClick={() => setShowWalkInModal(false)}
-                                            className="w-10 h-10 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all border border-slate-100"
+                                            className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-2xl flex items-center justify-center text-white transition-all backdrop-blur-md"
                                         >
                                             <X size={18} />
                                         </button>
                                     </div>
+                                </div>
 
-                                    <div className="space-y-6 text-left">
+                                <div className="p-7">
+                                    <div className="space-y-5 text-left">
                                         <div className="flex flex-col gap-2">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Mijoz Ismi</label>
                                             <input
@@ -1099,10 +1104,10 @@ const Dashboard = () => {
                                                                 setSelectedService({ name, price });
                                                                 setIsCustomService(false);
                                                             }}
-                                                            className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-20 ${
+                                                            className={`p-3 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between h-20 ${
                                                                 isSelected
-                                                                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/5 scale-105'
-                                                                    : 'border-slate-200/60 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-800'
+                                                                    ? 'border-primary bg-primary/5 shadow-md shadow-primary/10'
+                                                                    : 'border-slate-100 bg-slate-50 hover:bg-slate-100 hover:border-slate-200'
                                                             }`}
                                                         >
                                                             <span className={`text-[10px] font-bold uppercase truncate w-full ${isSelected ? 'text-primary' : 'text-slate-600'}`}>
@@ -1121,10 +1126,10 @@ const Dashboard = () => {
                                                         setIsCustomService(true);
                                                         setSelectedService(null);
                                                     }}
-                                                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-20 ${
+                                                    className={`p-3 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between h-20 ${
                                                         isCustomService
-                                                            ? 'border-primary bg-primary/5 shadow-lg shadow-primary/5 scale-105'
-                                                            : 'border-slate-200/60 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-800'
+                                                            ? 'border-primary bg-primary/5 shadow-md shadow-primary/10'
+                                                            : 'border-slate-100 bg-slate-50 hover:bg-slate-100 hover:border-slate-200'
                                                     }`}
                                                 >
                                                     <span className={`text-[10px] font-bold uppercase ${isCustomService ? 'text-primary' : 'text-slate-600'}`}>
@@ -1163,7 +1168,7 @@ const Dashboard = () => {
                                         )}
                                     </div>
 
-                                    <div className="flex flex-col gap-3 mt-8">
+                                    <div className="flex flex-col gap-3 mt-6">
                                         <button
                                             onClick={async () => {
                                                 let serviceName = '';
@@ -1225,6 +1230,7 @@ const Dashboard = () => {
                                             )}
                                         </button>
                                     </div>
+                                </div>
                                 </div>
                             </motion.div>
                         </div>
