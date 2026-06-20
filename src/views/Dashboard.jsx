@@ -189,7 +189,6 @@ const Dashboard = () => {
     });
     const [expenseName, setExpenseName] = useState('');
     const [expenseAmount, setExpenseAmount] = useState('');
-    const [expenseCategory, setExpenseCategory] = useState('Umumiy');
     const [expenseDate, setExpenseDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
@@ -202,7 +201,6 @@ const Dashboard = () => {
             id: Date.now(),
             name: expenseName.trim(),
             amount: parseInt(expenseAmount),
-            category: expenseCategory,
             date: expenseDate,
             createdAt: new Date().toISOString()
         };
@@ -216,7 +214,6 @@ const Dashboard = () => {
         setExpenses(prev => prev.filter(e => e.id !== id));
     };
 
-    const expenseCategories = ['Umumiy', 'Ijara', 'Asbob-uskunalar', 'Ish haqi', 'Mahsulotlar', 'Kommunal', 'Reklama', 'Boshqa'];
     const totalExpenses = React.useMemo(() => expenses.reduce((s, e) => s + (e.amount || 0), 0), [expenses]);
     const thisMonthExpenses = React.useMemo(() => {
         const m = new Date().toISOString().slice(0, 7);
@@ -813,7 +810,6 @@ const Dashboard = () => {
                                                         <div className="flex flex-col gap-1">
                                                             <h4 className="font-bold text-slate-800 text-sm uppercase leading-none">{exp.name}</h4>
                                                             <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="text-[8px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-wider">{exp.category}</span>
                                                                 <span className="text-[8px] font-bold text-slate-300 uppercase">{exp.date}</span>
                                                             </div>
                                                         </div>
