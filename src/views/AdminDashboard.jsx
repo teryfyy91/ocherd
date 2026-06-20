@@ -37,6 +37,7 @@ const AdminDashboard = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [newNotificationToast, setNewNotificationToast] = useState(null);
     const [shopToDelete, setShopToDelete] = useState(null);
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
     useEffect(() => {
         if (isSuperAdmin) {
@@ -770,8 +771,12 @@ const AdminDashboard = () => {
                             )}
                         </AnimatePresence>
                     </div>
-                    <button onClick={signOut} className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                        <LogOut size={20} />
+                    <button
+                        onClick={() => setLogoutModalOpen(true)}
+                        className="flex items-center gap-2 h-10 px-4 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-red-100 hover:border-red-500"
+                    >
+                        <LogOut size={18} />
+                        <span className="text-[9px] font-bold uppercase tracking-widest hidden sm:block">Chiqish</span>
                     </button>
                     <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 border border-slate-200">
                         <User size={20} />
@@ -923,6 +928,43 @@ const AdminDashboard = () => {
                                         )}
                                     </button>
                                 </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {logoutModalOpen && (
+                    <div className="fixed inset-0 z-[20000] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-xl">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white p-10 rounded-[4rem] shadow-2xl max-w-sm w-full relative overflow-hidden text-center"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full -mr-16 -mt-16" />
+                            <div className="w-24 h-24 bg-red-50 text-red-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-500/10 relative z-10">
+                                <LogOut size={40} />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-800 uppercase italic mb-3 relative z-10">Chiqish</h3>
+                            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-10 leading-loose opacity-60 relative z-10">
+                                Admin paneldan chiqishni tasdiqlaysizmi?
+                            </p>
+                            <div className="flex flex-col gap-4 relative z-10">
+                                <button
+                                    onClick={() => { setLogoutModalOpen(false); signOut(); }}
+                                    className="w-full h-16 bg-red-500 text-white rounded-[2rem] font-bold text-xs uppercase tracking-widest shadow-2xl shadow-red-500/40 active:scale-95 transition-all flex items-center justify-center gap-3"
+                                >
+                                    <LogOut size={16} />
+                                    Ha, Chiqish
+                                </button>
+                                <button
+                                    onClick={() => setLogoutModalOpen(false)}
+                                    className="w-full h-16 bg-slate-100 text-slate-400 rounded-[2rem] font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
+                                >
+                                    Bekor Qilish
+                                </button>
                             </div>
                         </motion.div>
                     </div>
