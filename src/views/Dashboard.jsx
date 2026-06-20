@@ -7,7 +7,9 @@ import {
     ChevronLeft, Plus, LayoutGrid, Store,
     ArrowRight, MapPin, MoreVertical, AlertTriangle, Check,
     BarChart3, TrendingUp, Star, MessageSquare, X, Camera, LogOut,
-    Search, Bell, Heart, Filter, User, Home, ShoppingBag
+    Search, Bell, Heart, Filter, User, Home, ShoppingBag,
+    Wallet, Receipt, Tag, PlusCircle, MinusCircle, DollarSign,
+    Play
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
@@ -83,6 +85,48 @@ const CustomTimePicker = ({ label, value, onChange }) => {
     );
 };
 
+const SessionTimer = ({ bookingId, createdAt }) => {
+    const [elapsed, setElapsed] = useState('');
+
+    useEffect(() => {
+        const getStartTime = () => {
+            const stored = localStorage.getItem('booking_start_' + bookingId);
+            if (stored) return parseInt(stored);
+            if (createdAt) return new Date(createdAt).getTime();
+            return Date.now();
+        };
+
+        const startTime = getStartTime();
+
+        const updateTimer = () => {
+            const diffMs = Date.now() - startTime;
+            const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+            const hours = Math.floor(diffSec / 3600);
+            const minutes = Math.floor((diffSec % 3600) / 60);
+            const seconds = diffSec % 60;
+
+            const pad = (num) => num.toString().padStart(2, '0');
+
+            if (hours > 0) {
+                setElapsed(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`);
+            } else {
+                setElapsed(`${pad(minutes)}:${pad(seconds)}`);
+            }
+        };
+
+        updateTimer();
+        const timerId = setInterval(updateTimer, 1000);
+        return () => clearInterval(timerId);
+    }, [bookingId, createdAt]);
+
+    return (
+        <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold font-mono tracking-wider animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping duration-1000" />
+            <span>{elapsed}</span>
+        </div>
+    );
+};
+
 const Dashboard = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -90,13 +134,37 @@ const Dashboard = () => {
         shopInfo, setShopInfo, updateShopInfo,
         queue, updateBookingStatus, deleteBooking,
         myShops, loadingShops, deleteShop,
-        reviews, sendNotification, signOut
+        reviews, sendNotification, signOut, addBooking
     } = useStore();
 
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'manage'
     const [managementTab, setManagementTab] = useState('queue');
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState(shopInfo || {});
+
+    // === WALK-IN CLIENT & TIMER STATES ===
+    const [showWalkInModal, setShowWalkInModal] = useState(false);
+    const [walkInName, setWalkInName] = useState('Mijoz');
+    const [selectedService, setSelectedService] = useState(null);
+    const [isCustomService, setIsCustomService] = useState(false);
+    const [customServiceName, setCustomServiceName] = useState('');
+    const [customServicePrice, setCustomServicePrice] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Wrapped update & delete to track timers in localStorage
+    const handleUpdateStatus = async (id, status) => {
+        if (status === 'In progress') {
+            localStorage.setItem('booking_start_' + id, Date.now().toString());
+        } else if (status === 'Done') {
+            localStorage.removeItem('booking_start_' + id);
+        }
+        await updateBookingStatus(id, status);
+    };
+
+    const handleDeleteBooking = async (id) => {
+        localStorage.removeItem('booking_start_' + id);
+        await deleteBooking(id);
+    };
     const [primaryImageFile, setPrimaryImageFile] = useState(null);
     const [primaryPreview, setPrimaryPreview] = useState(shopInfo?.imageUrl || '');
     const [serviceInput, setServiceInput] = useState('');
@@ -113,6 +181,47 @@ const Dashboard = () => {
     const [isSaving, setIsSaving] = useState(false);
     const primaryImageInputRef = React.useRef(null);
     const fileInputRef = React.useRef(null);
+
+    // === XARAJATLAR ===
+    const expensesKey = `expenses_${shopInfo?.id || 'default'}`;
+    const [expenses, setExpenses] = useState(() => {
+        try { return JSON.parse(localStorage.getItem(expensesKey)) || []; } catch { return []; }
+    });
+    const [expenseName, setExpenseName] = useState('');
+    const [expenseAmount, setExpenseAmount] = useState('');
+    const [expenseCategory, setExpenseCategory] = useState('Umumiy');
+    const [expenseDate, setExpenseDate] = useState(new Date().toISOString().split('T')[0]);
+
+    useEffect(() => {
+        try { localStorage.setItem(expensesKey, JSON.stringify(expenses)); } catch {}
+    }, [expenses, expensesKey]);
+
+    const addExpense = () => {
+        if (!expenseName.trim() || !expenseAmount.trim()) return;
+        const newExp = {
+            id: Date.now(),
+            name: expenseName.trim(),
+            amount: parseInt(expenseAmount),
+            category: expenseCategory,
+            date: expenseDate,
+            createdAt: new Date().toISOString()
+        };
+        setExpenses(prev => [newExp, ...prev]);
+        setExpenseName('');
+        setExpenseAmount('');
+        setExpenseDate(new Date().toISOString().split('T')[0]);
+    };
+
+    const deleteExpense = (id) => {
+        setExpenses(prev => prev.filter(e => e.id !== id));
+    };
+
+    const expenseCategories = ['Umumiy', 'Ijara', 'Asbob-uskunalar', 'Ish haqi', 'Mahsulotlar', 'Kommunal', 'Reklama', 'Boshqa'];
+    const totalExpenses = React.useMemo(() => expenses.reduce((s, e) => s + (e.amount || 0), 0), [expenses]);
+    const thisMonthExpenses = React.useMemo(() => {
+        const m = new Date().toISOString().slice(0, 7);
+        return expenses.filter(e => e.date?.startsWith(m)).reduce((s, e) => s + (e.amount || 0), 0);
+    }, [expenses]);
 
     const showToast = (msg) => {
         setSuccessMessage(msg);
@@ -447,15 +556,15 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setShowWalkInModal(true)}
+                                    className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/30 transition-all shadow-lg hover:scale-105 active:scale-95 animate-fade-in"
+                                    title="Walk-in qabul"
+                                >
+                                    <Plus size={20} />
+                                </button>
                                 <button onClick={() => setManagementTab('settings')} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/30 transition-all">
                                     <Settings size={20} />
-                                </button>
-                                <button
-                                    onClick={() => setLogoutModalOpen(true)}
-                                    className="flex items-center gap-2 h-12 px-4 bg-red-500/20 backdrop-blur-md rounded-2xl text-white border border-red-400/30 hover:bg-red-500 hover:border-red-500 transition-all group"
-                                >
-                                    <LogOut size={18} />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest">Chiqish</span>
                                 </button>
                             </div>
                         </div>
@@ -464,6 +573,7 @@ const Dashboard = () => {
                             {[
                                 { id: 'queue', icon: Users, label: 'Navbat' },
                                 { id: 'stats', icon: BarChart3, label: 'Stats' },
+                                { id: 'expenses', icon: Wallet, label: 'Xarajat' },
                                 { id: 'reviews', icon: Star, label: 'Izohlar' }
                             ].map(tab => (
                                 <button
@@ -512,7 +622,7 @@ const Dashboard = () => {
                                                         <p className="text-[9px] text-amber-600 font-bold uppercase tracking-widest">{item.service} • {item.time}</p>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => updateBookingStatus(item.id, 'Waiting')} className="h-14 px-8 bg-amber-500 text-white rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-amber-200 active:scale-95 transition-all hover:brightness-110">Qabul</button>
+                                                <button onClick={() => handleUpdateStatus(item.id, 'Waiting')} className="h-14 px-8 bg-amber-500 text-white rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-amber-200 active:scale-95 transition-all hover:brightness-110">Qabul</button>
                                             </motion.div>
                                         ))}
 
@@ -527,7 +637,7 @@ const Dashboard = () => {
                                                     <div onClick={() => setSelectedUserDetails(item)} className="flex flex-col gap-1 cursor-pointer">
                                                         <div className="flex items-center gap-3">
                                                             <h4 className="font-bold text-slate-800 text-base uppercase leading-none group-hover:text-primary transition-colors">{item.name}</h4>
-                                                            {item.status === 'In progress' && <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-[7px] font-bold uppercase tracking-widest animate-pulse">Band</span>}
+                                                            {item.status === 'In progress' && <SessionTimer bookingId={item.id} createdAt={item.createdAt} />}
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <Scissors size={12} className="text-primary/40" />
@@ -538,11 +648,11 @@ const Dashboard = () => {
 
                                                 <div className="relative z-10">
                                                     {item.status === 'In progress' ? (
-                                                        <button onClick={() => updateBookingStatus(item.id, 'Done')} className="w-16 h-16 bg-slate-900 text-white rounded-[1.8rem] flex items-center justify-center shadow-2xl shadow-slate-900/40 hover:scale-110 active:scale-95 transition-all">
+                                                        <button onClick={() => handleUpdateStatus(item.id, 'Done')} className="w-16 h-16 bg-slate-900 text-white rounded-[1.8rem] flex items-center justify-center shadow-2xl shadow-slate-900/40 hover:scale-110 active:scale-95 transition-all">
                                                             <Check size={28} />
                                                         </button>
                                                     ) : (
-                                                        <button onClick={() => updateBookingStatus(item.id, 'In progress')} className="h-14 px-8 bg-white border border-slate-200 text-slate-400 rounded-[1.5rem] font-bold text-[10px] uppercase tracking-widest hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">Boshlash</button>
+                                                        <button onClick={() => handleUpdateStatus(item.id, 'In progress')} className="h-14 px-8 bg-white border border-slate-200 text-slate-400 rounded-[1.5rem] font-bold text-[10px] uppercase tracking-widest hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">Boshlash</button>
                                                     )}
                                                 </div>
                                             </motion.div>
@@ -599,6 +709,143 @@ const Dashboard = () => {
                                         </ResponsiveContainer>
                                     </div>
                                 </section>
+                            </motion.div>
+                        )}
+
+                        {managementTab === 'expenses' && (
+                            <motion.div key="expenses" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="space-y-8">
+
+                                {/* Summary Cards */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-slate-900 px-6 py-6 rounded-[2rem] flex flex-col items-center text-center shadow-xl relative overflow-hidden">
+                                        <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-red-500/20 rounded-full blur-2xl" />
+                                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Bu Oy</span>
+                                        <span className="text-xl font-bold text-white mb-1">{thisMonthExpenses.toLocaleString()}</span>
+                                        <span className="text-[8px] font-bold text-red-400 uppercase tracking-widest">SO'M</span>
+                                    </div>
+                                    <div className="bg-white border border-slate-100 px-6 py-6 rounded-[2rem] flex flex-col items-center text-center shadow-xl shadow-slate-50">
+                                        <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Jami</span>
+                                        <span className="text-xl font-bold text-slate-800 mb-1">{totalExpenses.toLocaleString()}</span>
+                                        <span className="text-[8px] font-bold text-primary uppercase tracking-widest">SO'M</span>
+                                    </div>
+                                </div>
+
+                                {/* Add Expense Form */}
+                                <div className="bg-white border border-slate-100 p-8 rounded-[3rem] shadow-xl shadow-slate-50 space-y-5">
+                                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                                        <PlusCircle size={18} className="text-primary" />
+                                        Xarajat Qo'shish
+                                    </h3>
+
+                                    {/* Category */}
+                                    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                                        {expenseCategories.map(cat => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => setExpenseCategory(cat)}
+                                                className={`shrink-0 px-4 py-2 rounded-2xl text-[9px] font-bold uppercase tracking-wider transition-all ${expenseCategory === cat ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
+                                            >
+                                                {cat}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Name */}
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nomi</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Xarajat nomi..."
+                                            value={expenseName}
+                                            onChange={e => setExpenseName(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 px-5 py-4 rounded-2xl text-slate-800 font-bold text-sm outline-none focus:border-primary/50 focus:bg-white transition-all"
+                                        />
+                                    </div>
+
+                                    {/* Amount + Date */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Summa (so'm)</label>
+                                            <input
+                                                type="number"
+                                                placeholder="0"
+                                                value={expenseAmount}
+                                                onChange={e => setExpenseAmount(e.target.value)}
+                                                className="w-full bg-slate-50 border border-slate-200 px-5 py-4 rounded-2xl text-slate-800 font-bold text-sm outline-none focus:border-primary/50 focus:bg-white transition-all"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sana</label>
+                                            <input
+                                                type="date"
+                                                value={expenseDate}
+                                                onChange={e => setExpenseDate(e.target.value)}
+                                                className="w-full bg-slate-50 border border-slate-200 px-5 py-4 rounded-2xl text-slate-800 font-bold text-sm outline-none focus:border-primary/50 focus:bg-white transition-all"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={addExpense}
+                                        disabled={!expenseName.trim() || !expenseAmount.trim()}
+                                        className="w-full h-16 bg-primary text-white rounded-[2rem] font-bold text-xs uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        <Plus size={18} />
+                                        Qo'shish
+                                    </button>
+                                </div>
+
+                                {/* Expenses List */}
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center px-1">
+                                        <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Xarajatlar</h3>
+                                        <span className="bg-slate-900 text-white text-[7px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">{expenses.length} ta</span>
+                                    </div>
+
+                                    {expenses.length === 0 ? (
+                                        <div className="py-20 text-center bg-slate-50 border-2 border-dashed border-slate-100 rounded-[4rem] flex flex-col items-center gap-6 opacity-40">
+                                            <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center text-slate-200 shadow-xl">
+                                                <Wallet size={36} />
+                                            </div>
+                                            <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest">Hali xarajat kiritilmagan</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {expenses.map(exp => (
+                                                <motion.div
+                                                    key={exp.id}
+                                                    layout
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: 20 }}
+                                                    className="bg-white border border-slate-100 p-5 rounded-[2.5rem] shadow-lg shadow-slate-50 flex items-center justify-between group hover:border-red-100 transition-all"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-14 h-14 bg-red-50 rounded-[1.5rem] flex items-center justify-center text-red-400 shrink-0">
+                                                            <Receipt size={22} />
+                                                        </div>
+                                                        <div className="flex flex-col gap-1">
+                                                            <h4 className="font-bold text-slate-800 text-sm uppercase leading-none">{exp.name}</h4>
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span className="text-[8px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-wider">{exp.category}</span>
+                                                                <span className="text-[8px] font-bold text-slate-300 uppercase">{exp.date}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 shrink-0">
+                                                        <span className="font-bold text-slate-800 text-sm">{(exp.amount || 0).toLocaleString()} <span className="text-[8px] text-primary">so'm</span></span>
+                                                        <button
+                                                            onClick={() => deleteExpense(exp.id)}
+                                                            className="w-10 h-10 rounded-2xl bg-red-50 text-red-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </motion.div>
                         )}
 
@@ -801,6 +1048,187 @@ const Dashboard = () => {
                 </main>
 
                 <AnimatePresence>
+                    {showWalkInModal && (
+                        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-6 bg-slate-900/90 backdrop-blur-2xl">
+                            <motion.div
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 50 }}
+                                className="bg-white rounded-[3.5rem] p-10 max-w-md w-full relative overflow-hidden shadow-2xl border border-slate-100"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 animate-pulse" />
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full -ml-16 -mb-16" />
+
+                                <div className="relative z-10">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <h3 className="text-xl font-bold text-slate-800 uppercase italic">Yangi Mijoz (Walk-in)</h3>
+                                        <button
+                                            onClick={() => setShowWalkInModal(false)}
+                                            className="w-10 h-10 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all border border-slate-100"
+                                        >
+                                            <X size={18} />
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-6 text-left">
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Mijoz Ismi</label>
+                                            <input
+                                                type="text"
+                                                value={walkInName}
+                                                onChange={e => setWalkInName(e.target.value)}
+                                                className="w-full h-14 bg-slate-50 border border-slate-200 px-6 rounded-2xl text-slate-800 font-bold text-sm outline-none focus:border-primary/50 focus:bg-white transition-all"
+                                                placeholder="Mijoz"
+                                            />
+                                        </div>
+
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Xizmat turi</label>
+                                            <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-1 scrollbar-hide">
+                                                {(shopInfo.services || []).map((service, idx) => {
+                                                    const s = typeof service === 'string' && service.startsWith('{') ? JSON.parse(service) : service;
+                                                    const name = typeof s === 'object' ? s.name : s;
+                                                    const price = typeof s === 'object' ? s.price : 50000;
+                                                    const isSelected = selectedService?.name === name && !isCustomService;
+
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setSelectedService({ name, price });
+                                                                setIsCustomService(false);
+                                                            }}
+                                                            className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-20 ${
+                                                                isSelected
+                                                                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/5 scale-105'
+                                                                    : 'border-slate-200/60 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-800'
+                                                            }`}
+                                                        >
+                                                            <span className={`text-[10px] font-bold uppercase truncate w-full ${isSelected ? 'text-primary' : 'text-slate-600'}`}>
+                                                                {name}
+                                                            </span>
+                                                            <span className={`text-[11px] font-mono font-black ${isSelected ? 'text-primary' : 'text-slate-800'}`}>
+                                                                {price.toLocaleString()} so'm
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                })}
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setIsCustomService(true);
+                                                        setSelectedService(null);
+                                                    }}
+                                                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-20 ${
+                                                        isCustomService
+                                                            ? 'border-primary bg-primary/5 shadow-lg shadow-primary/5 scale-105'
+                                                            : 'border-slate-200/60 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-800'
+                                                    }`}
+                                                >
+                                                    <span className={`text-[10px] font-bold uppercase ${isCustomService ? 'text-primary' : 'text-slate-600'}`}>
+                                                        Boshqa...
+                                                    </span>
+                                                    <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">
+                                                        Custom xizmat
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {isCustomService && (
+                                            <div className="space-y-4 pt-2 border-t border-slate-100 animate-slide-down">
+                                                <div className="flex flex-col gap-2">
+                                                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-2">Xizmat Nomi</label>
+                                                    <input
+                                                        type="text"
+                                                        value={customServiceName}
+                                                        onChange={e => setCustomServiceName(e.target.value)}
+                                                        className="w-full h-12 bg-slate-50 border border-slate-200 px-6 rounded-xl text-slate-800 font-bold text-sm outline-none focus:border-primary/50 focus:bg-white transition-all"
+                                                        placeholder="Masalan: Kal va shotchik"
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col gap-2">
+                                                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-2">Narxi (so'm)</label>
+                                                    <input
+                                                        type="number"
+                                                        value={customServicePrice}
+                                                        onChange={e => setCustomServicePrice(e.target.value)}
+                                                        className="w-full h-12 bg-slate-50 border border-slate-200 px-6 rounded-xl text-slate-800 font-bold text-sm outline-none focus:border-primary/50 focus:bg-white transition-all"
+                                                        placeholder="50000"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col gap-3 mt-8">
+                                        <button
+                                            onClick={async () => {
+                                                let serviceName = '';
+                                                let servicePrice = 0;
+
+                                                if (isCustomService) {
+                                                    if (!customServiceName.trim() || !customServicePrice.trim()) {
+                                                        alert("Iltimos, xizmat nomi va narxini kiriting");
+                                                        return;
+                                                    }
+                                                    serviceName = customServiceName.trim();
+                                                    servicePrice = parseInt(customServicePrice);
+                                                } else {
+                                                    if (!selectedService) {
+                                                        alert("Iltimos, xizmat turini tanlang");
+                                                        return;
+                                                    }
+                                                    serviceName = selectedService.name;
+                                                    servicePrice = selectedService.price;
+                                                }
+
+                                                const walkInBooking = {
+                                                    shopId: shopInfo.id,
+                                                    shopName: shopInfo.name,
+                                                    name: walkInName.trim() || "Walk-in Mijoz",
+                                                    phone: "+998000000000",
+                                                    service: serviceName,
+                                                    price: servicePrice,
+                                                    time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
+                                                    status: 'In progress'
+                                                };
+
+                                                setIsSubmitting(true);
+                                                const res = await addBooking(walkInBooking);
+                                                setIsSubmitting(false);
+
+                                                if (res.success && res.id) {
+                                                    localStorage.setItem('booking_start_' + res.id, Date.now().toString());
+                                                    setShowWalkInModal(false);
+                                                    setWalkInName('Mijoz');
+                                                    setSelectedService(null);
+                                                    setIsCustomService(false);
+                                                    setCustomServiceName('');
+                                                    setCustomServicePrice('');
+                                                } else {
+                                                    alert(res.message || "Xatolik yuz berdi");
+                                                }
+                                            }}
+                                            disabled={isSubmitting || (!selectedService && !isCustomService)}
+                                            className="w-full h-16 bg-primary text-white rounded-[2rem] font-bold text-xs uppercase tracking-widest shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:hover:scale-100"
+                                        >
+                                            {isSubmitting ? (
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <Play size={14} className="fill-current text-white" />
+                                                    Xizmatni boshlash
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
                     {selectedUserDetails && (
                         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-6 bg-slate-900/90 backdrop-blur-2xl">
                             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-white rounded-[4.5rem] p-12 max-w-sm w-full relative overflow-hidden shadow-2xl border border-slate-100 text-center">

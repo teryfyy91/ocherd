@@ -352,7 +352,7 @@ export const StoreProvider = ({ children }) => {
             user_phone: booking.phone,
             service: booking.price ? `${booking.service}||${booking.price}` : booking.service,
             time: booking.time,
-            status: 'Pending',
+            status: booking.status || 'Pending',
             created_at: new Date().toISOString()
         };
 
@@ -368,7 +368,7 @@ export const StoreProvider = ({ children }) => {
             }
 
             fetchBookings();
-            return { success: true, message: 'Successfully requested booking!' };
+            return { success: true, id: insertedBooking.id, message: 'Successfully requested booking!' };
         } catch (err) {
             console.error('Error adding booking:', err);
             return { success: false, message: `Error: ${err.message || 'Failed to add booking'}` };
