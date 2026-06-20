@@ -295,11 +295,12 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             const res = await deleteShop(id);
-            if (res.success) {
-                await refreshShops();
-                setShopToDelete(null);
-            } else {
-                alert(res.error || "O'chirishda xatolik yuz berdi");
+            // Muvaffaqiyatli o'chirildi (DB yoki lokal)
+            setShopToDelete(null);
+            if (res.warning) {
+                console.warn('O\'chirish ogohlantirishlari:', res.warning);
+                // Ilovani yangilab, DB sinxronlanishini ta'minlaymiz
+                setTimeout(() => refreshShops(), 2000);
             }
         } catch (err) {
             console.error('Error deleting shop:', err);

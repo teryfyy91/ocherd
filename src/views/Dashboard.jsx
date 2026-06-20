@@ -104,6 +104,7 @@ const Dashboard = () => {
     const [activeMenuId, setActiveMenuId] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [shopToDelete, setShopToDelete] = useState(null);
+    const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const [successToast, setSuccessToast] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedUserDetails, setSelectedUserDetails] = useState(null);
@@ -430,15 +431,33 @@ const Dashboard = () => {
 
                     <div className="relative z-10 flex flex-col gap-8">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="flex flex-col ml-1">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShopInfo({ name: '', services: [], workingHours: { start: '09:00', end: '18:00' } });
+                                        setViewMode('list');
+                                    }}
+                                    className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/10 hover:bg-white/20 transition-all"
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
+                                <div className="flex flex-col">
                                     <h1 className="text-base font-bold text-white uppercase leading-none">{shopInfo.name}</h1>
                                     <span className="text-[7px] font-bold text-white/50 uppercase tracking-widest mt-1">Salon Boshqaruvi</span>
                                 </div>
                             </div>
-                            <button onClick={() => setManagementTab('settings')} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10">
-                                <Settings size={20} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setManagementTab('settings')} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/30 transition-all">
+                                    <Settings size={20} />
+                                </button>
+                                <button
+                                    onClick={() => setLogoutModalOpen(true)}
+                                    className="flex items-center gap-2 h-12 px-4 bg-red-500/20 backdrop-blur-md rounded-2xl text-white border border-red-400/30 hover:bg-red-500 hover:border-red-500 transition-all group"
+                                >
+                                    <LogOut size={18} />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest">Chiqish</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div className="bg-white/10 backdrop-blur-xl border border-white/10 p-2 rounded-[2.5rem] flex gap-1 items-center overflow-x-auto scrollbar-hide">
@@ -757,13 +776,23 @@ const Dashboard = () => {
                                             </div>
                                         </div>
 
-                                        <button
-                                            type="submit"
-                                            disabled={isSaving}
-                                            className="w-full h-18 bg-primary text-white rounded-[2.5rem] font-bold text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 active:scale-95 transition-all mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {isSaving ? 'Saqlanmoqda...' : 'Saqlash'}
-                                        </button>
+                                        <div className="flex flex-col gap-4 mt-8">
+                                            <button
+                                                type="submit"
+                                                disabled={isSaving}
+                                                className="w-full h-18 bg-primary text-white rounded-[2.5rem] font-bold text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {isSaving ? 'Saqlanmoqda...' : 'Saqlash'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={signOut}
+                                                className="w-full h-18 bg-red-50 text-red-500 rounded-[2.5rem] font-bold text-sm uppercase tracking-[0.3em] hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3 border border-red-100 shadow-sm active:scale-95"
+                                            >
+                                                <LogOut size={18} />
+                                                Chiqish
+                                            </button>
+                                        </div>
                                     </form>
                                 </section>
                             </motion.div>
@@ -796,6 +825,43 @@ const Dashboard = () => {
                                     </div>
                                 </div>
                                 <button onClick={() => setSelectedUserDetails(null)} className="w-full h-18 bg-slate-900 text-white rounded-[2.2rem] font-bold text-xs uppercase tracking-[0.4em] shadow-2xl active:scale-95 transition-all">Yopish</button>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {logoutModalOpen && (
+                        <div className="fixed inset-0 z-[1400] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-xl">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="bg-white p-10 rounded-[4rem] shadow-2xl max-w-sm w-full relative overflow-hidden text-center"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full -mr-16 -mt-16" />
+                                <div className="w-24 h-24 bg-red-50 text-red-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-500/10 relative z-10">
+                                    <LogOut size={40} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-800 uppercase italic mb-3 relative z-10">Chiqish</h3>
+                                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-10 leading-loose opacity-60 relative z-10">
+                                    Tizimdan chiqishni tasdiqlaysizmi?
+                                </p>
+                                <div className="flex flex-col gap-4 relative z-10">
+                                    <button
+                                        onClick={() => { setLogoutModalOpen(false); signOut(); }}
+                                        className="w-full h-16 bg-red-500 text-white rounded-[2rem] font-bold text-xs uppercase tracking-widest shadow-2xl shadow-red-500/40 active:scale-95 transition-all flex items-center justify-center gap-3"
+                                    >
+                                        <LogOut size={16} />
+                                        Ha, Chiqish
+                                    </button>
+                                    <button
+                                        onClick={() => setLogoutModalOpen(false)}
+                                        className="w-full h-16 bg-slate-100 text-slate-400 rounded-[2rem] font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
+                                    >
+                                        Bekor Qilish
+                                    </button>
+                                </div>
                             </motion.div>
                         </div>
                     )}
