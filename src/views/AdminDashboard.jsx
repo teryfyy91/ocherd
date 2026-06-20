@@ -31,6 +31,7 @@ const AdminDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const allShops = contextShops;
     const [stats, setStats] = useState({ totalUsers: 0, activeNow: 0, recentActions: [] });
+    const [blockedCount, setBlockedCount] = useState(0);
     const [loading, setLoading] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
@@ -62,6 +63,9 @@ const AdminDashboard = () => {
                                 time: new Date(b.created_at).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
                             }))
                         });
+                        // Update blocked count
+                        const blocked = (allShops || []).filter(s => s.status === 'Blocked').length;
+                        setBlockedCount(blocked);
                     }
 
                     const pending = allShops.filter(s => s.status === 'Pending');
@@ -305,6 +309,20 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleBlockShop = async (id) => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.from('shops').update({ status: 'Blocked' }).eq('id', id);
+            if (error) throw error;
+            await refreshShops();
+        } catch (err) {
+            console.error('Error blocking shop:', err);
+            alert('Salonni bloklashda xatolik yuz berdi');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const SuperGatewayTab = () => (
         <div className="flex flex-col gap-12 py-10">
             <div className="text-center relative py-12 md:py-20">
@@ -363,7 +381,7 @@ const AdminDashboard = () => {
                 ownerId: n.salonDetails?.owner_id
             }))
         ];
-        const activeShops = allShops.filter(s => s.status !== 'Pending');
+        const activeShops = allShops.filter(s => s.status === 'Active');
         const filteredActive = activeShops.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
         return (
@@ -447,6 +465,16 @@ const AdminDashboard = () => {
                                             >
                                                 {loading ? <Loader2 className="animate-spin size-4" /> : 'Tasdiqlash'}
                                             </button>
+                                            {/* Block button for active shops */}
+                                            {!s.isNewReg && (
+                                                <button
+                                                    disabled={loading}
+                                                    onClick={(e) => { e.stopPropagation(); handleBlockShop(s.id); }}
+                                                    className="flex-1 py-4 bg-yellow-500 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-yellow-600 disabled:opacity-50 ml-2"
+                                                >
+                                                    {loading ? <Loader2 className="animate-spin size-4" /> : 'Blok'}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </motion.div>
@@ -523,7 +551,7 @@ const AdminDashboard = () => {
                     {[
                         { label: 'Faol Hozir', val: stats.activeNow, color: 'text-emerald-400' },
                         { label: 'Salonlar', val: allShops.length, color: 'text-blue-400' },
-                        { label: 'Bloklangan', val: 0, color: 'text-red-400' }
+                        { label: 'Bloklangan', val: blockedCount, color: 'text-red-400' }
                     ].map((stat, i) => (
                         <div key={i} className="bg-white/5 backdrop-blur-md p-6 rounded-[2.5rem] border border-white/5">
                             <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500 mb-1">{stat.label}</p>
@@ -571,6 +599,7 @@ const AdminDashboard = () => {
     );
 
     const handleClearAllNotifications = async () => {
+        // Existing code unchanged
         try {
             // Delete all notifications from DB
             const { error } = await supabase

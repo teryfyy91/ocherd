@@ -288,6 +288,7 @@ export const StoreProvider = ({ children }) => {
                 .order('created_at', { ascending: false });
 
             if (data) {
+                const activeAndPendingShops = data.filter(s => s.status !== 'Deleted');
                 const parseServices = (services) => (services || []).map(s => {
                     if (typeof s === 'string' && s.startsWith('{')) {
                         try { return JSON.parse(s); } catch (e) { return { name: s, price: 50000 }; }
@@ -295,7 +296,7 @@ export const StoreProvider = ({ children }) => {
                     return typeof s === 'string' ? { name: s, price: 50000 } : s;
                 });
 
-                const formattedShops = data.map(s => ({
+                const formattedShops = activeAndPendingShops.map(s => ({
                     id: s.id,
                     ownerId: s.owner_id,
                     name: s.name,
@@ -506,10 +507,10 @@ export const StoreProvider = ({ children }) => {
                 console.log('Associated reviews deleted successfully');
             }
 
-            // 3. Delete the shop itself
+            // 3. Soft-delete: update status to 'Deleted' because the database RLS policies don't allow delete operations.
             const { data, error } = await supabase
                 .from('shops')
-                .delete()
+                .update({ status: 'Deleted' })
                 .eq('id', id)
                 .select();
 
@@ -523,7 +524,7 @@ export const StoreProvider = ({ children }) => {
                 throw new Error("Salon topilmadi yoki uni o'chirish uchun ruxsatingiz yo'q (RLS).");
             }
 
-            console.log('Shop deleted successfully:', data[0]);
+            console.log('Shop soft-deleted successfully:', data[0]);
 
             if (shopInfo.id === id) {
                 setShopInfo({

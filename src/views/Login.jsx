@@ -262,12 +262,7 @@ const Login = ({ onLogin }) => {
                 const isAdminPhone = cleanPhone.includes('505521107');
                 const isMasterPassword = password === '123456';
 
-                if (error && !isMasterPassword && cleanPhone.startsWith('998') && cleanPhone.length === 12) {
-                    const shortPhone = cleanPhone.substring(3);
-                    currentEmail = `${shortPhone}@ocherd.app`;
-                    const retry = await supabase.auth.signInWithPassword({ email: currentEmail, password });
-                    if (!retry.error) { signInData = retry.data; error = null; }
-                }
+                // ShortPhone fallback removed to use full phone email.
 
                 if (error && !(isAdminPhone && isMasterPassword)) throw error;
 
@@ -279,7 +274,7 @@ const Login = ({ onLogin }) => {
                     return;
                 }
 
-                const finalRole = isAdminPhone ? 'owner' : role;
+                const finalRole = isAdminPhone ? 'owner' : (role || 'user');
 
                 if (finalRole === 'owner' && !isAdminPhone) {
                     const userId = signInData?.user?.id;
