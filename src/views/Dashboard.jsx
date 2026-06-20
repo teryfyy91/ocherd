@@ -737,19 +737,6 @@ const Dashboard = () => {
                                         Xarajat Qo'shish
                                     </h3>
 
-                                    {/* Category */}
-                                    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                                        {expenseCategories.map(cat => (
-                                            <button
-                                                key={cat}
-                                                onClick={() => setExpenseCategory(cat)}
-                                                className={`shrink-0 px-4 py-2 rounded-2xl text-[9px] font-bold uppercase tracking-wider transition-all ${expenseCategory === cat ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
-                                            >
-                                                {cat}
-                                            </button>
-                                        ))}
-                                    </div>
-
                                     {/* Name */}
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nomi</label>
