@@ -127,6 +127,194 @@ const SessionTimer = ({ bookingId, createdAt }) => {
     );
 };
 
+const ActiveStopwatch = ({ bookingId, createdAt }) => {
+    const [elapsed, setElapsed] = useState('00:00');
+
+    useEffect(() => {
+        const getStartTime = () => {
+            const stored = localStorage.getItem('booking_start_' + bookingId);
+            if (stored) return parseInt(stored);
+            if (createdAt) return new Date(createdAt).getTime();
+            return Date.now();
+        };
+
+        const startTime = getStartTime();
+
+        const updateTimer = () => {
+            const diffMs = Date.now() - startTime;
+            const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+            const hours = Math.floor(diffSec / 3600);
+            const minutes = Math.floor((diffSec % 3600) / 60);
+            const seconds = diffSec % 60;
+
+            const pad = (num) => num.toString().padStart(2, '0');
+
+            if (hours > 0) {
+                setElapsed(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`);
+            } else {
+                setElapsed(`${pad(minutes)}:${pad(seconds)}`);
+            }
+        };
+
+        updateTimer();
+        const timerId = setInterval(updateTimer, 1000);
+        return () => clearInterval(timerId);
+    }, [bookingId, createdAt]);
+
+    return (
+        <span className="text-3xl font-black font-mono tracking-wider text-white">
+            {elapsed}
+        </span>
+    );
+};
+
+const ActiveStopwatchMini = ({ bookingId, createdAt }) => {
+    const [elapsed, setElapsed] = useState('00:00');
+
+    useEffect(() => {
+        const getStartTime = () => {
+            const stored = localStorage.getItem('booking_start_' + bookingId);
+            if (stored) return parseInt(stored);
+            if (createdAt) return new Date(createdAt).getTime();
+            return Date.now();
+        };
+
+        const startTime = getStartTime();
+
+        const updateTimer = () => {
+            const diffMs = Date.now() - startTime;
+            const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+            const hours = Math.floor(diffSec / 3600);
+            const minutes = Math.floor((diffSec % 3600) / 60);
+            const seconds = diffSec % 60;
+
+            const pad = (num) => num.toString().padStart(2, '0');
+
+            if (hours > 0) {
+                setElapsed(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`);
+            } else {
+                setElapsed(`${pad(minutes)}:${pad(seconds)}`);
+            }
+        };
+
+        updateTimer();
+        const timerId = setInterval(updateTimer, 1000);
+        return () => clearInterval(timerId);
+    }, [bookingId, createdAt]);
+
+    return (
+        <span className="text-xs font-black font-mono tracking-widest text-emerald-400">
+            {elapsed}
+        </span>
+    );
+};
+
+const ActiveSessionWidget = ({ queue, handleUpdateStatus, isTimerMinimized, setIsTimerMinimized }) => {
+    const activeSessions = React.useMemo(() => queue.filter(q => q.status === 'In progress'), [queue]);
+
+    if (activeSessions.length === 0) return null;
+
+    const currentSession = activeSessions[0];
+
+    return (
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] z-[1100] px-6 pb-6 pointer-events-none">
+            <AnimatePresence mode="wait">
+                {!isTimerMinimized ? (
+                    <motion.div 
+                        key="maximized"
+                        initial={{ y: 100, opacity: 0 }} 
+                        animate={{ y: 0, opacity: 1 }} 
+                        exit={{ y: 100, opacity: 0 }}
+                        className="bg-slate-900 text-white rounded-[3.5rem] p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-slate-800/80 relative overflow-hidden pointer-events-auto"
+                    >
+                        {/* Glowing backgrounds */}
+                        <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/15 rounded-full blur-3xl animate-pulse" />
+                        <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
+
+                        {/* Header with Minimize */}
+                        <div className="flex justify-between items-center mb-8 relative z-10">
+                            <div className="flex items-center gap-2">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-400">Jonli Seans</span>
+                            </div>
+                            <button 
+                                onClick={() => setIsTimerMinimized(true)}
+                                className="text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-white bg-slate-800/50 px-4 py-2 rounded-full transition-all"
+                            >
+                                Kichiklashtirish
+                            </button>
+                        </div>
+
+                        {/* Customer Info */}
+                        <div className="text-center mb-8 relative z-10">
+                            <h3 className="text-2xl font-black uppercase italic tracking-tight text-white mb-2 leading-none">
+                                {currentSession.name}
+                            </h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-800/40 py-2 px-4 rounded-full inline-block mt-2">
+                                {currentSession.service}
+                            </p>
+                        </div>
+
+                        {/* Large Beautiful Stopwatch */}
+                        <div className="flex flex-col items-center justify-center py-6 mb-8 relative z-10">
+                            <div className="relative w-44 h-44 rounded-full border-4 border-slate-800 flex items-center justify-center bg-slate-950/40 shadow-inner">
+                                {/* Animated spinning outline indicator */}
+                                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" style={{ animationDuration: '3s' }} />
+                                
+                                <div className="text-center">
+                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.25em] block mb-1">O'tgan vaqt</span>
+                                    <ActiveStopwatch bookingId={currentSession.id} createdAt={currentSession.createdAt} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <button
+                            onClick={() => handleUpdateStatus(currentSession.id, 'Done')}
+                            className="w-full h-18 bg-emerald-500 hover:bg-emerald-600 text-white rounded-[2.2rem] font-bold text-xs uppercase tracking-[0.25em] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.3)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 relative z-10"
+                        >
+                            <Check size={20} strokeWidth={3} />
+                            Tugatish (Sochni oldim)
+                        </button>
+                    </motion.div>
+                ) : (
+                    /* Minimized state */
+                    <motion.div
+                        key="minimized"
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 50, opacity: 0 }}
+                        onClick={() => setIsTimerMinimized(false)}
+                        className="bg-slate-900 text-white rounded-[2rem] px-6 py-4 shadow-2xl border border-slate-800 flex items-center justify-between cursor-pointer hover:border-primary/40 active:scale-98 transition-all pointer-events-auto"
+                    >
+                        <div className="flex items-center gap-3">
+                            <span className="relative flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </span>
+                            <div className="flex flex-col text-left">
+                                <span className="text-[10px] font-black uppercase text-white truncate max-w-[150px] leading-tight">
+                                    {currentSession.name}
+                                </span>
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-0.5">
+                                    {currentSession.service}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl">
+                            <ActiveStopwatchMini bookingId={currentSession.id} createdAt={currentSession.createdAt} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
 const Dashboard = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -138,6 +326,7 @@ const Dashboard = () => {
     } = useStore();
 
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'manage'
+    const [isTimerMinimized, setIsTimerMinimized] = useState(false);
     const [managementTab, setManagementTab] = useState('queue');
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState(shopInfo || {});
@@ -155,6 +344,7 @@ const Dashboard = () => {
     const handleUpdateStatus = async (id, status) => {
         if (status === 'In progress') {
             localStorage.setItem('booking_start_' + id, Date.now().toString());
+            setIsTimerMinimized(false);
         } else if (status === 'Done') {
             localStorage.removeItem('booking_start_' + id);
         }
@@ -553,13 +743,15 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setShowWalkInModal(true)}
-                                    className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/30 transition-all shadow-lg hover:scale-105 active:scale-95 animate-fade-in"
-                                    title="Walk-in qabul"
-                                >
-                                    <Plus size={20} />
-                                </button>
+                                {shopInfo.id && (
+                                    <button
+                                        onClick={() => setShowWalkInModal(true)}
+                                        className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/30 transition-all shadow-lg hover:scale-105 active:scale-95 animate-fade-in"
+                                        title="Walk-in qabul"
+                                    >
+                                        <Plus size={20} />
+                                    </button>
+                                )}
                                 <button onClick={() => setManagementTab('settings')} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/30 transition-all">
                                     <Settings size={20} />
                                 </button>
@@ -1183,6 +1375,12 @@ const Dashboard = () => {
                                                     status: 'In progress'
                                                 };
 
+                                                if (!shopInfo.id || !myShops.find(s => s.id === shopInfo.id)) {
+                                                    alert("Iltimos, avval salonni ro'yxatdan tanlang.");
+                                                    setShowWalkInModal(false);
+                                                    return;
+                                                }
+
                                                 setIsSubmitting(true);
                                                 const res = await addBooking(walkInBooking);
                                                 setIsSubmitting(false);
@@ -1190,6 +1388,7 @@ const Dashboard = () => {
                                                 if (res.success && res.id) {
                                                     localStorage.setItem('booking_start_' + res.id, Date.now().toString());
                                                     setShowWalkInModal(false);
+                                                    setIsTimerMinimized(false);
                                                     setWalkInName('Mijoz');
                                                     setSelectedService(null);
                                                     setIsCustomService(false);
@@ -1212,7 +1411,6 @@ const Dashboard = () => {
                                             )}
                                         </button>
                                     </div>
-                                </div>
                                 </div>
                             </motion.div>
                         </div>
@@ -1291,6 +1489,14 @@ const Dashboard = () => {
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {/* ACTIVE SESSION STOPWATCH WIDGET */}
+                <ActiveSessionWidget
+                    queue={queue}
+                    handleUpdateStatus={handleUpdateStatus}
+                    isTimerMinimized={isTimerMinimized}
+                    setIsTimerMinimized={setIsTimerMinimized}
+                />
             </div>
         </div>
     );

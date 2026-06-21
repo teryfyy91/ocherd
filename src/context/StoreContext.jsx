@@ -239,6 +239,10 @@ export const StoreProvider = ({ children }) => {
                 if (hasGalleryChanged || hasServicesChanged || hasNameChanged || hasImageChanged) {
                     setShopInfo(prev => ({ ...prev, ...freshShop }));
                 }
+            } else {
+                // shopInfo.id is stale (shop deleted or never in DB) — clear it
+                console.warn('shopInfo.id not found in allShops — clearing stale shopInfo');
+                setShopInfo({ name: '', services: [], workingHours: { start: '09:00', end: '18:00' } });
             }
         }
     }, [allShops, shopInfo.id]);
